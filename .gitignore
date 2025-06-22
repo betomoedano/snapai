@@ -92,14 +92,18 @@ temp/
 
 # Runtime configuration (contains sensitive data)
 config/
-.iconiq/
+.snapai/
 
 # Test outputs
 test-output/
 assets/
+
+# Generated images - exclude all first, then include test icons
 *.png
 *.jpg
 *.jpeg
+!test-icons/
+!test-icons/*.png
 
 # Package manager lock files (keep pnpm-lock.yaml)
 package-lock.json
