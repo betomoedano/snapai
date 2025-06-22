@@ -1,0 +1,80 @@
+{
+  "name": "iconiq",
+  "version": "0.1.0",
+  "description": "AI-powered icon generation CLI for mobile app developers",
+  "main": "dist/index.js",
+  "type": "module",
+  "bin": {
+    "iconiq": "./bin/run.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "bundle": "webpack --config webpack.config.js",
+    "prepare-publish": "pnpm run build && pnpm run bundle",
+    "publish-package": "pnpm run prepare-publish && pnpm publish",
+    "dev": "./bin/dev.js",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf dist bundle"
+  },
+  "keywords": [
+    "icon",
+    "app-icon",
+    "ai",
+    "cli",
+    "mobile",
+    "expo",
+    "react-native",
+    "dall-e"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "private": false,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@oclif/core": "^4.0.0",
+    "@oclif/plugin-help": "^6.0.0",
+    "openai": "^4.20.1",
+    "fs-extra": "^11.1.1",
+    "chalk": "^5.3.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.8.0",
+    "@types/node-fetch": "^3.0.3",
+    "@typescript-eslint/eslint-plugin": "^6.7.0",
+    "@typescript-eslint/parser": "^6.7.0",
+    "eslint": "^8.50.0",
+    "jest": "^29.7.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-obfuscator": "^3.5.1",
+    "javascript-obfuscator": "^4.0.2"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "README.md"
+  ],
+  "oclif": {
+    "bin": "iconiq",
+    "dirname": "iconiq",
+    "commands": "./dist/commands",
+    "plugins": [
+      "@oclif/plugin-help"
+    ],
+    "topicSeparator": " ",
+    "additionalHelpFlags": [
+      "-h"
+    ],
+    "additionalVersionFlags": [
+      "-v"
+    ]
+  },
+  "packageManager": "pnpm@9.13.2+sha512.88c9c3864450350e65a33587ab801acf946d7c814ed1134da4a924f6df5a2120fd36b46aab68f7cd1d413149112d53c7db3a4136624cfd00ff1846a0c6cef48a"
+}
