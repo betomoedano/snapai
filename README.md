@@ -14,20 +14,37 @@ npx iconiq
 ```
 
 ### Local Development Setup
-If you're developing locally, create an alias for easy testing:
 
+#### Quick Setup
 ```bash
-# In your shell profile (.zshrc, .bashrc, etc.)
-alias iconiq-dev="/Users/beto/Desktop/apps/iconiq/bin/dev.js"
-
-# Or create a symlink
-ln -sf /Users/beto/Desktop/apps/iconiq/bin/dev.js /usr/local/bin/iconiq-dev
-
-# After building the project
 cd /Users/beto/Desktop/apps/iconiq
 pnpm install
 pnpm run build
-iconiq-dev --help
+
+# Create alias for easy testing
+alias iconiq-dev="/Users/beto/Desktop/apps/iconiq/bin/dev.js"
+```
+
+#### Development with Hot Reload
+For active development with automatic recompilation:
+
+```bash
+# Terminal 1: Start TypeScript compiler in watch mode
+pnpm run dev
+
+# Terminal 2: Test your changes (auto-rebuilds on save)
+./bin/dev.js --help
+./bin/dev.js icon --prompt "test icon"
+
+# Or use the dev wrapper (same as above but shorter)
+./dev-cli.js --help
+./dev-cli.js icon --prompt "test icon"
+```
+
+#### One-off Testing
+```bash
+# Build and test immediately
+pnpm run build && ./bin/dev.js --help
 ```
 
 ### Setup

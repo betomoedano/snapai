@@ -47,21 +47,25 @@ iconiq --help
 ```bash
 cd /Users/beto/Desktop/apps/iconiq
 pnpm install
-```
-
-### 2. Development Mode (with hot reload)
-```bash
-pnpm run dev icon --help
-# or with alias
-iconiq-dev icon --help
-```
-
-### 3. Test Compiled Version
-```bash
 pnpm run build
-node dist/index.js --help
-# or with alias
-iconiq-build --help
+```
+
+### 2. Development Mode with Hot Reload
+```bash
+# Terminal 1: Start TypeScript compiler in watch mode
+pnpm run dev
+
+# Terminal 2: Test your changes (rebuilds automatically on save)
+./bin/dev.js icon --prompt "test icon"
+./bin/dev.js config --show
+
+# Or use the dev wrapper
+./dev-cli.js icon --prompt "test icon"
+```
+
+### 3. Quick Test (One-off)
+```bash
+pnpm run build && ./bin/dev.js --help
 ```
 
 ### 4. Test Bundled/Obfuscated Version

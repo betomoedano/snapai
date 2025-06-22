@@ -25,11 +25,11 @@ export default class IconCommand extends Command {
       description: 'Output directory for generated icon',
       default: './assets',
     }),
-    size: Flags.integer({
+    size: Flags.string({
       char: 's',
-      description: 'Icon size in pixels',
-      default: 1024,
-      options: ['256', '512', '1024'],
+      description: 'Icon size',
+      default: '1024x1024',
+      options: ['1024x1024', '1536x1024', '1024x1536'],
     }),
     quality: Flags.string({
       char: 'q',
@@ -60,15 +60,15 @@ export default class IconCommand extends Command {
       this.log(chalk.gray(`Prompt: ${flags.prompt}`));
 
       // Generate icon using OpenAI
-      const imageUrl = await OpenAIService.generateIcon({
+      const imageBase64 = await OpenAIService.generateIcon({
         prompt: flags.prompt,
         output: flags.output,
         size: flags.size,
         quality: flags.quality as 'standard' | 'hd',
       });
 
-      // Download and save the image
-      const outputPath = await this.downloadAndSaveImage(imageUrl, flags.output);
+      // Save the base64 image
+      const outputPath = await this.saveBase64Image(imageBase64, flags.output);
 
       this.log(chalk.green('✅ Icon generated successfully!'));
       this.log(chalk.gray(`Saved to: ${outputPath}`));
@@ -103,23 +103,17 @@ export default class IconCommand extends Command {
     }
   }
 
-  private async downloadAndSaveImage(url: string, outputDir: string): Promise<string> {
-    const { default: fetch } = await import('node-fetch');
+  private async saveBase64Image(base64Data: string, outputDir: string): Promise<string> {
     const filename = `icon-${Date.now()}.png`;
     const outputPath = path.join(outputDir, filename);
     
     await fs.ensureDir(outputDir);
     
     try {
-      this.log(chalk.gray('📥 Downloading image...'));
-      const response = await fetch(url);
+      this.log(chalk.gray('💾 Saving image...'));
       
-      if (!response.ok) {
-        throw new Error(`Failed to download image: ${response.statusText}`);
-      }
-      
-      const arrayBuffer = await response.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      // Convert base64 to buffer
+      const buffer = Buffer.from(base64Data, 'base64');
       await fs.writeFile(outputPath, buffer);
       
       return outputPath;

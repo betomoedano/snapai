@@ -20,8 +20,10 @@ export interface ConfigData {
 export interface IconGenerationOptions {
   prompt: string;
   output?: string;
-  size?: number;
+  size?: string;
   quality?: 'standard' | 'hd';
+  background?: 'transparent' | 'opaque' | 'auto';
+  outputFormat?: 'png' | 'jpeg' | 'webp';
 }
 
 export interface OpenAIResponse {

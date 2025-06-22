@@ -19,24 +19,26 @@ export class OpenAIService {
 
   static async generateIcon(options: IconGenerationOptions): Promise<string> {
     const client = await this.getClient();
-    const { prompt, size = 1024, quality = "standard" } = options;
+    const { prompt, size = "1024x1024", quality = "standard" } = options;
 
-    // Enhanced prompt for iOS app icons
-    const enhancedPrompt = `Create a ${size} × ${size} px square iOS app-icon illustration: ${prompt}. Use crisp, minimal design with vibrant colors. Add subtle depth with inner bevel effects but no hard shadows or outlines. Center the design with comfortable breathing room from edges. Solid, light-neutral background. No text, borders, or extraneous details. Final look should be clean, vibrant, and Apple-polished. Use the full image size for the icon, don't draw it inside the image, don't add borders - rounded corners will be applied by the platform.`;
+    // Enhanced prompt for iOS app icons with key elements for optimal generation
+    const enhancedPrompt = `Create a ${size} px iOS app-icon illustration: ${prompt}. Use crisp, minimal design with vibrant colors. Add a subtle inner bevel for gentle depth; no hard shadows or outlines. Center the design with comfortable breathing room from the edges. Solid, light-neutral background. No text, borders, or extraneous details. Final look: clean, vibrant, and Apple-polished. Use the full image size for the icon, don't draw it inside the image, don't add borders, the rounded corners would be applied by the platform, so don't add them.`;
 
     const response = await client.images.generate({
-      model: "dall-e-3",
+      model: "gpt-image-1",
       prompt: enhancedPrompt,
       n: 1,
-      size: `${size}x${size}` as any,
-      quality: quality,
-      response_format: "url",
+      size: size as any,
+      quality: quality === "standard" ? "medium" : "high",
+      background: "opaque",
+      output_format: "png",
+      moderation: "auto",
     });
 
-    if (!response.data?.[0]?.url) {
+    if (!response.data?.[0]?.b64_json) {
       throw new Error("Failed to generate image");
     }
 
-    return response.data[0].url;
+    return response.data[0].b64_json;
   }
 }
