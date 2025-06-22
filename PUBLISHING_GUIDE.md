@@ -3,6 +3,7 @@
 ## Pre-Publishing Checklist
 
 ### 1. Code Quality Check
+
 ```bash
 # Lint and type check
 pnpm run lint
@@ -16,7 +17,9 @@ pnpm run build
 ```
 
 ### 2. Version Management
+
 Update version in `package.json` following semantic versioning:
+
 - **Patch** (0.1.0 → 0.1.1): Bug fixes
 - **Minor** (0.1.0 → 0.2.0): New features, backward compatible
 - **Major** (0.1.0 → 1.0.0): Breaking changes
@@ -24,11 +27,12 @@ Update version in `package.json` following semantic versioning:
 ```bash
 # Update version (choose one)
 npm version patch   # 0.1.0 → 0.1.1
-npm version minor   # 0.1.0 → 0.2.0  
+npm version minor   # 0.1.0 → 0.2.0
 npm version major   # 0.1.0 → 1.0.0
 ```
 
 ### 3. Build for Production
+
 ```bash
 # Clean previous builds
 pnpm run clean
@@ -48,10 +52,12 @@ node bundle/snapai.js --help
 ### Initial NPM Setup (First Time Only)
 
 1. **Create NPM Account**
+
    - Visit https://www.npmjs.com/signup
    - Verify email address
 
 2. **Login to NPM**
+
    ```bash
    npm login
    # Enter username, password, email, and 2FA if enabled
@@ -97,17 +103,19 @@ pnpm run publish-package
 ### Post-Publishing Verification
 
 1. **Check NPM Registry**
+
    ```bash
    npm view snapai
    npm view snapai versions --json
    ```
 
 2. **Test Installation**
+
    ```bash
    # In a different directory
    cd /tmp
    npx snapai@latest --help
-   
+
    # Or install globally
    npm install -g snapai@latest
    snapai --help
@@ -152,6 +160,7 @@ npm publish
 ### 3. Update Documentation
 
 Update README.md with:
+
 - New features
 - Breaking changes
 - Migration guide (if needed)
@@ -159,6 +168,7 @@ Update README.md with:
 ## File Structure for Publishing
 
 ### What Gets Published (via .npmignore)
+
 ```
 snapai/
 ├── bundle/
@@ -172,6 +182,7 @@ snapai/
 ```
 
 ### What Stays Private (excluded by .npmignore)
+
 ```
 snapai/
 ├── src/                    # Source TypeScript code
@@ -188,26 +199,30 @@ snapai/
 ### Common Publishing Issues
 
 1. **Authentication Errors**
+
    ```bash
    npm logout
    npm login
    ```
 
 2. **Version Already Exists**
+
    ```bash
    npm version patch  # Bump version first
    npm publish
    ```
 
 3. **Package Name Taken**
+
    - Change name in package.json
    - Consider scoped package: `@username/snapai`
 
 4. **Bundle Size Too Large**
+
    ```bash
    # Check bundle size
    ls -lh bundle/snapai.js
-   
+
    # Optimize webpack config if needed
    ```
 
@@ -229,10 +244,12 @@ npx snapai --help
 ## Monitoring After Publishing
 
 ### 1. NPM Statistics
+
 - Check download stats: https://www.npmjs.com/package/snapai
 - Monitor issues and feedback
 
 ### 2. Version Management
+
 ```bash
 # List all published versions
 npm view snapai versions --json
@@ -242,6 +259,7 @@ npm view snapai version
 ```
 
 ### 3. Deprecating Old Versions (if needed)
+
 ```bash
 # Deprecate a specific version
 npm deprecate snapai@0.1.0 "Please upgrade to latest version"
@@ -250,16 +268,19 @@ npm deprecate snapai@0.1.0 "Please upgrade to latest version"
 ## Security Considerations
 
 ### 1. API Key Protection
+
 - Never commit API keys to repository
 - Users provide their own OpenAI keys
 - No server-side key storage
 
 ### 2. Source Code Protection
+
 - Source code stays in private repository
 - Only obfuscated bundle published to NPM
 - Use .npmignore to exclude sensitive files
 
 ### 3. Dependency Security
+
 ```bash
 # Check for vulnerabilities
 npm audit
@@ -271,6 +292,7 @@ npm audit fix
 ## Release Strategy
 
 ### 1. Release Channels
+
 - **Latest**: Stable releases (default)
 - **Beta**: Pre-release testing
 - **Alpha**: Early development
@@ -284,11 +306,14 @@ npm install snapai@beta
 ```
 
 ### 2. Semantic Versioning
+
 - **0.x.x**: Pre-1.0, breaking changes allowed in minor versions
 - **1.x.x**: Stable API, breaking changes only in major versions
 
 ### 3. Release Notes
+
 Create release notes for each version:
+
 - New features
 - Bug fixes
 - Breaking changes
