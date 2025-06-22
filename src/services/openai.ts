@@ -19,12 +19,18 @@ export class OpenAIService {
 
   static async generateIcon(options: IconGenerationOptions): Promise<string> {
     const client = await this.getClient();
-    const { prompt, size = "1024x1024", quality = "standard", rawPrompt = false } = options;
+    const {
+      prompt,
+      size = "1024x1024",
+      quality = "standard",
+      rawPrompt = false,
+    } = options;
 
     // Use either raw prompt or enhanced prompt for iOS app icons
-    const finalPrompt = rawPrompt 
-      ? prompt 
-      : `Create a full-bleed ${size} px iOS app icon: ${prompt}. IMPORTANT: Fill the entire canvas edge-to-edge with the design - no white background, no padding, no margins. The background color should extend to all four corners of the image. Design elements should be centered with appropriate spacing from edges but the background must cover 100% of the canvas. Use vibrant, solid background colors that fill the entire space. Add subtle depth with inner highlights, avoid hard shadows. Clean, minimal, Apple-style design. No borders, frames, or rounded corners - the platform handles that.`;
+    const finalPrompt = rawPrompt
+      ? prompt
+      : // : `Create a ${size} px iOS app-icon illustration: ${prompt}. Use crisp, minimal design with vibrant colors. Add a subtle inner bevel for gentle depth; no hard shadows or outlines. Center the design with comfortable breathing room from the edges. Solid, light-neutral background. No text, borders, or extraneous details. Final look: clean, vibrant, and Apple-polished. Use the full image size for the icon, don't draw it inside the image, don't add borders, the rounded corners would be applied by the platform, so don't add them.`;
+        `Create a full-bleed ${size} px iOS app icon: ${prompt}.Use crisp, minimal design with vibrant colors. Add a subtle inner bevel for gentle depth; no hard shadows or outlines. Center the design with comfortable breathing room from the edges. Solid, light-neutral background. IMPORTANT: Fill the entire canvas edge-to-edge with the design, no padding, no margins. Design elements should be centered with appropriate spacing from edges but the background must cover 100% of the canvas. Add subtle depth with inner highlights, avoid hard shadows. Clean, minimal, Apple-style design. No borders, frames, or rounded corners.`;
 
     const response = await client.images.generate({
       model: "gpt-image-1",
