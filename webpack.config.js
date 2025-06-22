@@ -25,7 +25,6 @@ export default {
     'openai': 'openai',
     'fs-extra': 'fs-extra',
     'chalk': 'chalk',
-    'node-fetch': 'node-fetch',
     'fs': 'fs',
     'path': 'path',
     'os': 'os'
