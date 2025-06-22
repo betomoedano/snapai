@@ -4,7 +4,7 @@ import os from 'os';
 import { ConfigData } from '../types.js';
 
 export class ConfigService {
-  private static configPath = path.join(os.homedir(), '.iconiq', 'config.json');
+  private static configPath = path.join(os.homedir(), '.snapai', 'config.json');
 
   static async getConfig(): Promise<ConfigData> {
     try {

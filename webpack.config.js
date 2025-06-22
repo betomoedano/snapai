@@ -1,16 +1,23 @@
-const path = require('path');
-const JavaScriptObfuscator = require('webpack-obfuscator');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import JavaScriptObfuscator from 'webpack-obfuscator';
 
-module.exports = {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default {
   entry: './dist/index.js',
   target: 'node',
   mode: 'production',
   output: {
     path: path.resolve(__dirname, 'bundle'),
-    filename: 'iconiq.js',
+    filename: 'snapai.js',
     library: {
-      type: 'commonjs2'
+      type: 'module'
     }
+  },
+  experiments: {
+    outputModule: true
   },
   externals: {
     // Keep these as external dependencies
@@ -19,7 +26,7 @@ module.exports = {
     'openai': 'openai',
     'fs-extra': 'fs-extra',
     'chalk': 'chalk',
-    'inquirer': 'inquirer',
+    'node-fetch': 'node-fetch',
     'fs': 'fs',
     'path': 'path',
     'os': 'os'

@@ -1,18 +1,21 @@
 {
-  "name": "iconiq",
+  "name": "snapai",
   "version": "0.1.0",
   "description": "AI-powered icon generation CLI for mobile app developers",
-  "main": "dist/index.js",
+  "main": "bundle/snapai.js",
   "type": "module",
   "bin": {
-    "iconiq": "./bin/run.js"
+    "snapai": "./bin/snapai"
   },
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
     "bundle": "webpack --config webpack.config.js",
     "prepare-publish": "pnpm run build && pnpm run bundle",
-    "publish-package": "pnpm run prepare-publish && pnpm publish",
+    "publish-package": "./scripts/publish.sh",
+    "version:patch": "./scripts/update-version.sh patch",
+    "version:minor": "./scripts/update-version.sh minor",
+    "version:major": "./scripts/update-version.sh major",
     "dev": "tsc --watch",
     "dev:cmd": "./dev-cli.js",
     "test": "jest",
@@ -29,7 +32,18 @@
     "react-native",
     "dall-e"
   ],
-  "author": "Beto Moedano",
+  "author": {
+    "name": "Beto Moedano",
+    "email": "beto@example.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/betomoedano/snapai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/betomoedano/snapai/issues"
+  },
+  "homepage": "https://github.com/betomoedano/snapai#readme",
   "license": "MIT",
   "private": false,
   "engines": {
@@ -61,13 +75,14 @@
     "javascript-obfuscator": "^4.0.2"
   },
   "files": [
-    "dist",
-    "bin",
-    "README.md"
+    "bundle/snapai.js",
+    "bin/snapai",
+    "README.md",
+    "LICENSE"
   ],
   "oclif": {
-    "bin": "iconiq",
-    "dirname": "iconiq",
+    "bin": "snapai",
+    "dirname": "snapai",
     "commands": "./dist/commands",
     "plugins": [
       "@oclif/plugin-help"

@@ -2,7 +2,7 @@ import { TelemetryData } from '../types.js';
 import { ConfigService } from './config.js';
 
 export class TelemetryService {
-  private static ENDPOINT = 'https://api.iconiq-analytics.com/v1/track';
+  private static ENDPOINT = 'https://api.snapai-analytics.com/v1/track';
 
   static async track(data: TelemetryData): Promise<void> {
     // Only track if user hasn't opted out
@@ -15,7 +15,7 @@ export class TelemetryService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': `iconiq-cli/${data.version}`
+          'User-Agent': `snapai-cli/${data.version}`
         },
         body: JSON.stringify(data)
       });

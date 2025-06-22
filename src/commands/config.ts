@@ -4,7 +4,7 @@ import { ConfigService } from '../services/config.js';
 import { ValidationService } from '../utils/validation.js';
 
 export default class ConfigCommand extends Command {
-  static description = 'Manage Iconiq configuration';
+  static description = 'Manage SnapAI configuration';
 
   static examples = [
     '<%= config.bin %> <%= command.id %> --api-key sk-your-openai-key',
@@ -80,7 +80,7 @@ export default class ConfigCommand extends Command {
       this.log(`🔑 OpenAI API Key: ${chalk.green(maskedKey)}`);
     } else {
       this.log(`🔑 OpenAI API Key: ${chalk.red('Not configured')}`);
-      this.log(chalk.gray('   Set with: iconiq config --api-key YOUR_KEY'));
+      this.log(chalk.gray('   Set with: snapai config --api-key YOUR_KEY'));
     }
     
     const telemetryStatus = config.telemetry_enabled ? 'Enabled' : 'Disabled';
@@ -102,11 +102,11 @@ export default class ConfigCommand extends Command {
     this.log(`📊 Telemetry is ${color(status)}`);
     
     if (enabled) {
-      this.log(chalk.gray('Anonymous usage data helps improve Iconiq.'));
-      this.log(chalk.gray('To disable: iconiq config --telemetry false'));
+      this.log(chalk.gray('Anonymous usage data helps improve SnapAI.'));
+      this.log(chalk.gray('To disable: snapai config --telemetry false'));
     } else {
       this.log(chalk.gray('No usage data is collected.'));
-      this.log(chalk.gray('To enable: iconiq config --telemetry true'));
+      this.log(chalk.gray('To enable: snapai config --telemetry true'));
     }
   }
 }

@@ -8,7 +8,7 @@ export class OpenAIService {
 
     if (!apiKey) {
       throw new Error(
-        "OpenAI API key not configured. Run: iconiq config --api-key YOUR_KEY"
+        "OpenAI API key not configured. Run: snapai config --api-key YOUR_KEY"
       );
     }
 
