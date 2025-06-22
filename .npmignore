@@ -40,6 +40,9 @@ tsconfig.json
 !bundle/
 !bin/
 !src/
+!test-icons/
 !package.json
 !README.md
 !LICENSE
+!CONTRIBUTING.md
+!CHANGELOG.md

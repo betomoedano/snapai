@@ -1,122 +1,183 @@
-# SnapAI - AI Icon Generation CLI
+# SnapAI ⚡
 
-Generate beautiful app icons using AI, perfect for mobile developers using Expo and React Native.
+> AI-powered icon generation for React Native & Expo developers
 
-## Quick Start
+Create stunning app icons in seconds using OpenAI's latest image generation models. Perfect for developers who want professional icons without the design hassle! 🎨
+
+## ✨ Features
+
+🚀 **Lightning Fast** - Generate icons in seconds, not hours  
+🎯 **iOS Optimized** - Perfect for App Store requirements  
+🛡️ **Privacy First** - Zero data collection, API keys stay local  
+📱 **Multiple Sizes** - Square, landscape, and portrait formats  
+💎 **HD Quality** - Crystal clear icons for any device  
+🔧 **Developer Friendly** - Simple CLI, perfect for CI/CD
+
+## 🚀 Quick Start
 
 ### Installation
+
 ```bash
+# Install globally
 npm install -g snapai
-# or
-pnpm install -g snapai
-# or
+
+# Or use directly (no installation)
 npx snapai
 ```
 
-### Local Development Setup
+> [!IMPORTANT]  
+> You'll need an OpenAI API key to generate icons. Get one at [platform.openai.com](https://platform.openai.com) - it costs ~$0.04 per icon!
 
-#### Quick Setup
-```bash
-cd /Users/beto/Desktop/apps/iconiq
-pnpm install
-pnpm run build
+### Setup Your API Key
 
-# Create alias for easy testing
-alias snapai-dev="/Users/beto/Desktop/apps/iconiq/bin/dev.js"
-```
-
-#### Development with Hot Reload
-For active development with automatic recompilation:
-
-```bash
-# Terminal 1: Start TypeScript compiler in watch mode
-pnpm run dev
-
-# Terminal 2: Test your changes (auto-rebuilds on save)
-./bin/dev.js --help
-./bin/dev.js icon --prompt "test icon"
-
-# Or use the dev wrapper (same as above but shorter)
-./dev-cli.js --help
-./dev-cli.js icon --prompt "test icon"
-```
-
-#### One-off Testing
-```bash
-# Build and test immediately
-pnpm run build && ./bin/dev.js --help
-```
-
-### Setup
-Add your OpenAI API key (required):
 ```bash
 snapai config --api-key sk-your-openai-api-key-here
 ```
 
-### Generate Icons
+### Generate Your First Icon! 🎉
+
 ```bash
-# Generate an iOS app icon
-snapai icon --prompt "minimalist calculator app icon"
+snapai icon --prompt "minimalist weather app with sun and cloud"
+```
+
+## 🎨 See It In Action
+
+**Real icons generated with SnapAI:**
+
+| Prompt                                                                               | Result                                                | Command                                                   |
+| ------------------------------------------------------------------------------------ | ----------------------------------------------------- | --------------------------------------------------------- |
+| `minimalist calculator app icon`                                                     | ![Calculator Icon](test-icons/icon-1750560478398.png) | `snapai icon --prompt "minimalist calculator app icon"`   |
+| `glass-like color-wheel flower made of eight evenly spaced, semi-transparent petals` | ![Flower Icon](test-icons/icon-1750560657796.png)     | `snapai icon --prompt "glass-like color-wheel flower..."` |
+
+## 🎨 Amazing Example Prompts
+
+Try these proven prompts that create stunning icons:
+
+```bash
+# Glass-like design (trending!)
+snapai icon --prompt "glass-like color-wheel flower made of eight evenly spaced, semi-transparent petals forming a perfect circle"
+
+# Minimalist apps
+snapai icon --prompt "minimalist calculator app with clean geometric numbers and soft gradients"
+snapai icon --prompt "fitness tracker app with stylized running figure using vibrant gradient colors"
+
+# Creative concepts
+snapai icon --prompt "weather app with glass-like sun and translucent cloud elements"
+snapai icon --prompt "music player app with abstract sound waves in soft pastel hues"
+snapai icon --prompt "banking app with secure lock symbol and professional gradients"
+```
+
+> [!TIP]
+> Use descriptive words like "glass-like", "minimalist", "vibrant gradients", and "soft pastel hues" for better results!
+
+## 🛠️ Command Reference
+
+### Generate Icons
+
+```bash
+# Basic usage
+snapai icon --prompt "your amazing icon idea"
 
 # Custom output directory
-snapai icon --prompt "fitness tracker app" --output ./assets/icons
+snapai icon --prompt "fitness app" --output ./assets/icons
+
+# High quality (costs 2x but worth it!)
+snapai icon --prompt "premium app icon" --quality hd
+
+# Different sizes
+snapai icon --prompt "landscape banner" --size 1536x1024
+snapai icon --prompt "portrait icon" --size 1024x1536
 ```
 
-## Commands
+### Configuration
 
-### `snapai config`
-Manage configuration settings:
 ```bash
-snapai config --api-key YOUR_KEY    # Set OpenAI API key
-snapai config --show               # Show current settings
+snapai config --show              # Check your setup
+snapai config --api-key YOUR_KEY  # Set/update API key
 ```
 
-### `snapai icon`
-Generate app icons:
+> [!NOTE]  
+> Icons are saved as PNG files with timestamps. Perfect for version control!
+
+## 🔐 Privacy & Security
+
+**Your data stays yours** 🛡️
+
+- ✅ **Zero tracking** - We collect absolutely nothing
+- ✅ **Local storage** - API keys never leave your machine
+- ✅ **No telemetry** - No analytics, no phone-home
+- ✅ **Open source** - Inspect every line of code
+- ✅ **No accounts** - Just install and use
+
+> [!WARNING]  
+> Keep your OpenAI API key secure! Never commit it to version control or share it publicly.
+
+## 💰 Pricing
+
+**SnapAI is 100% free!** You only pay OpenAI for generation:
+
+| Quality  | Size      | Price  | Best For              |
+| -------- | --------- | ------ | --------------------- |
+| Standard | 1024x1024 | ~$0.04 | Testing, iterations   |
+| HD       | 1024x1024 | ~$0.08 | Production, App Store |
+
+> [!TIP]
+> Start with standard quality for testing, then use HD for your final icons!
+
+## 🚀 Advanced Usage
+
+### CI/CD Integration
+
 ```bash
-snapai icon --prompt "your icon description"
-snapai icon --prompt "..." --output ./custom/path
-snapai icon --help                 # Show all options
+# Perfect for automation
+npx snapai icon --prompt "$(cat icon-prompt.txt)" --output ./dist/icons
 ```
 
-## Requirements
+### Batch Generation
 
-- Node.js 18+
-- OpenAI API key (get one at [platform.openai.com](https://platform.openai.com))
-
-## Pricing
-
-SnapAI is free to use - you only pay OpenAI for API usage:
-- ~$0.04 per 1024x1024 icon (standard quality)
-- ~$0.08 per 1024x1024 icon (HD quality)
-
-## Privacy
-
-SnapAI is completely privacy-focused:
-- ✅ No data collection or tracking
-- ✅ API keys stored locally only
-- ✅ No telemetry or analytics
-- ✅ Fully open source
-
-## Support
-
-- 🐛 Report issues: [GitHub Issues](https://github.com/betomoedano/snapai/issues)
-- 📖 Documentation: [snapai.dev](https://snapai.dev)
-- 💬 Community: [Discord](https://discord.gg/snapai)
-
-## Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-
-### Quick Start for Contributors
 ```bash
+# Generate multiple variations
+snapai icon --prompt "app icon variant 1" --output ./icons
+snapai icon --prompt "app icon variant 2" --output ./icons
+snapai icon --prompt "app icon variant 3" --output ./icons
+```
+
+## 🛠️ For Developers
+
+Need help setting up for development? Check out our detailed guides:
+
+- 📚 [Development Setup](DEV_SETUP.md) - Local development workflow
+- 📦 [Publishing Guide](PUBLISHING_GUIDE.md) - For maintainers
+
+```bash
+# Quick dev setup
 git clone https://github.com/betomoedano/snapai.git
-cd snapai
-pnpm install
-pnpm run build
+cd snapai && pnpm install && pnpm run build
 ./bin/dev.js --help
 ```
 
-## License
+## 📚 Learn More
 
-MIT - see [LICENSE](LICENSE) file for details.
+**Want to master React Native & Expo development?** 🚀
+
+Visit [**Code with Beto**](https://codewithbeto.dev) for premium courses:
+
+- 📱 **React Native with Expo** - Build real-world apps
+- ⚡ **React with TypeScript** - Type-safe development
+- 🔧 **GitHub Mastery** - Professional workflows
+- 🔥 **LiveStore Course** _(Coming Soon)_ - Local-first apps
+
+_Build the skills that top developers use in production!_ ✨
+
+## 🤝 Contributing
+
+Love SnapAI? Help make it even better!
+
+- 🐛 [Report bugs](https://github.com/betomoedano/snapai/issues)
+- 💡 [Suggest features](https://github.com/betomoedano/snapai/issues)
+- 📝 [Improve docs](CONTRIBUTING.md)
+- 🔧 [Submit code](CONTRIBUTING.md)
+
+## 📄 License
+
+MIT License - build amazing things! 🎉

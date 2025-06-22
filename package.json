@@ -69,8 +69,12 @@
   "files": [
     "bundle/snapai.js",
     "bin/snapai",
+    "src",
+    "test-icons",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "CHANGELOG.md"
   ],
   "oclif": {
     "bin": "snapai",
