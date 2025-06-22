@@ -48,6 +48,11 @@ snapai icon --prompt "minimalist weather app with sun and cloud"
 | ------------------------------------------------------------------------------------ | ----------------------------------------------------- | --------------------------------------------------------- |
 | `minimalist calculator app icon`                                                     | ![Calculator Icon](test-icons/icon-1750603172468.png) | `snapai icon --prompt "minimalist calculator app icon"`   |
 | `glass-like color-wheel flower made of eight evenly spaced, semi-transparent petals` | ![Flower Icon](test-icons/icon-1750560657796.png)     | `snapai icon --prompt "glass-like color-wheel flower..."` |
+| `glass-like sound wave pattern made of five curved, semi-transparent layers flowing in perfect harmony` | ![Sound Wave Icon](test-icons/icon-sound-wave.png) | `snapai icon --prompt "glass-like sound wave pattern..."` |
+| `glass-like speech bubble composed of three overlapping, semi-transparent rounded rectangles with soft gradients` | ![Messaging Icon](test-icons/icon-messaging.png) | `snapai icon --prompt "glass-like speech bubble..."` |
+| `glass-like camera aperture made of six triangular, semi-transparent blades forming a perfect hexagonal opening` | ![Camera Glass Icon](test-icons/icon-camera-glass.png) | `snapai icon --prompt "glass-like camera aperture..."` |
+| `stylized camera lens with concentric circles in warm sunset colors orange pink and coral gradients` | ![Camera Retro Icon](test-icons/icon-lens-retro.png) | `snapai icon --prompt "stylized camera lens with concentric circles..."` |
+| `neon-outlined calculator with electric blue glowing numbers` | ![Neon Calculator Icon](test-icons/icon-calculator-neon.png) | `snapai icon --prompt "neon-outlined calculator with electric blue glowing numbers"` |
 
 ## 🎨 Amazing Example Prompts
 
