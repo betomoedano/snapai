@@ -46,7 +46,7 @@ snapai icon --prompt "minimalist weather app with sun and cloud"
 
 | Prompt                                                                               | Result                                                | Command                                                   |
 | ------------------------------------------------------------------------------------ | ----------------------------------------------------- | --------------------------------------------------------- |
-| `minimalist calculator app icon`                                                     | ![Calculator Icon](test-icons/icon-1750560478398.png) | `snapai icon --prompt "minimalist calculator app icon"`   |
+| `minimalist calculator app icon`                                                     | ![Calculator Icon](test-icons/icon-1750603172468.png) | `snapai icon --prompt "minimalist calculator app icon"`   |
 | `glass-like color-wheel flower made of eight evenly spaced, semi-transparent petals` | ![Flower Icon](test-icons/icon-1750560657796.png)     | `snapai icon --prompt "glass-like color-wheel flower..."` |
 
 ## 🎨 Amazing Example Prompts

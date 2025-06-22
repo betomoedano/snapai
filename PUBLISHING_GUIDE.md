@@ -1,4 +1,4 @@
-# Publishing Guide for Iconiq
+# Publishing Guide for SnapAI
 
 ## Pre-Publishing Checklist
 
@@ -40,7 +40,7 @@ pnpm run build
 pnpm run bundle
 
 # Test bundled version
-node bundle/iconiq.js --help
+node bundle/snapai.js --help
 ```
 
 ## Publishing Process
@@ -77,13 +77,13 @@ npm pack --dry-run
 
 # 3. Review package contents
 npm pack
-tar -tzf iconiq-*.tgz
-rm iconiq-*.tgz
+tar -tzf snapai-*.tgz
+rm snapai-*.tgz
 
 # 4. Publish to NPM
 npm publish
 
-# For scoped packages (if using @username/iconiq):
+# For scoped packages (if using @username/snapai):
 # npm publish --access public
 ```
 
@@ -98,25 +98,25 @@ pnpm run publish-package
 
 1. **Check NPM Registry**
    ```bash
-   npm view iconiq
-   npm view iconiq versions --json
+   npm view snapai
+   npm view snapai versions --json
    ```
 
 2. **Test Installation**
    ```bash
    # In a different directory
    cd /tmp
-   npx iconiq@latest --help
+   npx snapai@latest --help
    
    # Or install globally
-   npm install -g iconiq@latest
-   iconiq --help
+   npm install -g snapai@latest
+   snapai --help
    ```
 
 3. **Verify Package Contents**
    ```bash
-   npm pack iconiq@latest
-   tar -tzf iconiq-*.tgz
+   npm pack snapai@latest
+   tar -tzf snapai-*.tgz
    ```
 
 ## Updating and Re-Publishing
@@ -160,9 +160,9 @@ Update README.md with:
 
 ### What Gets Published (via .npmignore)
 ```
-iconiq/
+snapai/
 ├── bundle/
-│   └── iconiq.js           # Obfuscated bundle (main executable)
+│   └── snapai.js           # Obfuscated bundle (main executable)
 ├── bin/
 │   ├── dev.js              # Development binary
 │   └── run.js              # Production binary
@@ -173,7 +173,7 @@ iconiq/
 
 ### What Stays Private (excluded by .npmignore)
 ```
-iconiq/
+snapai/
 ├── src/                    # Source TypeScript code
 ├── dist/                   # Compiled JavaScript
 ├── *.md (except README)    # Internal documentation
@@ -201,12 +201,12 @@ iconiq/
 
 3. **Package Name Taken**
    - Change name in package.json
-   - Consider scoped package: `@username/iconiq`
+   - Consider scoped package: `@username/snapai`
 
 4. **Bundle Size Too Large**
    ```bash
    # Check bundle size
-   ls -lh bundle/iconiq.js
+   ls -lh bundle/snapai.js
    
    # Optimize webpack config if needed
    ```
@@ -216,35 +216,35 @@ iconiq/
 ```bash
 # 1. Test in isolated environment
 cd /tmp
-mkdir test-iconiq
-cd test-iconiq
+mkdir test-snapai
+cd test-snapai
 
 # 2. Install from local package
-npm install /Users/beto/Desktop/apps/iconiq
+npm install /Users/beto/Desktop/apps/snapai
 
 # 3. Test installation
-npx iconiq --help
+npx snapai --help
 ```
 
 ## Monitoring After Publishing
 
 ### 1. NPM Statistics
-- Check download stats: https://www.npmjs.com/package/iconiq
+- Check download stats: https://www.npmjs.com/package/snapai
 - Monitor issues and feedback
 
 ### 2. Version Management
 ```bash
 # List all published versions
-npm view iconiq versions --json
+npm view snapai versions --json
 
 # Check latest version
-npm view iconiq version
+npm view snapai version
 ```
 
 ### 3. Deprecating Old Versions (if needed)
 ```bash
 # Deprecate a specific version
-npm deprecate iconiq@0.1.0 "Please upgrade to latest version"
+npm deprecate snapai@0.1.0 "Please upgrade to latest version"
 ```
 
 ## Security Considerations
@@ -280,7 +280,7 @@ npm audit fix
 npm publish --tag beta
 
 # Install beta version
-npm install iconiq@beta
+npm install snapai@beta
 ```
 
 ### 2. Semantic Versioning
