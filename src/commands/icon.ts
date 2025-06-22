@@ -78,6 +78,8 @@ export default class IconCommand extends Command {
 
       this.log(chalk.green('✅ Icon generated successfully!'));
       this.log(chalk.gray(`Saved to: ${outputPath}`));
+      this.log('');
+      this.log(chalk.dim('Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence'));
 
     } catch (error) {
       this.error(chalk.red(`Failed to generate icon: ${(error as Error).message}`));
