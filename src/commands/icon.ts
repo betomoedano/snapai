@@ -11,6 +11,7 @@ export default class IconCommand extends Command {
   static examples = [
     '<%= config.bin %> <%= command.id %> --prompt "minimalist calculator app icon"',
     '<%= config.bin %> <%= command.id %> --prompt "fitness tracker" --output ./assets/icons',
+    '<%= config.bin %> <%= command.id %> --prompt "a blue circle with white text" --raw-prompt',
   ];
 
   static flags = {
@@ -36,6 +37,10 @@ export default class IconCommand extends Command {
       default: 'standard',
       options: ['standard', 'hd'],
     }),
+    'raw-prompt': Flags.boolean({
+      description: 'Use the exact prompt without enhancement for iOS app icons',
+      default: false,
+    }),
   };
 
   public async run(): Promise<void> {
@@ -55,6 +60,9 @@ export default class IconCommand extends Command {
 
       this.log(chalk.blue('🎨 Generating your app icon...'));
       this.log(chalk.gray(`Prompt: ${flags.prompt}`));
+      if (flags['raw-prompt']) {
+        this.log(chalk.yellow('⚠️  Using raw prompt (no iOS enhancement)'));
+      }
 
       // Generate icon using OpenAI
       const imageBase64 = await OpenAIService.generateIcon({
@@ -62,6 +70,7 @@ export default class IconCommand extends Command {
         output: flags.output,
         size: flags.size,
         quality: flags.quality as 'standard' | 'hd',
+        rawPrompt: flags['raw-prompt'],
       });
 
       // Save the base64 image

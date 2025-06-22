@@ -19,14 +19,16 @@ export class OpenAIService {
 
   static async generateIcon(options: IconGenerationOptions): Promise<string> {
     const client = await this.getClient();
-    const { prompt, size = "1024x1024", quality = "standard" } = options;
+    const { prompt, size = "1024x1024", quality = "standard", rawPrompt = false } = options;
 
-    // Enhanced prompt for iOS app icons with key elements for optimal generation
-    const enhancedPrompt = `Create a ${size} px iOS app-icon illustration: ${prompt}. Use crisp, minimal design with vibrant colors. Add a subtle inner bevel for gentle depth; no hard shadows or outlines. Center the design with comfortable breathing room from the edges. Solid, light-neutral background. No text, borders, or extraneous details. Final look: clean, vibrant, and Apple-polished. Use the full image size for the icon, don't draw it inside the image, don't add borders, the rounded corners would be applied by the platform, so don't add them.`;
+    // Use either raw prompt or enhanced prompt for iOS app icons
+    const finalPrompt = rawPrompt 
+      ? prompt 
+      : `Create a ${size} px iOS app-icon illustration: ${prompt}. Use crisp, minimal design with vibrant colors. Add a subtle inner bevel for gentle depth; no hard shadows or outlines. Center the design with comfortable breathing room from the edges. Solid, light-neutral background. No text, borders, or extraneous details. Final look: clean, vibrant, and Apple-polished. Use the full image size for the icon, don't draw it inside the image, don't add borders, the rounded corners would be applied by the platform, so don't add them.`;
 
     const response = await client.images.generate({
       model: "gpt-image-1",
-      prompt: enhancedPrompt,
+      prompt: finalPrompt,
       n: 1,
       size: size as any,
       quality: quality === "standard" ? "medium" : "high",

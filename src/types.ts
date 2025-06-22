@@ -10,6 +10,7 @@ export interface IconGenerationOptions {
   quality?: 'standard' | 'hd';
   background?: 'transparent' | 'opaque' | 'auto';
   outputFormat?: 'png' | 'jpeg' | 'webp';
+  rawPrompt?: boolean;
 }
 
 export interface OpenAIResponse {
