@@ -10,14 +10,9 @@ export class ConfigService {
     try {
       await fs.ensureFile(this.configPath);
       const config = await fs.readJSON(this.configPath);
-      return {
-        telemetry_enabled: true,
-        ...config
-      };
+      return config;
     } catch {
-      return {
-        telemetry_enabled: true
-      };
+      return {};
     }
   }
 

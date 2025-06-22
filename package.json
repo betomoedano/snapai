@@ -1,6 +1,6 @@
 {
   "name": "snapai",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "AI-powered icon generation CLI for mobile app developers",
   "main": "bundle/snapai.js",
   "type": "module",
@@ -12,10 +12,6 @@
     "build:watch": "tsc --watch",
     "bundle": "webpack --config webpack.config.js",
     "prepare-publish": "pnpm run build && pnpm run bundle",
-    "publish-package": "./scripts/publish.sh",
-    "version:patch": "./scripts/update-version.sh patch",
-    "version:minor": "./scripts/update-version.sh minor",
-    "version:major": "./scripts/update-version.sh major",
     "dev": "tsc --watch",
     "dev:cmd": "./dev-cli.js",
     "test": "jest",
@@ -63,16 +59,12 @@
     "@types/node-fetch": "^3.0.3",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
-    "concurrently": "^8.2.2",
     "eslint": "^8.50.0",
     "jest": "^29.7.0",
-    "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2",
     "webpack": "^5.88.0",
-    "webpack-cli": "^5.1.4",
-    "webpack-obfuscator": "^3.5.1",
-    "javascript-obfuscator": "^4.0.2"
+    "webpack-cli": "^5.1.4"
   },
   "files": [
     "bundle/snapai.js",

@@ -1,6 +1,5 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import JavaScriptObfuscator from 'webpack-obfuscator';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,19 +30,6 @@ export default {
     'path': 'path',
     'os': 'os'
   },
-  plugins: [
-    new JavaScriptObfuscator({
-      rotateStringArray: true,
-      stringArray: true,
-      stringArrayEncoding: ['base64'],
-      stringArrayThreshold: 0.8,
-      transformObjectKeys: true,
-      unicodeEscapeSequence: false,
-      identifierNamesGenerator: 'hexadecimal',
-      deadCodeInjection: true,
-      deadCodeInjectionThreshold: 0.4
-    }, [])
-  ],
   resolve: {
     extensions: ['.js']
   }

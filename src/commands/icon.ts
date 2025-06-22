@@ -3,7 +3,6 @@ import fs from 'fs-extra';
 import path from 'path';
 import chalk from 'chalk';
 import { OpenAIService } from '../services/openai.js';
-import { TelemetryService } from '../services/telemetry.js';
 import { ValidationService } from '../utils/validation.js';
 
 export default class IconCommand extends Command {
@@ -41,8 +40,6 @@ export default class IconCommand extends Command {
 
   public async run(): Promise<void> {
     const { flags } = await this.parse(IconCommand);
-    const startTime = Date.now();
-    const sessionId = TelemetryService.generateSessionId();
 
     try {
       // Validate inputs
@@ -73,32 +70,7 @@ export default class IconCommand extends Command {
       this.log(chalk.green('✅ Icon generated successfully!'));
       this.log(chalk.gray(`Saved to: ${outputPath}`));
 
-      // Track successful generation
-      await TelemetryService.track({
-        session_id: sessionId,
-        command: 'icon',
-        success: true,
-        timestamp: Date.now(),
-        version: this.config.version,
-        execution_time: Date.now() - startTime,
-        prompt_length: flags.prompt.length,
-        output_format: 'png',
-        model_used: 'dall-e-3',
-      });
-
     } catch (error) {
-      // Track failed generation
-      await TelemetryService.track({
-        session_id: sessionId,
-        command: 'icon',
-        success: false,
-        timestamp: Date.now(),
-        version: this.config.version,
-        execution_time: Date.now() - startTime,
-        error_type: this.categorizeError(error),
-        prompt_length: flags.prompt?.length || 0,
-      });
-
       this.error(chalk.red(`Failed to generate icon: ${(error as Error).message}`));
     }
   }
@@ -122,10 +94,4 @@ export default class IconCommand extends Command {
     }
   }
 
-  private categorizeError(error: any): string {
-    if (error.message?.includes('API key')) return 'auth_error';
-    if (error.message?.includes('quota')) return 'quota_error';
-    if (error.message?.includes('network')) return 'network_error';
-    return 'unknown_error';
-  }
 }

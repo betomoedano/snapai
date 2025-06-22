@@ -69,7 +69,6 @@ Manage configuration settings:
 ```bash
 snapai config --api-key YOUR_KEY    # Set OpenAI API key
 snapai config --show               # Show current settings
-snapai config --telemetry false    # Disable usage tracking
 ```
 
 ### `snapai icon`
@@ -93,11 +92,11 @@ SnapAI is free to use - you only pay OpenAI for API usage:
 
 ## Privacy
 
-SnapAI collects anonymous usage statistics to improve the tool. No personal data, API keys, or prompt content is collected. You can opt out anytime:
-
-```bash
-snapai config --telemetry false
-```
+SnapAI is completely privacy-focused:
+- ✅ No data collection or tracking
+- ✅ API keys stored locally only
+- ✅ No telemetry or analytics
+- ✅ Fully open source
 
 ## Support
 
@@ -107,11 +106,16 @@ snapai config --telemetry false
 
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+### Quick Start for Contributors
+```bash
+git clone https://github.com/betomoedano/snapai.git
+cd snapai
+pnpm install
+pnpm run build
+./bin/dev.js --help
+```
 
 ## License
 

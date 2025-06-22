@@ -1,10 +1,3 @@
-# Source code (keep private)
-src/
-*.ts
-tsconfig.json
-webpack.config.js
-pnpm-workspace.yaml
-
 # Development files
 .env*
 .vscode/
@@ -13,12 +6,15 @@ node_modules/
 coverage/
 .nyc_output/
 
-# Documentation and planning (keep private)
+# Documentation and planning
 docs/
 PROJECT_PLAN.md
 npm-publishing-strategy.md
 telemetry-plan.md
 folder-structure.md
+IMPLEMENTATION_SUMMARY.md
+PUBLISHING_GUIDE.md
+DEV_SETUP.md
 
 # Test files
 test/
@@ -27,7 +23,7 @@ tests/
 *.test.ts
 jest.config.js
 
-# Build artifacts (exclude source builds)
+# Build artifacts
 dist/
 
 # Git and CI
@@ -35,9 +31,15 @@ dist/
 .github/
 .gitignore
 
-# Only publish bundled code and essentials
+# Development tools
+dev-cli.js
+webpack.config.js
+tsconfig.json
+
+# Only publish essential files
 !bundle/
 !bin/
+!src/
 !package.json
 !README.md
 !LICENSE
