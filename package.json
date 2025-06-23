@@ -1,8 +1,8 @@
 {
   "name": "snapai",
-  "version": "0.3.2",
+  "version": "0.3.5",
   "description": "AI-powered icon generation CLI for mobile app developers",
-  "main": "bundle/snapai.js",
+  "main": "dist/index.js",
   "type": "module",
   "bin": {
     "snapai": "./bin/snapai"
@@ -65,7 +65,7 @@
     "webpack-cli": "^5.1.4"
   },
   "files": [
-    "bundle/snapai.js",
+    "dist",
     "bin/snapai",
     "README.md",
     "LICENSE"
