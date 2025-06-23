@@ -1,6 +1,6 @@
 {
   "name": "snapai",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "AI-powered icon generation CLI for mobile app developers",
   "main": "bundle/snapai.js",
   "type": "module",
