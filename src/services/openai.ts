@@ -5,6 +5,7 @@ import { IconGenerationOptions, OpenAIResponse } from "../types.js";
 export class OpenAIService {
   private static async getClient(): Promise<OpenAI> {
     const apiKey = await ConfigService.get("openai_api_key");
+    const baseUrl = await ConfigService.get("openai_base_url");
 
     if (!apiKey) {
       throw new Error(
@@ -14,6 +15,7 @@ export class OpenAIService {
 
     return new OpenAI({
       apiKey: apiKey,
+			baseURL: baseUrl
     });
   }
 

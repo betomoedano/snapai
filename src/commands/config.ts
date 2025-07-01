@@ -15,6 +15,9 @@ export default class ConfigCommand extends Command {
     'api-key': Flags.string({
       description: 'Set OpenAI API key',
     }),
+    'base-url': Flags.string({
+      description: 'Set OpenAI Base URL',
+    }),
     show: Flags.boolean({
       description: 'Show current configuration',
     }),
@@ -25,6 +28,10 @@ export default class ConfigCommand extends Command {
 
     if (flags['api-key']) {
       await this.setApiKey(flags['api-key']);
+    }
+
+    if (flags['base-url']) {
+      await this.setBaseUrl(flags['base-url']);
     }
 
     if (flags.show) {
@@ -49,6 +56,19 @@ export default class ConfigCommand extends Command {
     this.log(chalk.dim('Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence'));
   }
 
+
+  private async setBaseUrl(baseUrl: string): Promise<void> {
+    const error = ValidationService.validateBaseUrl(baseUrl);
+    if (error) {
+      this.error(chalk.red(error));
+    }
+
+    await ConfigService.set('openai_base_url', baseUrl);
+    this.log(chalk.green('✅ OpenAI Base URL configured successfully!'));
+    this.log('');
+    this.log(chalk.dim('Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence'));
+  }
+
   private async showConfig(): Promise<void> {
     const config = await ConfigService.getConfig();
     
@@ -61,6 +81,10 @@ export default class ConfigCommand extends Command {
     } else {
       this.log(`🔑 OpenAI API Key: ${chalk.red('Not configured')}`);
       this.log(chalk.gray('   Set with: snapai config --api-key YOUR_KEY'));
+    }
+
+    if (config.openai_base_url) {
+      this.log(`🔗 OpenAI Base URL: ${chalk.blue(config.openai_base_url)}`);
     }
     
     if (config.default_output_path) {
