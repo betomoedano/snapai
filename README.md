@@ -15,6 +15,8 @@ Create stunning app icons in seconds using OpenAI's latest image generation mode
 
 ## 🚀 Quick Start
 
+🎥 [Watch the video tutorial](https://youtu.be/PwZ7mEuHt84)
+
 ### Installation
 
 ```bash
