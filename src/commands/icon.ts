@@ -114,6 +114,13 @@ export default class IconCommand extends Command {
       }
 
       this.log(chalk.blue("🎨 Generating your app icon..."));
+      this.log("");
+      this.log(
+        chalk.dim(
+          "Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence"
+        )
+      );
+      this.log("");
       this.log(chalk.gray(`Prompt: ${flags.prompt}`));
       if (flags["raw-prompt"]) {
         this.log(chalk.yellow("⚠️  Using raw prompt (no iOS enhancement)"));
@@ -155,12 +162,6 @@ export default class IconCommand extends Command {
           this.log(chalk.gray(`  ${index + 1}. ${path}`));
         });
       }
-      this.log("");
-      this.log(
-        chalk.dim(
-          "Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence"
-        )
-      );
     } catch (error) {
       this.error(
         chalk.red(`Failed to generate icon: ${(error as Error).message}`)
