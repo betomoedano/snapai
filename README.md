@@ -13,9 +13,11 @@ Create stunning app icons in seconds using OpenAI's latest image generation mode
 💎 **HD Quality** - Crystal clear icons for any device  
 🔧 **Developer Friendly** - Simple CLI, perfect for CI/CD
 
-## 🚀 Quick Start
+## 🚀 Full Video Tutorial
 
-🎥 [Watch the video tutorial](https://youtu.be/PwZ7mEuHt84)
+<a href="https://youtu.be/R4hvt8iz_rE">
+  <img src="https://i.ytimg.com/vi_webp/R4hvt8iz_rE/maxresdefault.webp" height="380" alt="YouTube Video Preview">
+</a>
 
 ### Installation
 
