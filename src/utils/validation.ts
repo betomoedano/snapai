@@ -19,6 +19,14 @@ export class ValidationService {
     return null;
   }
 
+  static validateBaseUrl(baseUrl: string): string | null {
+    if (!baseUrl || !baseUrl.startsWith('https://')) {
+      return 'Invalid OpenAI URL format';
+    }
+    
+    return null;
+  }
+
   static validateOutputPath(outputPath: string): string | null {
     if (!outputPath || outputPath.trim().length === 0) {
       return 'Output path cannot be empty';
