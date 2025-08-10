@@ -67,6 +67,7 @@ export class OpenAIService {
     } else if (model === "dall-e-3") {
       requestParams.quality = quality === "hd" ? "hd" : "standard";
       requestParams.n = 1; // dall-e-3 only supports n=1
+      requestParams.response_format = "b64_json"; // Request base64 data for dall-e-3
     } else if (model === "dall-e-2") {
       // dall-e-2 only supports standard quality
       requestParams.quality = "standard";
