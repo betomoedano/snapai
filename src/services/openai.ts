@@ -68,8 +68,8 @@ export class OpenAIService {
       requestParams.quality = quality === "hd" ? "hd" : "standard";
       requestParams.n = 1; // dall-e-3 only supports n=1
     } else if (model === "dall-e-2") {
-      // dall-e-2 only supports standard quality
-      requestParams.quality = "standard";
+      requestParams.response_format = "b64_json";
+      delete requestParams.quality;
     }
 
     const response = await client.images.generate(requestParams);
@@ -119,6 +119,7 @@ export class OpenAIService {
     };
 
     if (
+      model !== "dall-e-2" && // Skip validation for dall-e-2 since API does not support quality property
       !validQualities[model as keyof typeof validQualities]?.includes(quality)
     ) {
       throw new Error(
