@@ -2,7 +2,7 @@
 
 All notable changes to SnapAI will be documented in this file.
 
-## [0.5.0] - 2025-07-05
+## [0.4.1] - 2025-09-13
 
 #### Improvements
 
@@ -15,6 +15,8 @@ All notable changes to SnapAI will be documented in this file.
   - Added validation to reject any quality parameter for DALL-E 2
   - Ensured quality parameter is never sent in DALL-E 2 API requests
   - Fixed TypeScript typing issues in parameter validation
+- **Possible fix for #11**:
+  - Possible fix for unsupported esm url issue on windows (need to confirm with windows users)
 
 ## [0.4.0] - 2025-07-05
 
