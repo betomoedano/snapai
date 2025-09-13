@@ -14,6 +14,8 @@ export interface IconGenerationOptions {
   numImages?: number;
   moderation?: 'low' | 'auto';
   rawPrompt?: boolean;
+  style?: 'minimalism' | 'glassy' | 'woven' | 'geometric' | 'neon' | 'gradient' | 'flat' | 'material' | 'ios-classic' | 'android-material' | 'pixel' | 'game' | 'clay' | 'holographic';
+  
 }
 
 export interface OpenAIResponse {

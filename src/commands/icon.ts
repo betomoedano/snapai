@@ -4,6 +4,7 @@ import path from "path";
 import chalk from "chalk";
 import { OpenAIService } from "../services/openai.js";
 import { ValidationService } from "../utils/validation.js";
+import { StyleTemplates } from "../utils/styleTemplates.js";
 
 export default class IconCommand extends Command {
   static description =
@@ -22,6 +23,11 @@ export default class IconCommand extends Command {
     '<%= config.bin %> <%= command.id %> --prompt "logo" --background transparent --output-format png',
     '<%= config.bin %> <%= command.id %> --prompt "variations" --num-images 3 --model gpt-image-1',
     '<%= config.bin %> <%= command.id %> --prompt "custom design" --raw-prompt',
+    "",
+    // Style options
+    '<%= config.bin %> <%= command.id %> --prompt "calculator app" --style minimalism',
+    '<%= config.bin %> <%= command.id %> --prompt "music player" --style glassy',
+    '<%= config.bin %> <%= command.id %> --prompt "weather app" --style neon',
   ];
 
   static flags = {
@@ -96,6 +102,12 @@ export default class IconCommand extends Command {
       description: "Skip iOS-specific prompt enhancement",
       default: false,
     }),
+
+    // === Style Options ===
+    style: Flags.string({
+      description: "Icon style: minimalism, glassy, woven, geometric, neon, gradient, flat, material, ios-classic, android-material",
+      options: StyleTemplates.getAvailableStyles(),
+    }),
   };
 
   public async run(): Promise<void> {
@@ -122,8 +134,11 @@ export default class IconCommand extends Command {
       );
       this.log("");
       this.log(chalk.gray(`Prompt: ${flags.prompt}`));
+      if (flags.style) {
+        this.log(chalk.blue(`🎨 Style: ${flags.style} - ${StyleTemplates.getStyleDescription(flags.style as any)}`));
+      }
       if (flags["raw-prompt"]) {
-        this.log(chalk.yellow("⚠️  Using raw prompt (no iOS enhancement)"));
+        this.log(chalk.yellow("⚠️  Using raw prompt (no style enhancement)"));
       }
 
       // Generate icon using OpenAI
@@ -144,6 +159,7 @@ export default class IconCommand extends Command {
         numImages: flags["num-images"],
         moderation: flags.moderation as "low" | "auto",
         rawPrompt: flags["raw-prompt"],
+        style: flags.style as any,
       });
 
       // Save all generated images
