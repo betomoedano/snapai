@@ -83,6 +83,7 @@ snapai icon --prompt "banking app with secure lock symbol and professional gradi
 ### Generate Icons
 
 #### Basic Usage
+
 ```bash
 # Basic usage
 snapai icon --prompt "your amazing icon idea"
@@ -101,6 +102,7 @@ snapai icon --prompt "portrait icon" --size 1024x1536
 #### Advanced Options
 
 ##### Model Selection
+
 ```bash
 # Use GPT-Image-1 (default, best quality)
 snapai icon --prompt "modern app icon" --model gpt-image-1
@@ -113,6 +115,7 @@ snapai icon --prompt "simple app icon" --model dall-e-2
 ```
 
 ##### Multiple Images
+
 ```bash
 # Generate 3 variations (gpt-image-1 only)
 snapai icon --prompt "app icon" --num-images 3
@@ -122,6 +125,7 @@ snapai icon --prompt "logo design" --num-images 5 --quality high
 ```
 
 ##### Background & Format
+
 ```bash
 # Transparent background (gpt-image-1 only)
 snapai icon --prompt "logo" --background transparent --output-format png
@@ -132,6 +136,7 @@ snapai icon --prompt "photo" --output-format jpeg
 ```
 
 ##### Quality & Moderation
+
 ```bash
 # Ultra-high quality (gpt-image-1)
 snapai icon --prompt "professional icon" --quality high
@@ -142,64 +147,70 @@ snapai icon --prompt "edgy design" --moderation low
 
 #### All Available Flags
 
-| Flag | Short | Options | Default | Description |
-|------|-------|---------|---------|-------------|
-| `--prompt` | `-p` | text | *required* | Description of the icon to generate |
-| `--output` | `-o` | path | `./assets` | Output directory for generated icons |
-| `--model` | `-m` | `gpt-image-1`, `dall-e-3`, `dall-e-2` | `gpt-image-1` | AI model to use |
-| `--size` | `-s` | See sizes table below | `1024x1024` | Icon size (model-dependent) |
-| `--quality` | `-q` | See quality table below | `auto` | Image quality (model-dependent) |
-| `--background` | `-b` | `transparent`, `opaque`, `auto` | `auto` | Background type (gpt-image-1 only) |
-| `--output-format` | `-f` | `png`, `jpeg`, `webp` | `png` | Output format (gpt-image-1 only) |
-| `--num-images` | `-n` | 1-10 | `1` | Number of images (dall-e-3 max: 1) |
-| `--moderation` | | `low`, `auto` | `auto` | Content filtering (gpt-image-1 only) |
-| `--raw-prompt` | | boolean | `false` | Skip iOS enhancement |
+| Flag              | Short | Options                               | Default       | Description                          |
+| ----------------- | ----- | ------------------------------------- | ------------- | ------------------------------------ |
+| `--prompt`        | `-p`  | text                                  | _required_    | Description of the icon to generate  |
+| `--output`        | `-o`  | path                                  | `./assets`    | Output directory for generated icons |
+| `--model`         | `-m`  | `gpt-image-1`, `dall-e-3`, `dall-e-2` | `gpt-image-1` | AI model to use                      |
+| `--size`          | `-s`  | See sizes table below                 | `1024x1024`   | Icon size (model-dependent)          |
+| `--quality`       | `-q`  | See quality table below               | `auto`        | Image quality (model-dependent)      |
+| `--background`    | `-b`  | `transparent`, `opaque`, `auto`       | `auto`        | Background type (gpt-image-1 only)   |
+| `--output-format` | `-f`  | `png`, `jpeg`, `webp`                 | `png`         | Output format (gpt-image-1 only)     |
+| `--num-images`    | `-n`  | 1-10                                  | `1`           | Number of images (dall-e-3 max: 1)   |
+| `--moderation`    |       | `low`, `auto`                         | `auto`        | Content filtering (gpt-image-1 only) |
+| `--raw-prompt`    |       | boolean                               | `false`       | Skip iOS enhancement                 |
 
 #### Model Comparison
 
-| Feature | GPT-Image-1 | DALL-E 3 | DALL-E 2 |
-|---------|-------------|----------|----------|
-| **Quality** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
-| **Speed** | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Cost** | Medium | High | Low |
-| **Sizes** | 1024x1024, 1536x1024, 1024x1536, auto | 1024x1024, 1792x1024, 1024x1792 | 256x256, 512x512, 1024x1024 |
-| **Quality Options** | auto, high, medium, low | standard, hd | standard only |
-| **Multiple Images** | 1-10 | 1 only | 1-10 |
-| **Transparent BG** | ✅ | ❌ | ❌ |
-| **Format Options** | png, jpeg, webp | png only | png only |
+| Feature             | GPT-Image-1                           | DALL-E 3                        | DALL-E 2                    |
+| ------------------- | ------------------------------------- | ------------------------------- | --------------------------- |
+| **Quality**         | ⭐⭐⭐⭐⭐                            | ⭐⭐⭐⭐                        | ⭐⭐⭐                      |
+| **Speed**           | ⭐⭐⭐⭐                              | ⭐⭐⭐                          | ⭐⭐⭐⭐⭐                  |
+| **Cost**            | Medium                                | High                            | Low                         |
+| **Sizes**           | 1024x1024, 1536x1024, 1024x1536, auto | 1024x1024, 1792x1024, 1024x1792 | 256x256, 512x512, 1024x1024 |
+| **Quality Options** | auto, high, medium, low               | standard, hd                    | standard only               |
+| **Multiple Images** | 1-10                                  | 1 only                          | 1-10                        |
+| **Transparent BG**  | ✅                                    | ❌                              | ❌                          |
+| **Format Options**  | png, jpeg, webp                       | png only                        | png only                    |
 
 #### Size Guide
 
 **GPT-Image-1 & DALL-E 2:**
+
 - `1024x1024` - Square (perfect for app icons)
-- `1536x1024` - Landscape 
+- `1536x1024` - Landscape
 - `1024x1536` - Portrait
 - `auto` - Let AI decide best size (gpt-image-1 only)
 
 **DALL-E 3:**
+
 - `1024x1024` - Square
 - `1792x1024` - Wide landscape
 - `1024x1792` - Tall portrait
 
 **DALL-E 2:**
+
 - `256x256` - Small square
-- `512x512` - Medium square  
+- `512x512` - Medium square
 - `1024x1024` - Large square
 
 #### Quality Guide
 
 **GPT-Image-1:**
+
 - `auto` - AI optimizes quality vs speed
 - `high` - Maximum quality, slower
 - `medium` - Balanced quality and speed
 - `low` - Fast generation, lower quality
 
 **DALL-E 3:**
+
 - `standard` - Good quality, faster
 - `hd` - High definition, costs 2x more
 
 **DALL-E 2:**
-- `standard` - Only option available
+
+- API does not support quality option
 
 ### Configuration
 
@@ -230,14 +241,14 @@ snapai config --api-key YOUR_KEY  # Set/update API key
 
 ### Model Pricing
 
-| Model | Quality | Size | Price per Image | Best For |
-|-------|---------|------|-----------------|-----------|
-| **GPT-Image-1** | auto/medium | 1024x1024 | ~$0.04 | Balanced quality & cost |
-| **GPT-Image-1** | high | 1024x1024 | ~$0.08 | Professional icons |
-| **GPT-Image-1** | low | 1024x1024 | ~$0.02 | Quick iterations |
-| **DALL-E 3** | standard | 1024x1024 | ~$0.04 | Creative designs |
-| **DALL-E 3** | hd | 1024x1024 | ~$0.08 | High-detail artwork |
-| **DALL-E 2** | standard | 1024x1024 | ~$0.02 | Fast & economical |
+| Model           | Quality     | Size      | Price per Image | Best For                |
+| --------------- | ----------- | --------- | --------------- | ----------------------- |
+| **GPT-Image-1** | auto/medium | 1024x1024 | ~$0.04          | Balanced quality & cost |
+| **GPT-Image-1** | high        | 1024x1024 | ~$0.08          | Professional icons      |
+| **GPT-Image-1** | low         | 1024x1024 | ~$0.02          | Quick iterations        |
+| **DALL-E 3**    | standard    | 1024x1024 | ~$0.04          | Creative designs        |
+| **DALL-E 3**    | hd          | 1024x1024 | ~$0.08          | High-detail artwork     |
+| **DALL-E 2**    | standard    | 1024x1024 | ~$0.02          | Fast & economical       |
 
 ### Cost Optimization Tips
 
@@ -246,7 +257,7 @@ snapai config --api-key YOUR_KEY  # Set/update API key
 # 1. Start with DALL-E 2 for quick iterations
 snapai icon --prompt "app icon concept" --model dall-e-2
 
-# 2. Generate multiple variations with GPT-Image-1 
+# 2. Generate multiple variations with GPT-Image-1
 snapai icon --prompt "refined app icon" --model gpt-image-1 --num-images 3
 
 # 3. Final high-quality version with DALL-E 3

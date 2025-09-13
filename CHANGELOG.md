@@ -2,22 +2,40 @@
 
 All notable changes to SnapAI will be documented in this file.
 
+## [0.5.0] - 2025-07-05
+
+#### Improvements
+
+- **Enhanced DALL-E model response handling**:
+  - Added base64 response format (`b64_json`) for DALL-E models
+  - Improved image data handling for better reliability
+  - Ensures consistent response format across DALL-E 2 and DALL-E 3
+- **Fixed DALL-E 2 quality parameter handling**:
+  - Removed default "auto" quality assignment for DALL-E 2
+  - Added validation to reject any quality parameter for DALL-E 2
+  - Ensured quality parameter is never sent in DALL-E 2 API requests
+  - Fixed TypeScript typing issues in parameter validation
+
 ## [0.4.0] - 2025-07-05
 
 ### 🎨 Multi-Model Support & Advanced Features
 
 #### New Features
+
 - **Multi-Model Support**: Choose between GPT-Image-1, DALL-E 3, and DALL-E 2
+
   - `--model` flag to select AI model (default: gpt-image-1)
   - Model-specific parameter validation
   - Intelligent quality mapping per model
 
 - **Enhanced Size Options**: Expanded size support
+
   - Added 256x256, 512x512 for DALL-E 2
   - Added 1792x1024, 1024x1792 for DALL-E 3
   - Added 'auto' size option for GPT-Image-1
 
 - **Advanced Image Options**:
+
   - `--background`: Transparent/opaque backgrounds (GPT-Image-1 only)
   - `--output-format`: PNG, JPEG, WebP support (GPT-Image-1 only)
   - `--num-images`: Generate 1-10 variations in one command
@@ -29,12 +47,14 @@ All notable changes to SnapAI will be documented in this file.
   - Model-appropriate quality defaults
 
 #### Improvements
+
 - **Better CLI Help**: Reorganized help text with grouped flags and clearer descriptions
 - **Enhanced Documentation**: Comprehensive README with model comparison tables and cost guides
 - **Multiple Image Support**: Proper file naming when generating multiple images
 - **Improved UX**: Branding message now appears during generation (when users are waiting)
 
 #### Technical
+
 - Strong TypeScript interfaces for all new parameters
 - Model-specific parameter validation
 - Better error messages for invalid parameter combinations
