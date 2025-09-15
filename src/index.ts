@@ -13,10 +13,5 @@ process.on("warning", (warning) => {
 });
 
 import { execute } from "@oclif/core";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-await execute({ dir: dirname(__dirname) });
+await execute({ dir: import.meta.url });

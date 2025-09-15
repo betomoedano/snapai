@@ -197,6 +197,7 @@ snapai icon --prompt "edgy gaming app with dark theme and bold red accent colors
 | `--raw-prompt`    |       | boolean                               | `false`       | Skip iOS enhancement                 |
 | `--style`         |       | See style table below                 | _none_        | Icon design style                    |
 
+
 #### Model Comparison
 
 | Feature             | GPT-Image-1                           | DALL-E 3                        | DALL-E 2                    |
@@ -248,6 +249,7 @@ snapai icon --prompt "edgy gaming app with dark theme and bold red accent colors
 **DALL-E 2:**
 
 - `standard` - Only option available
+- API does not support quality option
 
 #### Style Guide
 
@@ -340,6 +342,9 @@ snapai icon --prompt "modern fitness app icon concept with dumbbell and clean de
 # 2. Test different styles with GPT-Image-1 (low cost)
 snapai icon --prompt "minimalist calculator app with clean white background and blue accents" --style minimalism --model gpt-image-1 --quality low
 snapai icon --prompt "premium calculator app with glass-like elements and translucent effects" --style glassy --model gpt-image-1 --quality low
+
+# 2.1 Generate multiple variations with GPT-Image-1
+snapai icon --prompt "refined app icon" --model gpt-image-1 --num-images 3
 
 # 3. Generate multiple variations with GPT-Image-1
 snapai icon --prompt "refined fitness app icon with dumbbell and energetic gradient design" --model gpt-image-1 --num-images 3 --style minimalism

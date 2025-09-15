@@ -40,6 +40,22 @@ All notable changes to SnapAI will be documented in this file.
 - TypeScript interfaces for style system
 - Style validation and description system
 
+## [0.4.1] - 2025-09-13
+
+#### Improvements
+
+- **Enhanced DALL-E model response handling**:
+  - Added base64 response format (`b64_json`) for DALL-E models
+  - Improved image data handling for better reliability
+  - Ensures consistent response format across DALL-E 2 and DALL-E 3
+- **Fixed DALL-E 2 quality parameter handling**:
+  - Removed default "auto" quality assignment for DALL-E 2
+  - Added validation to reject any quality parameter for DALL-E 2
+  - Ensured quality parameter is never sent in DALL-E 2 API requests
+  - Fixed TypeScript typing issues in parameter validation
+- **Possible fix for #11**:
+  - Possible fix for unsupported esm url issue on windows (need to confirm with windows users)
+
 ## [0.4.0] - 2025-07-05
 
 ### 🎨 Multi-Model Support & Advanced Features

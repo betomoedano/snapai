@@ -1,6 +1,6 @@
 {
   "name": "snapai",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "AI-powered icon generation CLI for mobile app developers",
   "main": "dist/index.js",
   "type": "module",
@@ -30,7 +30,7 @@
   ],
   "author": {
     "name": "Beto Moedano",
-    "email": "beto@example.com"
+    "email": "beto@codewithbeto.dev"
   },
   "repository": {
     "type": "git",

@@ -25,7 +25,7 @@ export class OpenAIService {
       prompt,
       model = "gpt-image-1",
       size = "1024x1024",
-      quality = "auto",
+      quality,
       background = "auto",
       outputFormat = "png",
       numImages = 1,
@@ -34,11 +34,14 @@ export class OpenAIService {
       style,
     } = options;
 
+    // Set default quality based on model
+    const defaultQuality = model === "dall-e-2" ? undefined : quality || "auto";
+
     // Validate model-specific parameters
     this.validateModelParameters(
       model,
       size,
-      quality,
+      defaultQuality,
       numImages,
       background,
       outputFormat,
@@ -69,17 +72,19 @@ export class OpenAIService {
     // Add model-specific parameters
     if (model === "gpt-image-1") {
       requestParams.quality = this.mapQualityForGptImage1(
-        quality
+        defaultQuality!
       ) as ImageGenerateParams["quality"];
       requestParams.background = background;
       requestParams.output_format = outputFormat;
       requestParams.moderation = moderation;
     } else if (model === "dall-e-3") {
-      requestParams.quality = quality === "hd" ? "hd" : "standard";
+      requestParams.quality = defaultQuality === "hd" ? "hd" : "standard";
+      requestParams.response_format = "b64_json";
       requestParams.n = 1; // dall-e-3 only supports n=1
     } else if (model === "dall-e-2") {
-      // dall-e-2 only supports standard quality
-      requestParams.quality = "standard";
+      // dall-e-2 does not allow quality parameter
+      requestParams.response_format = "b64_json";
+      // No quality parameter for dall-e-2
     }
 
     const response = await client.images.generate(requestParams);
@@ -100,7 +105,7 @@ export class OpenAIService {
   private static validateModelParameters(
     model: string,
     size: string,
-    quality: string,
+    quality: string | undefined,
     numImages: number,
     background: string,
     outputFormat: string,
@@ -122,18 +127,28 @@ export class OpenAIService {
     }
 
     // Validate quality based on model
-    const validQualities = {
-      "dall-e-2": ["standard"],
+    const validQualities: { [key: string]: string[] } = {
+      "dall-e-2": [], // no quality param is allowed for dall-e-2
       "dall-e-3": ["standard", "hd"],
       "gpt-image-1": ["auto", "high", "medium", "low"],
     };
 
+    // For dall-e-2, quality should be undefined
+    if (model === "dall-e-2" && quality !== undefined) {
+      throw new Error(
+        `Quality parameter is not supported for model "${model}"`
+      );
+    }
+
+    // For other models, validate the quality if provided
     if (
-      !validQualities[model as keyof typeof validQualities]?.includes(quality)
+      quality !== undefined &&
+      model !== "dall-e-2" &&
+      !validQualities[model]?.includes(quality)
     ) {
       throw new Error(
         `Invalid quality "${quality}" for model "${model}". Valid qualities: ${validQualities[
-          model as keyof typeof validQualities
+          model
         ]?.join(", ")}`
       );
     }
