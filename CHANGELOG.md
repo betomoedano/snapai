@@ -2,7 +2,7 @@
 
 All notable changes to SnapAI will be documented in this file.
 
-## [UNRELEASED] - 2025-09-15 🇲🇽
+## [0.5.0] - 2025-09-15 🇲🇽
 
 ### 🎨 Style System & Enhanced Prompts
 
