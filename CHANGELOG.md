@@ -2,6 +2,44 @@
 
 All notable changes to SnapAI will be documented in this file.
 
+## [UNRELEASED] - 2025-09-15 🇲🇽
+
+### 🎨 Style System & Enhanced Prompts
+
+#### New Features
+
+- **Style System**: 14 distinct visual styles for icon generation
+
+  - `--style` flag with options: minimalism, glassy, woven, geometric, neon, gradient, flat, material, ios-classic, android-material, pixel, game, clay, holographic
+  - Style-specific prompt enhancement for consistent visual identity
+  - Intelligent style descriptions and use case recommendations
+
+- **Enhanced Prompt Examples**: Comprehensive documentation improvements
+  - More descriptive and detailed prompt examples throughout documentation
+  - Style-specific examples in "See It In Action" section
+  - Professional workflow examples with style exploration
+  - Cost optimization tips including style testing
+
+#### Improvements
+
+- **Better Documentation**:
+
+  - Added comprehensive Style Guide with all 14 styles
+  - Enhanced command reference with style flag
+  - Updated all workflow examples with descriptive prompts
+  - Added style examples to CI/CD and batch generation sections
+
+- **Enhanced User Experience**:
+  - More descriptive prompts help users create better icons
+  - Style-specific examples show visual differences clearly
+  - Professional workflow includes style exploration phase
+
+#### Technical
+
+- Style templates with intelligent prompt enhancement
+- TypeScript interfaces for style system
+- Style validation and description system
+
 ## [0.4.1] - 2025-09-13
 
 #### Improvements
