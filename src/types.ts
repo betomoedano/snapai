@@ -1,5 +1,6 @@
 export interface ConfigData {
   openai_api_key?: string;
+  openai_base_url?: string;
   default_output_path?: string;
 }
 
