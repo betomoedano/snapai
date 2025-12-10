@@ -67,6 +67,9 @@ snapai icon --prompt "minimalist weather app with sun and cloud"
 
 ## 🎨 Amazing Example Prompts
 
+> [!NOTE]
+> Want to see how these prompts look with different styles? Add `--prompt-only` to any command below to preview for free!
+
 Try these proven prompts that create stunning icons:
 
 ```bash
@@ -93,6 +96,48 @@ snapai icon --prompt "modern Android app with Material Design floating action bu
 ## 🛠️ Command Reference
 
 ### Generate Icons
+
+#### Preview Prompts (No Generation)
+
+Use `--prompt-only` to see the final enhanced prompt that will be sent to the AI model without generating images. Perfect for:
+
+- Seeing how styles modify your prompt
+- Debugging and refining prompts before paying for generation
+- Understanding the iOS enhancement logic
+- Testing different style combinations
+
+```bash
+# See the raw prompt (no enhancements)
+snapai icon --prompt "calculator app with clean design" --prompt-only
+
+# See how minimalism style enhances your prompt
+snapai icon --prompt "calculator app" --style minimalism --prompt-only
+
+# See the default iOS enhancement for app icons
+snapai icon --prompt "modern fitness tracker" --prompt-only
+
+# Compare different styles for the same concept
+snapai icon --prompt "music player" --style glassy --prompt-only
+snapai icon --prompt "music player" --style neon --prompt-only
+snapai icon --prompt "music player" --style minimalism --prompt-only
+
+# See the full configuration with model and size
+snapai icon --prompt "banking app with secure lock" --style material --model gpt-image-1 --size 1024x1024 --prompt-only
+```
+
+**Example output:**
+```
+📝 Final Generated Prompt:
+
+Create a full-bleed 1024x1024 px iOS app icon: banking app with secure lock. Use crisp, minimal design with vibrant colors. Add a subtle inner bevel for gentle depth; no hard shadows or outlines. Center the design with comfortable breathing room from the edges. Solid, light-neutral background. IMPORTANT: Fill the entire canvas edge-to-edge with the design, no padding, no margins. Design elements should be centered with appropriate spacing from edges but the background must cover 100% of the canvas. Add subtle depth with inner highlights, avoid hard shadows. Clean, minimal, Apple-style design. No borders, frames, or rounded corners.
+
+🎨 Style: minimalism
+   Clean, simple lines with maximum 2-3 colors. Ultra-clean, Apple-inspired minimalism.
+
+🤖 Model: gpt-image-1
+
+📐 Size: 1024x1024
+```
 
 #### Basic Usage
 
@@ -196,6 +241,7 @@ snapai icon --prompt "edgy gaming app with dark theme and bold red accent colors
 | `--moderation`    |       | `low`, `auto`                         | `auto`        | Content filtering (gpt-image-1 only) |
 | `--raw-prompt`    |       | boolean                               | `false`       | Skip iOS enhancement                 |
 | `--style`         |       | See style table below                 | _none_        | Icon design style                    |
+| `--prompt-only`   |       | boolean                               | `false`       | Output final prompt without generating images |
 
 
 #### Model Comparison
@@ -336,6 +382,11 @@ snapai config --api-key YOUR_KEY  # Set/update API key
 
 ```bash
 # 💡 Cost-effective workflow
+# 0. Preview prompts for FREE before paying
+snapai icon --prompt "fitness app concept" --style minimalism --prompt-only
+snapai icon --prompt "fitness app concept" --style glassy --prompt-only
+snapai icon --prompt "fitness app concept" --style neon --prompt-only
+
 # 1. Start with DALL-E 2 for quick iterations
 snapai icon --prompt "modern fitness app icon concept with dumbbell and clean design" --model dall-e-2
 
@@ -354,18 +405,28 @@ snapai icon --prompt "final fitness app icon with professional dumbbell design a
 ```
 
 > [!TIP]
-> Use `--model dall-e-2` for testing, then `--model gpt-image-1` for style exploration and variations, and `--model dall-e-3 --quality hd` for production! Combine with `--style` for consistent visual identity.
+> Use `--model dall-e-2` for testing, then `--model gpt-image-1` for style exploration and variations, and `--model dall-e-3 --quality hd` for production! Combine with `--style` for consistent visual identity. Use `--prompt-only` to preview and refine prompts for FREE before generating!
 
 ## 🚀 Advanced Usage
 
 ### CI/CD Integration
 
 ```bash
+# Preview prompts in CI/CD pipelines before generation
+npx snapai icon --prompt "$(cat icon-prompt.txt)" --prompt-only --style minimalism
+
 # Perfect for automation with different models
 npx snapai icon --prompt "$(cat icon-prompt.txt)" --output ./dist/icons --model gpt-image-1 --style minimalism
 
 # Generate multiple formats for web
 npx snapai icon --prompt "modern web logo with company branding and clean geometric design" --background transparent --output-format webp --output ./web-assets --style glassy
+
+# Use in scripts to validate prompts
+#!/bin/bash
+PROMPT=$(cat icon-concept.txt)
+echo "Testing prompt variations..."
+npx snapai icon --prompt "$PROMPT" --style minimalism --prompt-only > prompts-minimal.txt
+npx snapai icon --prompt "$PROMPT" --style glassy --prompt-only > prompts-glassy.txt
 ```
 
 ### Batch Generation
@@ -382,6 +443,11 @@ snapai icon --prompt "premium banner logo with glass-like elements and transluce
 ### Professional Workflow
 
 ```bash
+# 0. Prompt Design & Preview (FREE)
+snapai icon --prompt "fitness app with dumbbell" --style minimalism --prompt-only
+snapai icon --prompt "fitness app with dumbbell" --style glassy --prompt-only
+snapai icon --prompt "fitness app with dumbbell" --style neon --prompt-only
+
 # 1. Concept phase - quick & cheap
 snapai icon --prompt "modern fitness app icon concept with dumbbell and clean geometric design" --model dall-e-2 --num-images 5
 
