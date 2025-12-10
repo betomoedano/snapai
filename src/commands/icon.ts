@@ -28,6 +28,10 @@ export default class IconCommand extends Command {
     '<%= config.bin %> <%= command.id %> --prompt "calculator app" --style minimalism',
     '<%= config.bin %> <%= command.id %> --prompt "music player" --style glassy',
     '<%= config.bin %> <%= command.id %> --prompt "weather app" --style neon',
+    "",
+    // Prompt-only options
+    '<%= config.bin %> <%= command.id %> --prompt "calculator app" --style minimalism --prompt-only',
+    '<%= config.bin %> <%= command.id %> --prompt "music player" --raw-prompt --prompt-only',
   ];
 
   static flags = {
@@ -108,6 +112,12 @@ export default class IconCommand extends Command {
       description: "Icon style: minimalism, glassy, woven, geometric, neon, gradient, flat, material, ios-classic, android-material",
       options: StyleTemplates.getAvailableStyles(),
     }),
+
+    // === Output Options ===
+    "prompt-only": Flags.boolean({
+      description: "Output the final prompt without generating images",
+      default: false,
+    }),
   };
 
   public async run(): Promise<void> {
@@ -120,6 +130,36 @@ export default class IconCommand extends Command {
         this.error(promptError);
       }
 
+      // If prompt-only mode, output prompt and return
+      if (flags["prompt-only"]) {
+        const finalPrompt = this.generateFinalPrompt(flags);
+
+        this.log(chalk.blue("📝 Final Generated Prompt:"));
+        this.log("");
+        this.log(finalPrompt);
+        this.log("");
+
+        if (flags.style) {
+          this.log(chalk.blue(`🎨 Style: ${flags.style}`));
+          this.log(chalk.gray(`   ${StyleTemplates.getStyleDescription(flags.style as any)}`));
+        }
+
+        if (flags.model) {
+          this.log(chalk.blue(`🤖 Model: ${flags.model}`));
+        }
+
+        if (flags.size) {
+          this.log(chalk.blue(`📐 Size: ${flags.size}`));
+        }
+
+        if (flags["raw-prompt"]) {
+          this.log(chalk.yellow("⚠️  Using raw prompt (no style enhancement)"));
+        }
+
+        return;
+      }
+
+      // Validate output path for image generation
       const outputError = ValidationService.validateOutputPath(flags.output);
       if (outputError) {
         this.error(outputError);
@@ -182,6 +222,21 @@ export default class IconCommand extends Command {
       this.error(
         chalk.red(`Failed to generate icon: ${(error as Error).message}`)
       );
+    }
+  }
+
+  private generateFinalPrompt(flags: any): string {
+    const { prompt, size = "1024x1024", style } = flags;
+    const rawPrompt = flags["raw-prompt"];
+
+    // Use either raw prompt, style-enhanced prompt, or default iOS prompt
+    if (rawPrompt) {
+      return prompt;
+    } else if (style) {
+      return StyleTemplates.getStylePrompt(prompt, style, size);
+    } else {
+      // Default iOS prompt (backward compatibility)
+      return `Create a full-bleed ${size} px iOS app icon: ${prompt}.Use crisp, minimal design with vibrant colors. Add a subtle inner bevel for gentle depth; no hard shadows or outlines. Center the design with comfortable breathing room from the edges. Solid, light-neutral background. IMPORTANT: Fill the entire canvas edge-to-edge with the design, no padding, no margins. Design elements should be centered with appropriate spacing from edges but the background must cover 100% of the canvas. Add subtle depth with inner highlights, avoid hard shadows. Clean, minimal, Apple-style design. No borders, frames, or rounded corners.`;
     }
   }
 
