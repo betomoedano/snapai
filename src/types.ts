@@ -1,5 +1,6 @@
 export interface ConfigData {
   openai_api_key?: string;
+  google_api_key?: string;
   default_output_path?: string;
 }
 
@@ -10,12 +11,11 @@ export interface IconGenerationOptions {
   quality?: 'auto' | 'standard' | 'hd' | 'high' | 'medium' | 'low';
   background?: 'transparent' | 'opaque' | 'auto';
   outputFormat?: 'png' | 'jpeg' | 'webp';
-  model?: 'dall-e-2' | 'dall-e-3' | 'gpt-image-1';
+  model?: 'gpt-image-1.5';
   numImages?: number;
   moderation?: 'low' | 'auto';
   rawPrompt?: boolean;
-  style?: 'minimalism' | 'glassy' | 'woven' | 'geometric' | 'neon' | 'gradient' | 'flat' | 'material' | 'ios-classic' | 'android-material' | 'pixel' | 'game' | 'clay' | 'holographic';
-  
+  apiKey?: string;
 }
 
 export interface OpenAIResponse {

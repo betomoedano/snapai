@@ -19,6 +19,13 @@ export class ValidationService {
     return null;
   }
 
+  static validateGoogleApiKey(apiKey: string): string | null {
+    if (!apiKey || apiKey.trim().length === 0) {
+      return 'Invalid Google API key format';
+    }
+    return null;
+  }
+
   static validateOutputPath(outputPath: string): string | null {
     if (!outputPath || outputPath.trim().length === 0) {
       return 'Output path cannot be empty';

@@ -3,25 +3,30 @@ import fs from "fs-extra";
 import path from "path";
 import chalk from "chalk";
 import { OpenAIService } from "../services/openai.js";
+import { GeminiService } from "../services/gemini.js";
 import { ValidationService } from "../utils/validation.js";
-import { StyleTemplates } from "../utils/styleTemplates.js";
+import { buildFinalIconPrompt } from "../utils/icon-prompt.js";
+import { createInterface } from "node:readline/promises";
+import { stdin as input, stdout as output } from "node:process";
 
 export default class IconCommand extends Command {
   static description =
-    "Generate AI-powered app icons using OpenAI models (GPT-Image-1, DALL-E 3, DALL-E 2)";
+    "Generate AI-powered app icons using OpenAI (gpt-image-1.5) or Gemini (banana)";
 
   static examples = [
     // Basic usage
     '<%= config.bin %> <%= command.id %> --prompt "minimalist calculator app icon"',
     '<%= config.bin %> <%= command.id %> --prompt "fitness tracker" --output ./assets/icons',
     "",
-    // Model selection
-    '<%= config.bin %> <%= command.id %> --prompt "artistic icon" --model dall-e-3 --quality hd',
-    '<%= config.bin %> <%= command.id %> --prompt "quick concept" --model dall-e-2',
+    // OpenAI
+    '<%= config.bin %> <%= command.id %> --prompt "best quality" --model gpt-image-1.5 --num-images 3',
+    "",
+    // Gemini
+    '<%= config.bin %> <%= command.id %> --prompt "modern app icon" --model banana',
     "",
     // Advanced options
-    '<%= config.bin %> <%= command.id %> --prompt "logo" --background transparent --output-format png',
-    '<%= config.bin %> <%= command.id %> --prompt "variations" --num-images 3 --model gpt-image-1',
+    '<%= config.bin %> <%= command.id %> --prompt "logo" --model gpt-image-1.5 --background transparent --output-format png',
+    '<%= config.bin %> <%= command.id %> --prompt "high-res banana" --model banana --pro --q 4k --n 3',
     '<%= config.bin %> <%= command.id %> --prompt "custom design" --raw-prompt',
     "",
     // Style options
@@ -42,14 +47,22 @@ export default class IconCommand extends Command {
       description: "Output directory",
       default: "./assets",
     }),
+    "api-key": Flags.string({
+      description:
+        "OpenAI API key override (does not persist to disk). Also supports SNAPAI_API_KEY / OPENAI_API_KEY",
+    }),
+    "google-api-key": Flags.string({
+      description:
+        "Google Studio API key override (does not persist to disk). Also supports SNAPAI_GOOGLE_API_KEY / GEMINI_API_KEY",
+    }),
 
-    // === Model & Quality ===
+    // === Provider / Model ===
     model: Flags.string({
       char: "m",
       description:
-        "AI model: gpt-image-1 (best), dall-e-3 (creative), dall-e-2 (fast)",
-      default: "gpt-image-1",
-      options: ["dall-e-2", "dall-e-3", "gpt-image-1"],
+        'Model: OpenAI ("gpt-image-1.5") or Gemini ("banana")',
+      default: "gpt-image-1.5",
+      options: ["banana", "gpt-image-1.5"],
     }),
     size: Flags.string({
       char: "s",
@@ -67,7 +80,6 @@ export default class IconCommand extends Command {
       ],
     }),
     quality: Flags.string({
-      char: "q",
       description: "Quality level (depends on model)",
       default: "auto",
       options: ["auto", "standard", "hd", "high", "medium", "low"],
@@ -87,8 +99,7 @@ export default class IconCommand extends Command {
       options: ["png", "jpeg", "webp"],
     }),
     "num-images": Flags.integer({
-      char: "n",
-      description: "Number of images 1-10 (DALL-E 3 supports 1 only)",
+      description: "Number of images 1-10 (OpenAI only)",
       default: 1,
       min: 1,
       max: 10,
@@ -103,10 +114,31 @@ export default class IconCommand extends Command {
       default: false,
     }),
 
-    // === Style Options ===
     style: Flags.string({
-      description: "Icon style: minimalism, glassy, woven, geometric, neon, gradient, flat, material, ios-classic, android-material",
-      options: StyleTemplates.getAvailableStyles(),
+      description: "Optional style hint appended after enhancement",
+    }),
+    "use-icon-words": Flags.boolean({
+      description:
+        'Include the words "icon" / "logo" in the enhancer (may add unwanted borders/padding)',
+      default: false,
+    }),
+
+    // === Gemini Options (banana) ===
+    pro: Flags.boolean({
+      description: "Use Gemini Pro model (banana only)",
+      default: false,
+    }),
+    n: Flags.integer({
+      char: "n",
+      description: "Number of images (banana pro only, max 10)",
+      default: 1,
+      min: 1,
+      max: 10,
+    }),
+    q: Flags.string({
+      description: "Quality: 1k, 2k, 4k (banana pro only)",
+      default: "1k",
+      options: ["1k", "2k", "4k"],
     }),
   };
 
@@ -141,11 +173,83 @@ export default class IconCommand extends Command {
         this.log(chalk.yellow("⚠️  Using raw prompt (no style enhancement)"));
       }
 
-      // Generate icon using OpenAI
-      const imageBase64Array = await OpenAIService.generateIcon({
+      const modelFlag = flags.model as "banana" | "gpt-image-1.5";
+      const provider: "banana" | "gpt" = modelFlag === "banana" ? "banana" : "gpt";
+      const openaiModel: "gpt-image-1.5" = "gpt-image-1.5";
+
+      if (flags["api-key"]) {
+        const keyError = ValidationService.validateApiKey(flags["api-key"]);
+        if (keyError) this.error(chalk.red(keyError));
+      }
+      if (flags["google-api-key"]) {
+        const keyError = ValidationService.validateGoogleApiKey(
+          flags["google-api-key"]
+        );
+        if (keyError) this.error(chalk.red(keyError));
+      }
+
+      if (provider === "banana") {
+        if (!flags.pro) {
+          if (flags.n !== 1) {
+            this.error(chalk.red("Banana normal only supports --n 1"));
+          }
+          if (flags.q !== "1k") {
+            this.error(chalk.red("Banana normal does not support --q"));
+          }
+        } else {
+          if (flags.n >= 5) {
+            const ok = await this.confirmLargeGeneration(flags.n);
+            if (!ok) {
+              this.log(chalk.yellow("Aborted."));
+              return;
+            }
+          }
+        }
+
+        const finalPrompt = buildFinalIconPrompt({
+          prompt: flags.prompt,
+          rawPrompt: flags["raw-prompt"],
+          style: flags.style,
+          squareOnly: true,
+          sizeHint: flags.pro ? `${flags.q.toUpperCase()}` : "1K",
+          useIconWords: flags["use-icon-words"],
+        });
+
+        const images = await GeminiService.generateBananaImages({
+          prompt: finalPrompt,
+          pro: flags.pro,
+          n: flags.pro ? flags.n : 1,
+          quality: flags.q as "1k" | "2k" | "4k",
+          apiKey: flags["google-api-key"],
+        });
+
+        const outputPaths = await this.saveBinaryImages(images, flags.output);
+        this.log(chalk.green("✅ Icon(s) generated successfully!"));
+        if (outputPaths.length === 1) {
+          this.log(chalk.gray(`Saved to: ${outputPaths[0]}`));
+        } else {
+          this.log(chalk.gray(`Saved ${outputPaths.length} images to:`));
+          outputPaths.forEach((p, index) => {
+            this.log(chalk.gray(`  ${index + 1}. ${p}`));
+          });
+        }
+        return;
+      }
+
+      // OpenAI (gpt)
+      const finalPrompt = buildFinalIconPrompt({
         prompt: flags.prompt,
+        rawPrompt: flags["raw-prompt"],
+        style: flags.style,
+        squareOnly: false,
+        sizeHint: flags.size,
+        useIconWords: flags["use-icon-words"],
+      });
+
+      const imageBase64Array = await OpenAIService.generateIcon({
+        prompt: finalPrompt,
         output: flags.output,
-        model: flags.model as "dall-e-2" | "dall-e-3" | "gpt-image-1",
+        model: openaiModel,
         size: flags.size,
         quality: flags.quality as
           | "auto"
@@ -158,11 +262,10 @@ export default class IconCommand extends Command {
         outputFormat: flags["output-format"] as "png" | "jpeg" | "webp",
         numImages: flags["num-images"],
         moderation: flags.moderation as "low" | "auto",
-        rawPrompt: flags["raw-prompt"],
-        style: flags.style as any,
+        rawPrompt: true,
+        apiKey: flags["api-key"],
       });
 
-      // Save all generated images
       const outputPaths = await this.saveBase64Images(
         imageBase64Array,
         flags.output,
@@ -182,6 +285,18 @@ export default class IconCommand extends Command {
       this.error(
         chalk.red(`Failed to generate icon: ${(error as Error).message}`)
       );
+    }
+  }
+
+  private async confirmLargeGeneration(n: number): Promise<boolean> {
+    const rl = createInterface({ input, output });
+    try {
+      const answer = await rl.question(
+        `You're about to generate many images (${n}). This may incur unplanned costs. Are you sure you want to continue? (y/n) `
+      );
+      return answer.trim().toLowerCase().startsWith("y");
+    } finally {
+      rl.close();
     }
   }
 
@@ -211,6 +326,35 @@ export default class IconCommand extends Command {
         const buffer = Buffer.from(base64Data, "base64");
         await fs.writeFile(outputPath, buffer);
 
+        outputPaths.push(outputPath);
+      }
+
+      return outputPaths;
+    } catch (error: any) {
+      throw new Error(`Failed to save image(s): ${error.message}`);
+    }
+  }
+
+  private async saveBinaryImages(
+    images: Array<{ base64: string; extension: string }>,
+    outputDir: string
+  ): Promise<string[]> {
+    await fs.ensureDir(outputDir);
+    const outputPaths: string[] = [];
+    const timestamp = Date.now();
+
+    try {
+      this.log(chalk.gray(`💾 Saving ${images.length} image(s)...`));
+
+      for (let i = 0; i < images.length; i++) {
+        const { base64, extension } = images[i];
+        const filename =
+          images.length === 1
+            ? `icon-${timestamp}.${extension}`
+            : `icon-${timestamp}-${i + 1}.${extension}`;
+        const outputPath = path.join(outputDir, filename);
+        const buffer = Buffer.from(base64, "base64");
+        await fs.writeFile(outputPath, buffer);
         outputPaths.push(outputPath);
       }
 
