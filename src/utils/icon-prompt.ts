@@ -44,6 +44,35 @@ export function buildFinalIconPrompt(params: {
     useIconWords = false,
   } = params;
 
+  const styleResolved = resolveStylePreset(style);
+  const presetDirective = styleResolved.preset
+    ? StyleTemplates.getStyleDirective(styleResolved.preset)
+    : null;
+
+  // Raw mode: send the user's prompt literally.
+  // - If no style: DO NOT add any SnapAI instructions/context/constraints.
+  // - If style is present: apply style as a dominant constraint, but still avoid all other SnapAI rules.
+  if (rawPrompt) {
+    if (!styleResolved.preset && !styleResolved.text) {
+      return prompt;
+    }
+
+    if (styleResolved.preset && presetDirective) {
+      return [
+        `STYLE PRESET (dominant): ${styleResolved.preset}`,
+        `Style directive (must dominate all decisions): ${presetDirective}`,
+        ``,
+        `User prompt: ${prompt}`,
+      ].join("\n");
+    }
+
+    return [
+      `STYLE (dominant): ${styleResolved.text}`,
+      ``,
+      `User prompt: ${prompt}`,
+    ].join("\n");
+  }
+
   const sizeText = "1024x1024";
   const artworkNoun = useIconWords
     ? "square app icon artwork"
@@ -56,11 +85,6 @@ export function buildFinalIconPrompt(params: {
 
   // Base "context" block: avoids canvas/plate/text/logo/photo failures.
   const contextBlock = ICON_BASE_CONTEXT_LINES.join("\n");
-
-  const styleResolved = resolveStylePreset(style);
-  const presetDirective = styleResolved.preset
-    ? StyleTemplates.getStyleDirective(styleResolved.preset)
-    : null;
 
   // Layer 1: concept + art-direction guidance (human readable).
   const layer1 = [
@@ -159,18 +183,6 @@ export function buildFinalIconPrompt(params: {
           `Primary style preset (dominant): ${styleResolved.preset}\nStyle directive: ${presetDirective}\n\nMaterial:`
         )
       : layer1;
-
-  if (rawPrompt) {
-    // "Raw" mode: keep only the essentials, but still include constraints + optional style system.
-    const rawLayer1 = [
-      `Create a full-bleed ${sizeText} ${artworkNoun}.`,
-      ``,
-      `Subject: ${prompt}`,
-      ``,
-      contextBlock,
-    ].join("\n");
-    return `${rawLayer1}\n\n${layer2}${layer3}`;
-  }
 
   return `${layer1WithStyle}\n\n${layer2}${layer3}`;
 }

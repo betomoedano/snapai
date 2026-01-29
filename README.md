@@ -134,6 +134,11 @@ npx snapai icon --prompt "professional banking app with secure lock" --output ./
 
 # Style hint (appended after enhancement)
 npx snapai icon --prompt "calculator app" --style minimalism
+
+# Preview the final generated prompt (no image generation)
+npx snapai icon --prompt "calculator app" --raw-prompt --prompt-only
+npx snapai icon --prompt "calculator app" --prompt-only
+npx snapai icon --prompt "calculator app" --style minimalism --prompt-only
 ```
 
 ### OpenAI (`gpt-1.5` / `gpt-1`)
@@ -181,22 +186,23 @@ Nano Banana notes:
 
 ### `snapai icon` flags
 
-| Flag               | Short | Default    | Description                                                                     |
-| ------------------ | ----- | ---------- | ------------------------------------------------------------------------------- |
-| `--prompt`         | `-p`  | required   | Description of the icon to generate                                             |
-| `--output`         | `-o`  | `./assets` | Output directory                                                                |
-| `--model`          | `-m`  | `gpt-1.5`  | `gpt-1.5`/`gpt-1` (OpenAI) or `banana` (Google Nano Banana)                     |
-| `--quality`        | `-q`  | `auto`     | GPT: `auto/high/medium/low` (aliases: `hd`, `standard`). Banana Pro: `1k/2k/4k` |
-| `--background`     | `-b`  | `auto`     | Background (`transparent`, `opaque`, `auto`) (OpenAI only)                      |
-| `--output-format`  | `-f`  | `png`      | Output format (`png`, `jpeg`, `webp`) (OpenAI only)                             |
-| `--n`              | `-n`  | `1`        | Number of images (max 10). For Banana normal, must be `1`.                      |
-| `--moderation`     |       | `auto`     | Content filtering (`low`, `auto`) (OpenAI only)                                 |
-| `--raw-prompt`     | `-r`  | `false`    | Skip SnapAI prompt enhancement                                                  |
-| `--style`          | `-s`  |            | Rendering style hint appended after enhancement                                 |
-| `--use-icon-words` | `-i`  | `false`    | Include `"icon"` / `"logo"` in enhancement (may increase padding)               |
-| `--pro`            | `-P`  | `false`    | Enable Nano Banana Pro (banana only)                                            |
-| `--openai-api-key` | `-k`  |            | OpenAI API key override (does not persist)                                      |
-| `--google-api-key` | `-g`  |            | Google API key override (does not persist)                                      |
+| Flag               | Short | Default    | Description                                                                       |
+| ------------------ | ----- | ---------- | --------------------------------------------------------------------------------- |
+| `--prompt`         | `-p`  | required   | Description of the icon to generate                                               |
+| `--output`         | `-o`  | `./assets` | Output directory                                                                  |
+| `--model`          | `-m`  | `gpt-1.5`  | `gpt-1.5`/`gpt-1` (OpenAI) or `banana` (Google Nano Banana)                       |
+| `--quality`        | `-q`  | `auto`     | GPT: `auto/high/medium/low` (aliases: `hd`, `standard`). Banana Pro: `1k/2k/4k`   |
+| `--background`     | `-b`  | `auto`     | Background (`transparent`, `opaque`, `auto`) (OpenAI only)                        |
+| `--output-format`  | `-f`  | `png`      | Output format (`png`, `jpeg`, `webp`) (OpenAI only)                               |
+| `--n`              | `-n`  | `1`        | Number of images (max 10). For Banana normal, must be `1`.                        |
+| `--moderation`     |       | `auto`     | Content filtering (`low`, `auto`) (OpenAI only)                                   |
+| `--prompt-only`    |       | `false`    | Preview final prompt + config without generating images                           |
+| `--raw-prompt`     | `-r`  | `false`    | Send prompt as-is (no SnapAI enhancement/constraints). Style still applies if set |
+| `--style`          | `-s`  |            | Rendering style hint appended after enhancement                                   |
+| `--use-icon-words` | `-i`  | `false`    | Include `"icon"` / `"logo"` in enhancement (may increase padding)                 |
+| `--pro`            | `-P`  | `false`    | Enable Nano Banana Pro (banana only)                                              |
+| `--openai-api-key` | `-k`  |            | OpenAI API key override (does not persist)                                        |
+| `--google-api-key` | `-g`  |            | Google API key override (does not persist)                                        |
 
 ## Examples (real outputs) 🖼️
 

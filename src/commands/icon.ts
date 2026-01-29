@@ -6,6 +6,7 @@ import { OpenAIService } from "../services/openai.js";
 import { GeminiService } from "../services/gemini.js";
 import { ValidationService } from "../utils/validation.js";
 import { buildFinalIconPrompt } from "../utils/icon-prompt.js";
+import { StyleTemplates } from "../utils/styleTemplates.js";
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 
@@ -55,6 +56,11 @@ export default class IconCommand extends Command {
     '<%= config.bin %> <%= command.id %> --prompt "calculator app" --style minimalism',
     '<%= config.bin %> <%= command.id %> --prompt "music player" --style glassy',
     '<%= config.bin %> <%= command.id %> --prompt "weather app" --style neon',
+    "",
+    // Prompt preview (no generation)
+    '<%= config.bin %> <%= command.id %> --prompt "calculator app" --raw-prompt --prompt-only',
+    '<%= config.bin %> <%= command.id %> --prompt "calculator app" --prompt-only',
+    '<%= config.bin %> <%= command.id %> --prompt "calculator app" --style minimalism --prompt-only',
   ];
 
   static flags = {
@@ -68,6 +74,11 @@ export default class IconCommand extends Command {
       char: "o",
       description: "Output directory",
       default: "./assets",
+    }),
+    "prompt-only": Flags.boolean({
+      description:
+        "Preview the final generated prompt/config without generating images",
+      default: false,
     }),
     /**
      * Deprecated: use --openai-api-key.
@@ -148,7 +159,8 @@ export default class IconCommand extends Command {
     }),
     "raw-prompt": Flags.boolean({
       char: "r",
-      description: "Skip iOS-specific prompt enhancement",
+      description:
+        "Send the prompt as-is (no SnapAI enhancement/constraints). If --style is provided, style is applied as a dominant constraint.",
       default: false,
     }),
 
@@ -218,22 +230,6 @@ export default class IconCommand extends Command {
         this.error(outputError);
       }
 
-      this.log(chalk.blue("🎨 Generating your app icon..."));
-      this.log("");
-      this.log(
-        chalk.dim(
-          "Powered by codewithbeto.dev — check out our React Native course!"
-        )
-      );
-      this.log("");
-      this.log(chalk.gray(`Prompt: ${flags.prompt}`));
-      if (flags.style) {
-        this.log(chalk.blue(`🎨 Style: ${flags.style}`));
-      }
-      if (flags["raw-prompt"]) {
-        this.log(chalk.yellow("⚠️  Using raw prompt (no style enhancement)"));
-      }
-
       if (isStyleDangerous(flags.style)) {
         this.error(
           chalk.red(
@@ -243,11 +239,17 @@ export default class IconCommand extends Command {
       }
 
       const modelFlag = flags.model as string;
+      const normalizedModelFlag =
+        String(modelFlag || "")
+          .trim()
+          .toLowerCase() === "gpt"
+          ? "gpt-1.5"
+          : modelFlag;
       const provider: "banana" | "openai" =
-        modelFlag === "banana" ? "banana" : "openai";
+        normalizedModelFlag === "banana" ? "banana" : "openai";
       const openaiModel =
         provider === "openai"
-          ? (modelFlag as "gpt-1" | "gpt-1.5" | "gpt")
+          ? (normalizedModelFlag as "gpt-1" | "gpt-1.5" | "gpt")
           : undefined;
 
       const qualityInput = this.normalizeFlagString(flags.quality, "auto");
@@ -277,6 +279,137 @@ export default class IconCommand extends Command {
       }
       const requestedN = flags.n !== 1 ? flags.n : flags["num-images"];
 
+      // Build the final prompt once (used by all providers).
+      const finalPrompt = buildFinalIconPrompt({
+        prompt: flags.prompt,
+        rawPrompt: flags["raw-prompt"],
+        style: flags.style,
+        useIconWords: flags["use-icon-words"],
+      });
+
+      // Prompt-only mode: preview everything, generate nothing.
+      if (flags["prompt-only"]) {
+        const styleInput = flags.style?.trim();
+        const styleNormalized = styleInput?.toLowerCase();
+        const availableStyles = StyleTemplates.getAvailableStyles().map((s) =>
+          String(s).toLowerCase()
+        );
+        const isPresetStyle = Boolean(
+          styleNormalized && availableStyles.includes(styleNormalized)
+        );
+
+        // Provider-specific validation (so preview matches reality), but do not prompt for confirmation.
+        if (provider === "banana") {
+          if (!flags.pro) {
+            if (requestedN !== 1) {
+              this.error(chalk.red("Banana normal only supports -n 1"));
+            }
+            const bananaQ = this.resolveBananaQuality(qualityInput);
+            if (bananaQ !== "1k") {
+              this.error(chalk.red("Banana normal only supports --quality 1k"));
+            }
+          } else {
+            // In generation mode we prompt for confirmation when n is large; in preview we just warn.
+            // (We still allow preview so users can inspect the prompt/config without paying.)
+          }
+        }
+
+        this.log(chalk.blue("🔎 Prompt preview (no generation)"));
+        this.log("");
+        this.log(chalk.gray(`Raw prompt: ${flags.prompt}`));
+        this.log(chalk.gray(`Enhanced: ${flags["raw-prompt"] ? "no" : "yes"}`));
+        this.log(
+          chalk.gray(`useIconWords: ${flags["use-icon-words"] ? "yes" : "no"}`)
+        );
+        this.log(
+          chalk.gray(
+            `Style: ${
+              styleInput
+                ? `${styleInput}${isPresetStyle ? " (preset)" : " (custom)"}`
+                : "none"
+            }`
+          )
+        );
+        if (styleInput && isPresetStyle) {
+          this.log(
+            chalk.dim(
+              `Style summary: ${StyleTemplates.getStyleDescription(
+                styleNormalized as any
+              )}`
+            )
+          );
+        }
+        this.log("");
+        this.log(chalk.gray("Configuration:"));
+        this.log(chalk.gray(`  provider: ${provider}`));
+        this.log(
+          chalk.gray(
+            `  model: ${
+              normalizedModelFlag === modelFlag
+                ? modelFlag
+                : `${modelFlag} (alias → ${normalizedModelFlag})`
+            }`
+          )
+        );
+        this.log(chalk.gray(`  size: 1024x1024 (fixed)`));
+        this.log(chalk.gray(`  n: ${requestedN}`));
+        if (provider === "banana") {
+          const bananaQualityResolved = this.resolveBananaQuality(qualityInput);
+          this.log(
+            chalk.gray(
+              `  quality: ${qualityInput} (resolved: ${bananaQualityResolved})`
+            )
+          );
+          this.log(chalk.gray(`  pro: ${flags.pro ? "yes" : "no"}`));
+          if (flags.pro && requestedN >= 5) {
+            this.log(
+              chalk.yellow(
+                `⚠️  Cost warning: generating ${requestedN} images may incur unplanned costs (generation mode will ask to confirm).`
+              )
+            );
+          }
+        } else {
+          const openaiQualityResolved = this.resolveOpenAIQuality(qualityInput);
+          this.log(
+            chalk.gray(
+              `  quality: ${qualityInput} (resolved: ${openaiQualityResolved})`
+            )
+          );
+          this.log(chalk.gray(`  background: ${flags.background}`));
+          this.log(chalk.gray(`  outputFormat: ${flags["output-format"]}`));
+          this.log(chalk.gray(`  moderation: ${flags.moderation}`));
+          if (requestedN >= 5) {
+            this.log(
+              chalk.yellow(
+                `⚠️  Cost warning: generating ${requestedN} images may incur unplanned costs.`
+              )
+            );
+          }
+        }
+
+        this.log("");
+        this.log(chalk.gray("Final prompt (sent to the model):"));
+        this.log("");
+        this.log(finalPrompt);
+        return;
+      }
+
+      this.log(chalk.blue("🎨 Generating your app icon..."));
+      this.log("");
+      this.log(
+        chalk.dim(
+          "Powered by codewithbeto.dev — check out our React Native course!"
+        )
+      );
+      this.log("");
+      this.log(chalk.gray(`Prompt: ${flags.prompt}`));
+      if (flags.style) {
+        this.log(chalk.blue(`🎨 Style: ${flags.style}`));
+      }
+      if (flags["raw-prompt"]) {
+        this.log(chalk.yellow("⚠️  Using raw prompt (no style enhancement)"));
+      }
+
       if (provider === "banana") {
         if (!flags.pro) {
           if (requestedN !== 1) {
@@ -297,14 +430,8 @@ export default class IconCommand extends Command {
         }
 
         const bananaQuality = this.resolveBananaQuality(qualityInput);
-        const basePrompt = buildFinalIconPrompt({
-          prompt: flags.prompt,
-          rawPrompt: flags["raw-prompt"],
-          style: flags.style,
-          useIconWords: flags["use-icon-words"],
-        });
         const images = await GeminiService.generateBananaImages({
-          prompt: basePrompt,
+          prompt: finalPrompt,
           pro: flags.pro,
           n: flags.pro ? requestedN : 1,
           quality: bananaQuality,
@@ -326,15 +453,9 @@ export default class IconCommand extends Command {
 
       // OpenAI (gpt-1.5 / gpt-1)
       const openaiQuality = this.resolveOpenAIQuality(qualityInput);
-      const basePrompt = buildFinalIconPrompt({
-        prompt: flags.prompt,
-        rawPrompt: flags["raw-prompt"],
-        style: flags.style,
-        useIconWords: flags["use-icon-words"],
-      });
       const outputFormat = flags["output-format"] as "png" | "jpeg" | "webp";
       const imageBase64Array = await OpenAIService.generateIcon({
-        prompt: basePrompt,
+        prompt: finalPrompt,
         output: flags.output,
         model: openaiModel,
         quality: openaiQuality,

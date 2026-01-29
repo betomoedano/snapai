@@ -8,3 +8,4 @@ const __dirname = dirname(__filename);
 
 const entryPath = join(__dirname, "..", "dist", "index.js");
 await import(pathToFileURL(entryPath).href);
+
