@@ -14,20 +14,16 @@ export function buildFinalIconPrompt(params: {
   prompt: string;
   rawPrompt?: boolean;
   style?: string;
-  squareOnly?: boolean;
-  sizeHint?: string;
   useIconWords?: boolean;
 }): string {
   const {
     prompt,
     rawPrompt = false,
     style,
-    squareOnly = false,
-    sizeHint,
     useIconWords = false,
   } = params;
 
-  const sizeText = sizeHint ? sizeHint : "1024x1024";
+  const sizeText = "1024x1024";
   const artworkNoun = useIconWords
     ? "square app icon artwork"
     : "square app artwork";
@@ -79,7 +75,7 @@ export function buildFinalIconPrompt(params: {
     `Modern, premium, app-icon-first. Creative without being childish. Readable at small sizes.`,
   ].join("\n");
 
-  const squareRule = squareOnly ? `Square 1:1 aspect ratio.` : null;
+  const squareRule = `Square 1:1 aspect ratio.`;
 
   const layer2 = [
     `Technical constraints:`,

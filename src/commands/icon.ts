@@ -33,7 +33,7 @@ function isStyleDangerous(style?: string): boolean {
 
 export default class IconCommand extends Command {
   static description =
-    "Generate AI-powered app icons using OpenAI (gpt-image-1.5) or Gemini (banana)";
+    "Generate AI-powered app icons using GPT (gpt) or Gemini (banana)";
 
   static examples = [
     // Basic usage
@@ -41,14 +41,14 @@ export default class IconCommand extends Command {
     '<%= config.bin %> <%= command.id %> --prompt "fitness tracker" --output ./assets/icons',
     "",
     // OpenAI
-    '<%= config.bin %> <%= command.id %> --prompt "best quality" --model gpt-image-1.5 --num-images 3',
+    '<%= config.bin %> <%= command.id %> --prompt "best quality" --model gpt -n 3 -q high',
     "",
     // Gemini
     '<%= config.bin %> <%= command.id %> --prompt "modern app icon" --model banana',
     "",
     // Advanced options
-    '<%= config.bin %> <%= command.id %> --prompt "logo" --model gpt-image-1.5 --background transparent --output-format png',
-    '<%= config.bin %> <%= command.id %> --prompt "high-res banana" --model banana --pro --q 4k --n 3',
+    '<%= config.bin %> <%= command.id %> --prompt "logo" --model gpt --background transparent --output-format png',
+    '<%= config.bin %> <%= command.id %> --prompt "high-res banana" --model banana --pro -n 3 -q 4k',
     '<%= config.bin %> <%= command.id %> --prompt "custom design" --raw-prompt',
     "",
     // Style options
@@ -69,11 +69,22 @@ export default class IconCommand extends Command {
       description: "Output directory",
       default: "./assets",
     }),
+    /**
+     * Deprecated: use --openai-api-key.
+     * Kept for backwards compatibility.
+     */
     "api-key": Flags.string({
+      description:
+        "OpenAI API key override (does not persist to disk). Also supports SNAPAI_API_KEY / OPENAI_API_KEY",
+      hidden: true,
+    }),
+    "openai-api-key": Flags.string({
+      char: "k",
       description:
         "OpenAI API key override (does not persist to disk). Also supports SNAPAI_API_KEY / OPENAI_API_KEY",
     }),
     "google-api-key": Flags.string({
+      char: "g",
       description:
         "Google Studio API key override (does not persist to disk). Also supports SNAPAI_GOOGLE_API_KEY / GEMINI_API_KEY",
     }),
@@ -82,29 +93,28 @@ export default class IconCommand extends Command {
     model: Flags.string({
       char: "m",
       description:
-        'Model: OpenAI ("gpt-image-1.5") or Gemini ("banana")',
-      default: "gpt-image-1.5",
-      options: ["banana", "gpt-image-1.5"],
-    }),
-    size: Flags.string({
-      char: "s",
-      description: "Image size (depends on model)",
-      default: "1024x1024",
-      options: [
-        "256x256",
-        "512x512",
-        "1024x1024",
-        "1536x1024",
-        "1024x1536",
-        "1792x1024",
-        "1024x1792",
-        "auto",
-      ],
+        'Model: GPT ("gpt") or Gemini ("banana")',
+      default: "gpt",
+      options: ["gpt", "banana"],
     }),
     quality: Flags.string({
-      description: "Quality level (depends on model)",
+      char: "q",
+      description:
+        "Quality level (depends on model). GPT: auto|high|medium|low (aliases: hd, standard). Banana Pro: 1k|2k|4k",
       default: "auto",
-      options: ["auto", "standard", "hd", "high", "medium", "low"],
+      options: [
+        // OpenAI (gpt)
+        "auto",
+        "standard",
+        "hd",
+        "high",
+        "medium",
+        "low",
+        // Banana pro tiers
+        "1k",
+        "2k",
+        "4k",
+      ],
     }),
 
     // === Advanced Options ===
@@ -120,11 +130,16 @@ export default class IconCommand extends Command {
       default: "png",
       options: ["png", "jpeg", "webp"],
     }),
+    /**
+     * Deprecated: use -n/--n.
+     * Kept for backwards compatibility.
+     */
     "num-images": Flags.integer({
       description: "Number of images 1-10 (OpenAI only)",
       default: 1,
       min: 1,
       max: 10,
+      hidden: true,
     }),
     moderation: Flags.string({
       description: "Content filtering: low, auto (GPT-Image-1 only)",
@@ -132,14 +147,17 @@ export default class IconCommand extends Command {
       options: ["low", "auto"],
     }),
     "raw-prompt": Flags.boolean({
+      char: "r",
       description: "Skip iOS-specific prompt enhancement",
       default: false,
     }),
 
     style: Flags.string({
+      char: "s",
       description: "Optional style hint appended after enhancement",
     }),
     "use-icon-words": Flags.boolean({
+      char: "i",
       description:
         'Include the words "icon" / "logo" in the enhancer (may add unwanted borders/padding)',
       default: false,
@@ -147,22 +165,43 @@ export default class IconCommand extends Command {
 
     // === Gemini Options (banana) ===
     pro: Flags.boolean({
+      char: "P",
       description: "Use Gemini Pro model (banana only)",
       default: false,
     }),
     n: Flags.integer({
       char: "n",
-      description: "Number of images (banana pro only, max 10)",
+      description: "Number of images (max 10)",
       default: 1,
       min: 1,
       max: 10,
     }),
-    q: Flags.string({
-      description: "Quality: 1k, 2k, 4k (banana pro only)",
-      default: "1k",
-      options: ["1k", "2k", "4k"],
-    }),
   };
+
+  private normalizeFlagString(input: unknown, fallback: string): string {
+    if (Array.isArray(input)) return String(input[0] ?? fallback);
+    if (typeof input === "string") return input;
+    return fallback;
+  }
+
+  private resolveOpenAIQuality(input: string): "auto" | "high" | "medium" | "low" {
+    const q = input.trim().toLowerCase();
+    if (q === "hd") return "high";
+    if (q === "standard") return "medium";
+    if (q === "auto" || q === "high" || q === "medium" || q === "low") return q;
+    throw new Error(
+      `Invalid --quality "${input}" for model "gpt". Valid: auto|high|medium|low (aliases: hd, standard)`
+    );
+  }
+
+  private resolveBananaQuality(input: string): "1k" | "2k" | "4k" {
+    const q = input.trim().toLowerCase();
+    if (q === "auto") return "1k";
+    if (q === "1k" || q === "2k" || q === "4k") return q;
+    throw new Error(
+      `Invalid --quality "${input}" for model "banana". Valid: 1k|2k|4k (or auto)`
+    );
+  }
 
   public async run(): Promise<void> {
     const { flags } = await this.parse(IconCommand);
@@ -203,12 +242,19 @@ export default class IconCommand extends Command {
         );
       }
 
-      const modelFlag = flags.model as "banana" | "gpt-image-1.5";
-      const provider: "banana" | "gpt" = modelFlag === "banana" ? "banana" : "gpt";
-      const openaiModel: "gpt-image-1.5" = "gpt-image-1.5";
+      const modelFlag = flags.model as "banana" | "gpt";
+      const provider: "banana" | "gpt" = modelFlag;
 
-      if (flags["api-key"]) {
-        const keyError = ValidationService.validateApiKey(flags["api-key"]);
+      const qualityInput = this.normalizeFlagString(flags.quality, "auto");
+
+      const openaiApiKey = flags["openai-api-key"] || flags["api-key"];
+      if (flags["openai-api-key"] && flags["api-key"]) {
+        this.error(
+          chalk.red('Use only one: --openai-api-key or the deprecated --api-key')
+        );
+      }
+      if (openaiApiKey) {
+        const keyError = ValidationService.validateApiKey(openaiApiKey);
         if (keyError) this.error(chalk.red(keyError));
       }
       if (flags["google-api-key"]) {
@@ -218,17 +264,26 @@ export default class IconCommand extends Command {
         if (keyError) this.error(chalk.red(keyError));
       }
 
+      // unify image count flags
+      if (flags.n !== 1 && flags["num-images"] !== 1) {
+        this.error(
+          chalk.red('Use only one: -n/--n or the deprecated --num-images')
+        );
+      }
+      const requestedN = flags.n !== 1 ? flags.n : flags["num-images"];
+
       if (provider === "banana") {
         if (!flags.pro) {
-          if (flags.n !== 1) {
-            this.error(chalk.red("Banana normal only supports --n 1"));
+          if (requestedN !== 1) {
+            this.error(chalk.red("Banana normal only supports -n 1"));
           }
-          if (flags.q !== "1k") {
-            this.error(chalk.red("Banana normal does not support --q"));
+          const bananaQ = this.resolveBananaQuality(qualityInput);
+          if (bananaQ !== "1k") {
+            this.error(chalk.red("Banana normal only supports --quality 1k"));
           }
         } else {
-          if (flags.n >= 5) {
-            const ok = await this.confirmLargeGeneration(flags.n);
+          if (requestedN >= 5) {
+            const ok = await this.confirmLargeGeneration(requestedN);
             if (!ok) {
               this.log(chalk.yellow("Aborted."));
               return;
@@ -236,19 +291,18 @@ export default class IconCommand extends Command {
           }
         }
 
+        const bananaQuality = this.resolveBananaQuality(qualityInput);
         const basePrompt = buildFinalIconPrompt({
           prompt: flags.prompt,
           rawPrompt: flags["raw-prompt"],
           style: flags.style,
-          squareOnly: true,
-          sizeHint: flags.pro ? `${flags.q.toUpperCase()}` : "1K",
           useIconWords: flags["use-icon-words"],
         });
         const images = await GeminiService.generateBananaImages({
           prompt: basePrompt,
           pro: flags.pro,
-          n: flags.pro ? flags.n : 1,
-          quality: flags.q as "1k" | "2k" | "4k",
+          n: flags.pro ? requestedN : 1,
+          quality: bananaQuality,
           apiKey: flags["google-api-key"],
         });
 
@@ -266,33 +320,25 @@ export default class IconCommand extends Command {
       }
 
       // OpenAI (gpt)
+      const openaiQuality = this.resolveOpenAIQuality(qualityInput);
       const basePrompt = buildFinalIconPrompt({
         prompt: flags.prompt,
         rawPrompt: flags["raw-prompt"],
         style: flags.style,
-        squareOnly: false,
-        sizeHint: flags.size,
         useIconWords: flags["use-icon-words"],
       });
       const outputFormat = flags["output-format"] as "png" | "jpeg" | "webp";
       const imageBase64Array = await OpenAIService.generateIcon({
         prompt: basePrompt,
         output: flags.output,
-        model: openaiModel,
-        size: flags.size,
-        quality: flags.quality as
-          | "auto"
-          | "standard"
-          | "hd"
-          | "high"
-          | "medium"
-          | "low",
+        model: "gpt",
+        quality: openaiQuality,
         background: flags.background as "transparent" | "opaque" | "auto",
         outputFormat,
-        numImages: flags["num-images"],
+        numImages: requestedN,
         moderation: flags.moderation as "low" | "auto",
         rawPrompt: true,
-        apiKey: flags["api-key"],
+        apiKey: openaiApiKey,
       });
 
       const outputPaths = await this.saveBase64Images(

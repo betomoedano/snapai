@@ -65,10 +65,7 @@ All notable changes to SnapAI will be documented in this file.
   - Model-specific parameter validation
   - Intelligent quality mapping per model
 
-- **Enhanced Size Options**: Expanded size support
-  - Added 256x256, 512x512 for DALL-E 2
-  - Added 1792x1024, 1024x1792 for DALL-E 3
-  - Added 'auto' size option for GPT-Image-1
+- **Icon output**: SnapAI generates square icons only (**1024x1024**, 1:1)
 
 - **Advanced Image Options**:
   - `--background`: Transparent/opaque backgrounds (GPT-Image-1 only)
@@ -100,7 +97,7 @@ All notable changes to SnapAI will be documented in this file.
 - **NEW**: AI-powered icon generation using OpenAI's gpt-image-1
 - **NEW**: OCLIF v4 based CLI
 - **NEW**: Local API key management
-- **NEW**: Support for multiple icon sizes (1024x1024, 1536x1024, 1024x1536)
+- **NEW**: Square icon output (1024x1024)
 - **NEW**: Quality options (standard/HD)
 - **NEW**: Enhanced prompts for iOS-style icons
 - **NEW**: TypeScript codebase with full type safety

@@ -1,10 +1,10 @@
 export class PromptTemplates {
-  static enhanceForIOSIcon(userPrompt: string, size: number = 1024): string {
-    return `Create a ${size} × ${size} px square iOS app-icon illustration: ${userPrompt}. Use crisp, minimal design with vibrant colors. Add a subtle inner bevel for gentle depth; no hard shadows or outlines. Center the design with comfortable breathing room from the edges. Solid, light-neutral background. No text, borders, or extraneous details. Final look: clean, vibrant, and Apple-polished. Use the full image size for the icon, don't draw it inside the image, don't add borders, the rounded corners would be applied by the platform, so don't add them.`;
+  static enhanceForIOSIcon(userPrompt: string): string {
+    return `Create a 1024 × 1024 px square iOS app-icon illustration: ${userPrompt}. Use crisp, minimal design with vibrant colors. Add a subtle inner bevel for gentle depth; no hard shadows or outlines. Center the design with comfortable breathing room from the edges. Solid, light-neutral background. No text, borders, or extraneous details. Final look: clean, vibrant, and Apple-polished. Use the full image size for the icon, don't draw it inside the image, don't add borders, the rounded corners would be applied by the platform, so don't add them.`;
   }
 
-  static enhanceForAndroidIcon(userPrompt: string, size: number = 1024): string {
-    return `Create a ${size} × ${size} px square Android app-icon illustration: ${userPrompt}. Use material design principles with bold, vibrant colors and clean geometry. Subtle depth with appropriate shadowing. Center the design with comfortable margins. Solid background or subtle gradient. No text, borders, or extraneous details. Final look should be modern, bold, and Android-appropriate. Use the full image size for the icon.`;
+  static enhanceForAndroidIcon(userPrompt: string): string {
+    return `Create a 1024 × 1024 px square Android app-icon illustration: ${userPrompt}. Use material design principles with bold, vibrant colors and clean geometry. Subtle depth with appropriate shadowing. Center the design with comfortable margins. Solid background or subtle gradient. No text, borders, or extraneous details. Final look should be modern, bold, and Android-appropriate. Use the full image size for the icon.`;
   }
 
   static getSuccessfulPromptElements(): string[] {

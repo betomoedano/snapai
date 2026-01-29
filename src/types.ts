@@ -7,11 +7,14 @@ export interface ConfigData {
 export interface IconGenerationOptions {
   prompt: string;
   output?: string;
-  size?: string;
   quality?: 'auto' | 'standard' | 'hd' | 'high' | 'medium' | 'low';
   background?: 'transparent' | 'opaque' | 'auto';
   outputFormat?: 'png' | 'jpeg' | 'webp';
-  model?: 'gpt-image-1.5';
+  /**
+   * CLI model alias.
+   * Internally, SnapAI maps this to the provider's underlying model ID.
+   */
+  model?: 'gpt';
   numImages?: number;
   moderation?: 'low' | 'auto';
   rawPrompt?: boolean;

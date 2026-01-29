@@ -4,6 +4,9 @@ import { IconGenerationOptions } from "../types.js";
 import { ImageGenerateParams } from "openai/resources/images.js";
 
 export class OpenAIService {
+  private static readonly OPENAI_IMAGE_MODEL_ID = "gpt-image-1.5";
+  private static readonly FIXED_SIZE = "1024x1024";
+
   private static async getClient(apiKeyOverride?: string): Promise<OpenAI> {
     const apiKey =
       apiKeyOverride ||
@@ -26,8 +29,7 @@ export class OpenAIService {
     const client = await this.getClient(options.apiKey);
     const {
       prompt,
-      model = "gpt-image-1.5",
-      size = "1024x1024",
+      model = "gpt",
       quality = "auto",
       background = "auto",
       outputFormat = "png",
@@ -39,7 +41,6 @@ export class OpenAIService {
     // Validate model-specific parameters
     this.validateModelParameters(
       model,
-      size,
       quality,
       numImages,
       background,
@@ -51,13 +52,13 @@ export class OpenAIService {
 
     // Build request parameters based on model
     const requestParams: ImageGenerateParams = {
-      model,
+      model: this.OPENAI_IMAGE_MODEL_ID,
       prompt: finalPrompt,
       n: numImages,
-      size: size as any,
+      size: this.FIXED_SIZE as any,
     };
 
-    // gpt-image-1.5 parameters
+    // OpenAI image parameters
     requestParams.quality = this.mapQualityForGptImage1(
       quality
     ) as ImageGenerateParams["quality"];
@@ -82,24 +83,14 @@ export class OpenAIService {
 
   private static validateModelParameters(
     model: string,
-    size: string,
     quality: string,
     numImages: number,
     background: string,
     outputFormat: string,
     moderation: string
   ): void {
-    if (model !== "gpt-image-1.5") {
-      throw new Error(`Only "gpt-image-1.5" is supported for OpenAI`);
-    }
-
-    const validSizes = ["1024x1024", "1536x1024", "1024x1536", "auto"];
-    if (!validSizes.includes(size)) {
-      throw new Error(
-        `Invalid size "${size}" for model "${model}". Valid sizes: ${validSizes.join(
-          ", "
-        )}`
-      );
+    if (model !== "gpt") {
+      throw new Error(`Only "gpt" is supported for OpenAI`);
     }
 
     const validQualities = ["auto", "high", "medium", "low"];
@@ -127,14 +118,14 @@ export class OpenAIService {
   }
 
   private static mapQualityForGptImage1(quality: string): string {
-    // Map our quality options to gpt-image-1.5 quality options
+    // Map our CLI-friendly quality options to OpenAI image API.
     const qualityMap: { [key: string]: string } = {
       auto: "auto",
       high: "high",
       medium: "medium",
       low: "low",
-      hd: "high", // Map hd to high for gpt-image-1.5
-      standard: "medium", // Map standard to medium for gpt-image-1.5
+      hd: "high",
+      standard: "medium",
     };
     return qualityMap[quality] || "auto";
   }

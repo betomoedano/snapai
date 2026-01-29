@@ -1,6 +1,8 @@
 export type IconStyle = 'minimalism' | 'glassy' | 'woven' | 'geometric' | 'neon' | 'gradient' | 'flat' | 'material' | 'ios-classic' | 'android-material' | 'pixel' | 'game' | 'clay' | 'holographic';
 
 export class StyleTemplates {
+  private static readonly FIXED_SIZE = 1024;
+
   private static readonly baseRulesV2 = [
     `Single dominant subject only.`,
     `No rounded-square tile or app plate.`,
@@ -10,9 +12,9 @@ export class StyleTemplates {
     `Soft edges unless the selected style requires sharp geometry.`,
   ].join(" ");
 
-  static getStylePrompt(userPrompt: string, style: IconStyle, size: string = '1024x1024'): string {
-    const sizeNum = size === 'auto' ? 1024 : parseInt(size.split('x')[0]);
-    
+  static getStylePrompt(userPrompt: string, style: IconStyle): string {
+    const sizeNum = this.FIXED_SIZE;
+
     switch (style) {
       case 'minimalism':
         return `Create a ${sizeNum}x${sizeNum} square app icon artwork. Subject: ${userPrompt}. ${this.baseRulesV2} Rendering style: Reduce the idea to its purest metaphor. Max 2–3 colors. Flat or very subtle depth.`;
