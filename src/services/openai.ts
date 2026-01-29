@@ -4,7 +4,19 @@ import { IconGenerationOptions } from "../types.js";
 import { ImageGenerateParams } from "openai/resources/images.js";
 
 export class OpenAIService {
-  private static readonly OPENAI_IMAGE_MODEL_ID = "gpt-image-1.5";
+  /**
+   * SnapAI model aliases (CLI-facing) → OpenAI model IDs.
+   *
+   * - gpt-1.5: current default (was previously exposed as "gpt")
+   * - gpt-1: previous generation
+   * - gpt: kept as backwards-compatible alias for gpt-1.5
+   */
+  private static readonly OPENAI_IMAGE_MODEL_ID_BY_ALIAS: Record<string, string> =
+    {
+      "gpt-1": "gpt-image-1",
+      "gpt-1.5": "gpt-image-1.5",
+      gpt: "gpt-image-1.5",
+    };
   private static readonly FIXED_SIZE = "1024x1024";
 
   private static async getClient(apiKeyOverride?: string): Promise<OpenAI> {
@@ -29,7 +41,7 @@ export class OpenAIService {
     const client = await this.getClient(options.apiKey);
     const {
       prompt,
-      model = "gpt",
+      model = "gpt-1.5",
       quality = "auto",
       background = "auto",
       outputFormat = "png",
@@ -50,9 +62,11 @@ export class OpenAIService {
 
     const finalPrompt = rawPrompt ? prompt : prompt;
 
+    const resolvedModelId = this.resolveOpenAIImageModelId(model);
+
     // Build request parameters based on model
     const requestParams: ImageGenerateParams = {
-      model: this.OPENAI_IMAGE_MODEL_ID,
+      model: resolvedModelId,
       prompt: finalPrompt,
       n: numImages,
       size: this.FIXED_SIZE as any,
@@ -89,9 +103,7 @@ export class OpenAIService {
     outputFormat: string,
     moderation: string
   ): void {
-    if (model !== "gpt") {
-      throw new Error(`Only "gpt" is supported for OpenAI`);
-    }
+    this.resolveOpenAIImageModelId(model);
 
     const validQualities = ["auto", "high", "medium", "low"];
     if (!validQualities.includes(quality)) {
@@ -128,5 +140,20 @@ export class OpenAIService {
       standard: "medium",
     };
     return qualityMap[quality] || "auto";
+  }
+
+  private static resolveOpenAIImageModelId(model: string): string {
+    const key = String(model || "").trim().toLowerCase();
+    const resolved = this.OPENAI_IMAGE_MODEL_ID_BY_ALIAS[key];
+    if (!resolved) {
+      const valid = Object.keys(this.OPENAI_IMAGE_MODEL_ID_BY_ALIAS)
+        .filter((k) => k !== "gpt")
+        .sort()
+        .join(", ");
+      throw new Error(
+        `Invalid OpenAI model "${model}". Valid: ${valid} (or legacy alias: gpt)`
+      );
+    }
+    return resolved;
   }
 }

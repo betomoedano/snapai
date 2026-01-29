@@ -33,7 +33,7 @@ function isStyleDangerous(style?: string): boolean {
 
 export default class IconCommand extends Command {
   static description =
-    "Generate AI-powered app icons using GPT (gpt) or Gemini (banana)";
+    "Generate AI-powered app icons using OpenAI (gpt-1.5/gpt-1) or Gemini (banana)";
 
   static examples = [
     // Basic usage
@@ -41,13 +41,13 @@ export default class IconCommand extends Command {
     '<%= config.bin %> <%= command.id %> --prompt "fitness tracker" --output ./assets/icons',
     "",
     // OpenAI
-    '<%= config.bin %> <%= command.id %> --prompt "best quality" --model gpt -n 3 -q high',
+    '<%= config.bin %> <%= command.id %> --prompt "best quality" --model gpt-1.5 -n 3 -q high',
     "",
     // Gemini
     '<%= config.bin %> <%= command.id %> --prompt "modern app icon" --model banana',
     "",
     // Advanced options
-    '<%= config.bin %> <%= command.id %> --prompt "logo" --model gpt --background transparent --output-format png',
+    '<%= config.bin %> <%= command.id %> --prompt "logo" --model gpt-1.5 --background transparent --output-format png',
     '<%= config.bin %> <%= command.id %> --prompt "high-res banana" --model banana --pro -n 3 -q 4k',
     '<%= config.bin %> <%= command.id %> --prompt "custom design" --raw-prompt',
     "",
@@ -93,9 +93,9 @@ export default class IconCommand extends Command {
     model: Flags.string({
       char: "m",
       description:
-        'Model: GPT ("gpt") or Gemini ("banana")',
-      default: "gpt",
-      options: ["gpt", "banana"],
+        'Model: OpenAI ("gpt-1.5" or "gpt-1") or Gemini ("banana"). (Legacy alias: "gpt")',
+      default: "gpt-1.5",
+      options: ["gpt-1.5", "gpt-1", "banana", "gpt"],
     }),
     quality: Flags.string({
       char: "q",
@@ -120,8 +120,9 @@ export default class IconCommand extends Command {
     // === Advanced Options ===
     background: Flags.string({
       char: "b",
-      description: "Background: transparent, opaque, auto (GPT-Image-1 only)",
-      default: "auto",
+      description:
+        "Background request: transparent, opaque, auto (GPT-Image-1 only). Note: SnapAI always saves images with an opaque background.",
+      default: "opaque",
       options: ["transparent", "opaque", "auto"],
     }),
     "output-format": Flags.string({
@@ -190,7 +191,7 @@ export default class IconCommand extends Command {
     if (q === "standard") return "medium";
     if (q === "auto" || q === "high" || q === "medium" || q === "low") return q;
     throw new Error(
-      `Invalid --quality "${input}" for model "gpt". Valid: auto|high|medium|low (aliases: hd, standard)`
+      `Invalid --quality "${input}" for OpenAI models. Valid: auto|high|medium|low (aliases: hd, standard)`
     );
   }
 
@@ -242,8 +243,13 @@ export default class IconCommand extends Command {
         );
       }
 
-      const modelFlag = flags.model as "banana" | "gpt";
-      const provider: "banana" | "gpt" = modelFlag;
+      const modelFlag = flags.model as string;
+      const provider: "banana" | "openai" =
+        modelFlag === "banana" ? "banana" : "openai";
+      const openaiModel =
+        provider === "openai"
+          ? (modelFlag as "gpt-1" | "gpt-1.5" | "gpt")
+          : undefined;
 
       const qualityInput = this.normalizeFlagString(flags.quality, "auto");
 
@@ -319,7 +325,7 @@ export default class IconCommand extends Command {
         return;
       }
 
-      // OpenAI (gpt)
+      // OpenAI (gpt-1.5 / gpt-1)
       const openaiQuality = this.resolveOpenAIQuality(qualityInput);
       const basePrompt = buildFinalIconPrompt({
         prompt: flags.prompt,
@@ -328,12 +334,24 @@ export default class IconCommand extends Command {
         useIconWords: flags["use-icon-words"],
       });
       const outputFormat = flags["output-format"] as "png" | "jpeg" | "webp";
+      const requestedBackground = flags.background as
+        | "transparent"
+        | "opaque"
+        | "auto";
+      const enforcedBackground: "opaque" = "opaque";
+      if (requestedBackground === "transparent") {
+        this.log(
+          chalk.yellow(
+            '⚠️  "--background transparent" requested, but SnapAI always outputs an opaque image. Proceeding with opaque background.'
+          )
+        );
+      }
       const imageBase64Array = await OpenAIService.generateIcon({
         prompt: basePrompt,
         output: flags.output,
-        model: "gpt",
+        model: openaiModel,
         quality: openaiQuality,
-        background: flags.background as "transparent" | "opaque" | "auto",
+        background: enforcedBackground,
         outputFormat,
         numImages: requestedN,
         moderation: flags.moderation as "low" | "auto",

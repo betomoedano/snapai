@@ -28,14 +28,25 @@ export function buildFinalIconPrompt(params: {
     ? "square app icon artwork"
     : "square app artwork";
 
+  const glossyKeywords =
+    /\b(glassy|glass|chrome|holographic|iridescent|neon|glow|bloom|sparkle|sparkles|lens\s*flare|shiny|shine|metallic)\b/i;
+  const isDefaultLook = !style && !glossyKeywords.test(prompt);
+
   const contextBlock = [
     `Context: This is a mobile app icon for an app launcher / home screen.`,
+    `The output image IS the icon (full-bleed). Do not place a smaller icon centered on a blank/white canvas.`,
+    `Do NOT draw a rounded-square tile/container, app plate, sticker, or UI mockup. The platform applies rounded corners; you must output a full square image.`,
     `It must read as an icon, not a standalone photo.`,
     `Do NOT generate a photographic portrait, a concert photo, a landscape photo, or a full real-world scene.`,
     `No realistic human faces as the main subject. No celebrity-like portraits.`,
     `If a "photo" is part of the concept, it must be a small framed element inside the icon (e.g. a museum frame), not the full image.`,
     `Do not copy or imitate real brand logos, trademarked shapes, or recognizable brand marks.`,
   ].join("\n");
+
+  const styleResolved = resolveStylePreset(style);
+  const presetDirective = styleResolved.preset
+    ? StyleTemplates.getStyleDirective(styleResolved.preset)
+    : null;
 
   const layer1 = [
     `Create a full-bleed ${sizeText} ${artworkNoun}.`,
@@ -62,17 +73,24 @@ export function buildFinalIconPrompt(params: {
     `Creativity does NOT mean: always adding eyes/faces, always making it cute, always anthropomorphizing objects.`,
     ``,
     `Material:`,
-    `Select one dominant material (glass, metal, gel, ceramic, plastic, light, fabric, liquid).`,
+    isDefaultLook
+      ? `Default to an illustration-friendly matte finish (painted polymer, ceramic, paper, or flat vector). Avoid glass/chrome/neon unless explicitly requested.`
+      : `Select one dominant material (glass, metal, gel, ceramic, plastic, light, fabric, liquid).`,
     `Material choice should communicate mood and product category.`,
     ``,
     `Composition:`,
     `Main subject fills 92–98% of the canvas. Strong silhouette. No unnecessary elements.`,
     ``,
     `Lighting:`,
-    `Use lighting to define mood and hierarchy. Do not add facial expressions unless using the character_icon archetype.`,
+    isDefaultLook
+      ? `Soft, controlled lighting. Minimal specular highlights. No bloom/glow/lens flares. No “3D glass icon” look.`
+      : `Use lighting to define mood and hierarchy. Do not add facial expressions unless using the character_icon archetype.`,
     ``,
     `Overall feel:`,
     `Modern, premium, app-icon-first. Creative without being childish. Readable at small sizes.`,
+    isDefaultLook
+      ? `Rendering default: clean illustration / 2D or 2.5D, matte finish, subtle shading only.`
+      : null,
   ].join("\n");
 
   const squareRule = `Square 1:1 aspect ratio.`;
@@ -80,15 +98,21 @@ export function buildFinalIconPrompt(params: {
   const layer2 = [
     `Technical constraints:`,
     squareRule,
-    `Main subject fills 92–98% of the canvas.`,
-    `Keep the silhouette centered and balanced; avoid critical details within ~5–8% of the edges (safe area).`,
+    `Main subject fills 92–98% of the canvas. Scale up / zoom in — avoid excessive empty space.`,
+    `Keep the silhouette centered and balanced. Keep critical details within ~5–8% safe area, but the background must still be full-bleed to the edges.`,
     `Android-safe guidance: keep critical details within the central ~70% of the canvas (silhouette can extend beyond).`,
     `No text. No watermark. No borders. No frames. No container tiles. No app plates.`,
     `No letters, numbers, monograms, or typography.`,
     `No floating sticker or badge appearance.`,
-    `Background must touch all four edges and stay clean: low-detail, low-noise, no busy patterns.`,
+    `Background MUST be full-bleed and touch all four edges (no white/blank outer margin).`,
+    `Do NOT draw rounded corners, rounded-square tiles, or an app-icon "plate". Do NOT draw an icon inside a larger square canvas.`,
+    `No outer padding, matte, vignette, frame, or border. Use the entire 1024x1024 canvas.`,
+    `Keep background clean: low-detail, low-noise, no busy patterns.`,
     `Not a photo: no camera realism, no full-scene photography, no portrait framing as the whole image.`,
     `Do not imitate real brand logos or trademarked marks.`,
+    isDefaultLook
+      ? `Avoid over-stylized glossy/glassy icon aesthetics: no inflated glass, no chrome, no rainbow refraction, no neon glow, no sparkles, no lens flare, no exaggerated shine.`
+      : null,
     `If generating multiple images: keep the same archetype + dominant material, and vary only small details.`,
     ``,
     `Base rules:`,
@@ -113,11 +137,6 @@ export function buildFinalIconPrompt(params: {
     .filter(Boolean)
     .join("\n");
 
-  const styleResolved = resolveStylePreset(style);
-  const presetDirective = styleResolved.preset
-    ? StyleTemplates.getStyleDirective(styleResolved.preset)
-    : null;
-
   const styleLine = styleResolved.preset
     ? [
         `Primary style preset (dominant): ${styleResolved.preset}`,
@@ -134,7 +153,7 @@ export function buildFinalIconPrompt(params: {
         ``,
         `Style system:`,
         styleResolved.preset
-          ? `This preset is the base art direction. Concept, material, lighting, and rendering must all comply with it.`
+          ? `This preset is the base art direction and is a HARD constraint. If any other instruction conflicts, the style rules win. Concept, material, lighting, composition, and rendering must all comply with it.`
           : `Apply the style after the concept is defined. Styles affect material and rendering (texture/color/lighting), not the chosen archetype.`,
         styleLine,
       ].join("\n")

@@ -1,10 +1,12 @@
 # SnapAI
 
+![SnapAI](./test-icons/OG-SnapAI.webp)
+
 Generate high-quality **square app icon artwork** from the terminal — built for **React Native** and **Expo**.
 
 SnapAI is a developer-friendly CLI that talks directly to:
 
-- **OpenAI Images** (`gpt` → `gpt-image-1.5`)
+- **OpenAI Images** (`gpt-1.5` → `gpt-image-1.5`, `gpt-1` → `gpt-image-1`)
 - **Google Nano Banana** _(Gemini image models)_ — selected via `--model banana`
 
 The workflow is intentionally **square-only**: **always `1024x1024` (1:1)** to match iOS/Android icon needs and avoid resizing headaches.
@@ -13,7 +15,9 @@ The workflow is intentionally **square-only**: **always `1024x1024` (1:1)** to m
 
 - **Fast**: generate icons in seconds. No UI. No accounts.
 - **Latest image models**:
-  - OpenAI: `gpt` _(uses `gpt-image-1.5` under the hood)_
+  - OpenAI:
+    - `gpt-1.5` _(uses `gpt-image-1.5` under the hood)_
+    - `gpt-1` _(uses `gpt-image-1` under the hood)_
   - Google Nano Banana (Gemini):
     - normal: `gemini-2.5-flash-image`
     - pro: `gemini-3-pro-image-preview`
@@ -28,6 +32,8 @@ The workflow is intentionally **square-only**: **always `1024x1024` (1:1)** to m
 
 [Watch on YouTube](https://youtu.be/R4hvt8iz_rE)
 
+[Read: Introducing Code With Beto Skills](https://codewithbeto.dev/blog/introducing-code-with-beto-skills)
+
 ## Install 📦
 
 ```bash
@@ -38,10 +44,10 @@ npx snapai --help
 npm install -g snapai
 ```
 
-> [!IMPORTANT]
+> **Important** 🔑  
 > You need **at least one** API key:
 >
-> - **OpenAI** (for `gpt` → `gpt-image-1.5`)
+> - **OpenAI** (for `gpt-1.5` → `gpt-image-1.5`, `gpt-1` → `gpt-image-1`)
 > - **Google AI Studio** (for Google Nano Banana / Gemini via `--model banana`)
 >
 > SnapAI is **CLI-only** and sends requests **directly** to the provider you select.
@@ -54,9 +60,9 @@ npx snapai icon --prompt "minimalist weather app with sun and cloud"
 
 Output defaults to `./assets` (timestamped filenames).
 
-> [!NOTE]
-> Models can still draw the subject with **visual padding** (an empty border). This is normal.
-> SnapAI avoids forcing the words `"icon"` / `"logo"` by default to reduce padding.
+> **Note** 📝  
+> Models can still draw the subject with **visual padding** (an empty border). This is normal.  
+> SnapAI avoids forcing the words `"icon"` / `"logo"` by default to reduce padding.  
 > If you want more “icon-y” framing, opt in with `--use-icon-words`.
 
 ## Providers & models (what “banana” means) 🧠
@@ -65,11 +71,12 @@ SnapAI exposes providers via `--model`:
 
 | Provider                    | SnapAI flag            | Underlying model             | Notes                                                     |
 | --------------------------- | ---------------------- | ---------------------------- | --------------------------------------------------------- |
-| OpenAI                      | `--model gpt`          | `gpt-image-1.5`              | Always 1:1 square `1024x1024`, background/output controls |
+| OpenAI (latest)             | `--model gpt-1.5`      | `gpt-image-1.5`              | Always 1:1 square `1024x1024`, background/output controls |
+| OpenAI (previous)           | `--model gpt-1`        | `gpt-image-1`                | Same controls as above                                    |
 | Google Nano Banana (normal) | `--model banana`       | `gemini-2.5-flash-image`     | Always 1 image, square output                             |
 | Google Nano Banana (pro)    | `--model banana --pro` | `gemini-3-pro-image-preview` | Quality tiers via `--quality 1k/2k/4k`, multiple via `-n` |
 
-> [!TIP]
+> **Tip** 💡  
 > If you want **multiple variations** quickly, use **OpenAI** (`-n`) or **Banana Pro** (`--pro -n ...`).
 
 ## Setup 🔐
@@ -129,11 +136,11 @@ npx snapai icon --prompt "professional banking app with secure lock" --output ./
 npx snapai icon --prompt "calculator app" --style minimalism
 ```
 
-### OpenAI (`gpt`)
+### OpenAI (`gpt-1.5` / `gpt-1`)
 
 ```bash
 # Multiple variations
-npx snapai icon --prompt "app icon concept" --model gpt -n 3
+npx snapai icon --prompt "app icon concept" --model gpt-1.5 -n 3
 
 # Higher quality
 npx snapai icon --prompt "premium app icon" --quality high
@@ -164,7 +171,7 @@ Nano Banana notes:
   - “a finance app, shield + checkmark, modern, clean gradients”
 - If you see too much empty border:
   - remove the words `"icon"` / `"logo"` (default behavior), or keep them off and be explicit about “fill the frame”
-- Use `--style` for rendering/material hints (examples: `glassy`, `minimalism`, `neon`, `pixel`, `material`)
+- Use `--style` for rendering/material hints (examples: `minimalism`, `material`, `pixel`, `kawaii`, `cute`, `glassy`, `neon`)
 
 ## Command reference 📚
 
@@ -174,7 +181,7 @@ Nano Banana notes:
 | ------------------ | ----- | ---------- | ------------------------------------------------------------------------------- |
 | `--prompt`         | `-p`  | required   | Description of the icon to generate                                             |
 | `--output`         | `-o`  | `./assets` | Output directory                                                                |
-| `--model`          | `-m`  | `gpt`      | `gpt` (OpenAI) or `banana` (Google Nano Banana)                                 |
+| `--model`          | `-m`  | `gpt-1.5`  | `gpt-1.5`/`gpt-1` (OpenAI) or `banana` (Google Nano Banana)                     |
 | `--quality`        | `-q`  | `auto`     | GPT: `auto/high/medium/low` (aliases: `hd`, `standard`). Banana Pro: `1k/2k/4k` |
 | `--background`     | `-b`  | `auto`     | Background (`transparent`, `opaque`, `auto`) (OpenAI only)                      |
 | `--output-format`  | `-f`  | `png`      | Output format (`png`, `jpeg`, `webp`) (OpenAI only)                             |
@@ -189,14 +196,16 @@ Nano Banana notes:
 
 ## Examples (real outputs) 🖼️
 
-| Prompt                                                                                                            | Result                                                       | Command                                                                  |
-| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| `glass-like color-wheel flower made of eight evenly spaced, semi-transparent petals`                              | ![Flower Icon](test-icons/icon-1750560657796.png)            | `snapai icon --prompt "glass-like color-wheel flower..."`                |
-| `glass-like sound wave pattern made of five curved, semi-transparent layers flowing in perfect harmony`           | ![Sound Wave Icon](test-icons/icon-sound-wave.png)           | `snapai icon --prompt "glass-like sound wave pattern..."`                |
-| `glass-like speech bubble composed of three overlapping, semi-transparent rounded rectangles with soft gradients` | ![Messaging Icon](test-icons/icon-messaging.png)             | `snapai icon --prompt "glass-like speech bubble..."`                     |
-| `glass-like camera aperture made of six triangular, semi-transparent blades forming a perfect hexagonal opening`  | ![Camera Glass Icon](test-icons/icon-camera-glass.png)       | `snapai icon --prompt "glass-like camera aperture..."`                   |
-| `stylized camera lens with concentric circles in warm sunset colors orange pink and coral gradients`              | ![Camera Retro Icon](test-icons/icon-lens-retro.png)         | `snapai icon --prompt "stylized camera lens with concentric circles..."` |
-| `neon-outlined calculator with electric blue glowing numbers`                                                     | ![Neon Calculator Icon](test-icons/icon-calculator-neon.png) | `snapai icon --prompt "neon-outlined calculator..."`                     |
+| Prompt                                                                  | Result                                                                                                                                                        | Command                                                                                                                 |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `minimalist weather app with sun and cloud`                             | ![Weather Icon](<test-icons/npx snapai icon --prompt "minimalist weather app with sun and cloud" --model gpt-1.5.webp>)                                       | `npx snapai icon --prompt "minimalist weather app with sun and cloud" --model gpt-1.5`                                  |
+| `premium banking app, shield + checkmark, clean gradients`              | ![Banking Icon](<test-icons/npx snapai icon --prompt "premium banking app, shield + checkmark, clean gradients" --model gpt-1.5.webp>)                        | `npx snapai icon --prompt "premium banking app, shield + checkmark, clean gradients" --model gpt-1.5`                   |
+| `calendar app, simple date grid, clean illustration`                    | ![Calendar Icon](<test-icons/npx snapai icon --prompt "calendar app, simple date grid, clean illustration" --model gpt-1.webp>)                               | `npx snapai icon --prompt "calendar app, simple date grid, clean illustration" --model gpt-1`                           |
+| `notes app, pen + paper, minimal, friendly`                             | ![Notes Icon](<test-icons/npx snapai icon --prompt "notes app, pen + paper, minimal, friendly" --model gpt-1.webp>)                                           | `npx snapai icon --prompt "notes app, pen + paper, minimal, friendly" --model gpt-1`                                    |
+| `music player app, abstract sound wave, clean shapes`                   | ![Music Icon](<test-icons/npx snapai icon --prompt "music player app, abstract sound wave, clean shapes" --model banana.webp>)                                | `npx snapai icon --prompt "music player app, abstract sound wave, clean shapes" --model banana`                         |
+| `camera app, lens icon, simple concentric circles`                      | ![Camera Icon](<test-icons/npx snapai icon --prompt "camera app, lens icon, simple concentric circles" --model banana.webp>)                                  | `npx snapai icon --prompt "camera app, lens icon, simple concentric circles" --model banana`                            |
+| `finance app, secure lock, clean illustration, bold silhouette`         | ![Finance Lock Icon](<test-icons/npx snapai icon --prompt "finance app, secure lock, clean illustration, bold silhouette" --model banana --pro.webp>)         | `npx snapai icon --prompt "finance app, secure lock, clean illustration, bold silhouette" --model banana --pro`         |
+| `photo editor app, magic wand + spark, simple shapes, modern gradients` | ![Photo Editor Icon](<test-icons/npx snapai icon --prompt "photo editor app, magic wand + spark, simple shapes, modern gradients" --model banana --pro.webp>) | `npx snapai icon --prompt "photo editor app, magic wand + spark, simple shapes, modern gradients" --model banana --pro` |
 
 ## Privacy & security 🔒
 
@@ -205,7 +214,7 @@ Nano Banana notes:
 - SnapAI does not run a backend and does not collect your prompts/images.
 - API keys are stored locally only if you run `snapai config ...` (or provided at runtime via env vars/flags).
 
-> [!WARNING]
+> **Warning** ⚠️  
 > Never commit API keys to git. Use environment variables in CI.
 
 ## Development 🛠️

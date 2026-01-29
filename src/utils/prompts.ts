@@ -1,10 +1,10 @@
 export class PromptTemplates {
   static enhanceForIOSIcon(userPrompt: string): string {
-    return `Create a 1024 × 1024 px square iOS app-icon illustration: ${userPrompt}. Use crisp, minimal design with vibrant colors. Add a subtle inner bevel for gentle depth; no hard shadows or outlines. Center the design with comfortable breathing room from the edges. Solid, light-neutral background. No text, borders, or extraneous details. Final look: clean, vibrant, and Apple-polished. Use the full image size for the icon, don't draw it inside the image, don't add borders, the rounded corners would be applied by the platform, so don't add them.`;
+    return `Create a 1024 × 1024 px square iOS app-icon illustration: ${userPrompt}. Use crisp, minimal design with vibrant colors. Use subtle shading for gentle depth (matte finish); no glossy glass look, no harsh specular highlights, no lens flare. The output image IS the icon: full-bleed edge-to-edge background (no white outer margin), do not draw a smaller icon centered on a blank canvas. Center the design with comfortable breathing room from the edges (but avoid excessive empty space). Solid, light-neutral background. No text, borders, or extraneous details. Final look: clean, modern, and illustration-first. Use the full image size for the icon, don't draw it inside the image, don't add borders, the rounded corners would be applied by the platform, so don't add them.`;
   }
 
   static enhanceForAndroidIcon(userPrompt: string): string {
-    return `Create a 1024 × 1024 px square Android app-icon illustration: ${userPrompt}. Use material design principles with bold, vibrant colors and clean geometry. Subtle depth with appropriate shadowing. Center the design with comfortable margins. Solid background or subtle gradient. No text, borders, or extraneous details. Final look should be modern, bold, and Android-appropriate. Use the full image size for the icon.`;
+    return `Create a 1024 × 1024 px square Android app-icon illustration: ${userPrompt}. Use material design principles with bold, vibrant colors and clean geometry. Subtle depth with soft, controlled shadowing (matte finish); avoid glossy glass icons, exaggerated shine, neon glow, sparkles, or lens flare. The output image IS the icon: full-bleed edge-to-edge background (no white outer margin), do not draw a smaller icon centered on a blank canvas. Center the design with comfortable margins (but avoid excessive empty space). Solid background or subtle gradient. No text, borders, or extraneous details. Final look should be modern, bold, and illustration-first. Use the full image size for the icon.`;
   }
 
   static getSuccessfulPromptElements(): string[] {
@@ -23,13 +23,13 @@ export class PromptTemplates {
 
   static getPopularExamples(): string[] {
     return [
-      "crisp, minimal, glass-like color-wheel flower made of eight evenly spaced, semi-transparent petals forming a perfect circle",
+      "crisp, minimal color-wheel flower made of eight evenly spaced petals forming a perfect circle (matte illustration)",
       "minimalist calculator app with clean geometric numbers and soft gradients",
       "fitness tracker app with stylized running figure using vibrant gradient colors",
-      "weather app with glass-like sun and translucent cloud elements",
-      "music player app with abstract sound waves in soft pastel hues",
+      "weather app with simple sun and cloud shapes, clean and friendly (matte illustration)",
+      "music player app with abstract sound waves, simple shapes, soft pastel hues",
       "photo gallery app with camera lens design using inner bevel effects",
-      "messaging app with speech bubble in vibrant, translucent style",
+      "messaging app with speech bubble in vibrant, clean illustration style",
       "calendar app with clean date grid and subtle depth",
       "note-taking app with pen and paper using soft, blended colors",
       "banking app with secure lock symbol and professional gradients"
