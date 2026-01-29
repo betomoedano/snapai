@@ -1,11 +1,11 @@
 {
   "name": "snapai",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "description": "AI-powered icon generation CLI for mobile app developers",
   "main": "dist/index.js",
   "type": "module",
   "bin": {
-    "snapai": "./bin/snapai"
+    "snapai": "./bin/snapai.js"
   },
   "scripts": {
     "build": "tsc",
@@ -26,7 +26,7 @@
     "mobile",
     "expo",
     "react-native",
-    "dall-e"
+    "gemini"
   ],
   "author": {
     "name": "Beto Moedano",
@@ -48,8 +48,10 @@
   "dependencies": {
     "@oclif/core": "^4.0.0",
     "@oclif/plugin-help": "^6.0.0",
+    "@google/genai": "^1.0.0",
     "openai": "^4.20.1",
     "fs-extra": "^11.1.1",
+    "mime": "^4.0.0",
     "chalk": "^5.3.0"
   },
   "devDependencies": {
@@ -66,7 +68,7 @@
   },
   "files": [
     "dist",
-    "bin/snapai",
+    "bin/snapai.js",
     "README.md",
     "LICENSE"
   ],

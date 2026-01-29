@@ -31,7 +31,7 @@ pnpm run build
 pnpm run dev
 
 # In another terminal, test your changes
-./bin/dev.js config --api-key sk-your-test-key
+./bin/dev.js config --openai-api-key sk-your-test-key
 ./bin/dev.js icon --prompt "test icon"
 ```
 

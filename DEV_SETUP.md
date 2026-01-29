@@ -62,7 +62,7 @@ node bundle/snapai.js --help
 ### Setup API Key
 
 ```bash
-snapai-dev config --api-key sk-your-openai-key-here
+snapai-dev config --openai-api-key sk-your-openai-key-here
 snapai-dev config --show
 ```
 

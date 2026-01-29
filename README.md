@@ -1,442 +1,249 @@
-# SnapAI ⚡
+# SnapAI
 
-> AI-powered icon generation for React Native & Expo developers
+![SnapAI](./test-icons/OG-SnapAI.webp)
 
-Create stunning app icons in seconds using OpenAI's latest image generation models. Perfect for developers who want professional icons without the design hassle! 🎨
+Generate high-quality **square app icon artwork** from the terminal — built for **React Native** and **Expo**.
 
-## ✨ Features
+SnapAI is a developer-friendly CLI that talks directly to:
 
-🚀 **Lightning Fast** - Generate icons in seconds, not hours  
-🎯 **iOS Optimized** - Perfect for App Store requirements  
-🛡️ **Privacy First** - Zero data collection, API keys stay local  
-📱 **Multiple Sizes** - Square, landscape, and portrait formats  
-💎 **HD Quality** - Crystal clear icons for any device  
-🔧 **Developer Friendly** - Simple CLI, perfect for CI/CD
+- **OpenAI Images** (`gpt-1.5` → `gpt-image-1.5`, `gpt-1` → `gpt-image-1`)
+- **Google Nano Banana** _(Gemini image models)_ — selected via `--model banana`
 
-## 🚀 Full Video Tutorial
+The workflow is intentionally **square-only**: **always `1024x1024` (1:1)** to match iOS/Android icon needs and avoid resizing headaches.
 
-<a href="https://youtu.be/R4hvt8iz_rE">
-  <img src="https://i.ytimg.com/vi_webp/R4hvt8iz_rE/maxresdefault.webp" height="380" alt="YouTube Video Preview">
-</a>
+## Features ✨
 
-### Installation
+- **Fast**: generate icons in seconds. No UI. No accounts.
+- **Latest image models**:
+  - OpenAI:
+    - `gpt-1.5` _(uses `gpt-image-1.5` under the hood)_
+    - `gpt-1` _(uses `gpt-image-1` under the hood)_
+  - Google Nano Banana (Gemini):
+    - normal: `gemini-2.5-flash-image`
+    - pro: `gemini-3-pro-image-preview`
+- **iOS + Android oriented**: prompt enhancement tuned for app-icon style outputs.
+- **Quality controls**:
+  - OpenAI: `--quality auto|high|medium|low` (aliases: `hd` → `high`, `standard` → `medium`)
+  - Nano Banana Pro: `--quality 1k|2k|4k`
+- **DX-friendly**: just a CLI (great for CI/CD too).
+- **Privacy-first**: no telemetry, no tracking. Uses your API keys and sends requests directly to the provider you choose.
+
+## Video tutorial 🎥
+
+[Watch on YouTube](https://youtu.be/R4hvt8iz_rE)
+
+[Read: Introducing Code With Beto Skills](https://codewithbeto.dev/blog/introducing-code-with-beto-skills)
+
+## Install 📦
 
 ```bash
-# Install globally
+# Recommended (no install)
+npx snapai --help
+
+# Or install globally
 npm install -g snapai
-
-# Or use directly (no installation)
-npx snapai
 ```
 
-> [!IMPORTANT]  
-> You'll need an OpenAI API key to generate icons. Get one at [platform.openai.com](https://platform.openai.com) - it costs ~$0.04 per icon!
+> **Important** 🔑  
+> You need **at least one** API key:
+>
+> - **OpenAI** (for `gpt-1.5` → `gpt-image-1.5`, `gpt-1` → `gpt-image-1`)
+> - **Google AI Studio** (for Google Nano Banana / Gemini via `--model banana`)
+>
+> SnapAI is **CLI-only** and sends requests **directly** to the provider you select.
 
-### Setup Your API Key
+## Quickstart (first icon) ⚡
 
 ```bash
-snapai config --api-key sk-your-openai-api-key-here
+npx snapai icon --prompt "minimalist weather app with sun and cloud"
 ```
 
-### Generate Your First Icon! 🎉
+Output defaults to `./assets` (timestamped filenames).
+
+> **Note** 📝  
+> Models can still draw the subject with **visual padding** (an empty border). This is normal.  
+> SnapAI avoids forcing the words `"icon"` / `"logo"` by default to reduce padding.  
+> If you want more “icon-y” framing, opt in with `--use-icon-words`.
+
+## Providers & models (what “banana” means) 🧠
+
+SnapAI exposes providers via `--model`:
+
+| Provider                    | SnapAI flag            | Underlying model             | Notes                                                     |
+| --------------------------- | ---------------------- | ---------------------------- | --------------------------------------------------------- |
+| OpenAI (latest)             | `--model gpt-1.5`      | `gpt-image-1.5`              | Always 1:1 square `1024x1024`, background/output controls |
+| OpenAI (previous)           | `--model gpt-1`        | `gpt-image-1`                | Same controls as above                                    |
+| Google Nano Banana (normal) | `--model banana`       | `gemini-2.5-flash-image`     | Always 1 image, square output                             |
+| Google Nano Banana (pro)    | `--model banana --pro` | `gemini-3-pro-image-preview` | Quality tiers via `--quality 1k/2k/4k`, multiple via `-n` |
+
+> **Tip** 💡  
+> If you want **multiple variations** quickly, use **OpenAI** (`-n`) or **Banana Pro** (`--pro -n ...`).
+
+## Setup 🔐
+
+You can store keys locally (developer machine), or provide them at runtime (CI/CD).
+
+### Local config (writes to `~/.snapai/config.json`)
 
 ```bash
-snapai icon --prompt "minimalist weather app with sun and cloud"
+snapai config --openai-api-key "sk-your-openai-api-key"
+snapai config --google-api-key "your-google-ai-studio-key"
+
+snapai config --show
 ```
 
-## 🎨 See It In Action
+### CI/CD secrets (recommended)
 
-**Real icons generated with SnapAI:**
-
-| Prompt                                                                                                            | Result                                                       | Command                                                                              |
-| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| `glass-like color-wheel flower made of eight evenly spaced, semi-transparent petals`                              | ![Flower Icon](test-icons/icon-1750560657796.png)            | `snapai icon --prompt "glass-like color-wheel flower..."`                            |
-| `glass-like sound wave pattern made of five curved, semi-transparent layers flowing in perfect harmony`           | ![Sound Wave Icon](test-icons/icon-sound-wave.png)           | `snapai icon --prompt "glass-like sound wave pattern..."`                            |
-| `glass-like speech bubble composed of three overlapping, semi-transparent rounded rectangles with soft gradients` | ![Messaging Icon](test-icons/icon-messaging.png)             | `snapai icon --prompt "glass-like speech bubble..."`                                 |
-| `glass-like camera aperture made of six triangular, semi-transparent blades forming a perfect hexagonal opening`  | ![Camera Glass Icon](test-icons/icon-camera-glass.png)       | `snapai icon --prompt "glass-like camera aperture..."`                               |
-| `stylized camera lens with concentric circles in warm sunset colors orange pink and coral gradients`              | ![Camera Retro Icon](test-icons/icon-lens-retro.png)         | `snapai icon --prompt "stylized camera lens with concentric circles..."`             |
-| `neon-outlined calculator with electric blue glowing numbers`                                                     | ![Neon Calculator Icon](test-icons/icon-calculator-neon.png) | `snapai icon --prompt "neon-outlined calculator with electric blue glowing numbers"` |
-
-**Style-specific examples:**
-
-| Prompt                                                                             | Result                                         | Command                                                            |
-| ---------------------------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------ |
-| `minimalist terminal with clean black background and white command prompt symbols` | ![Minimalist Terminal](test-icons/minimal.png) | `snapai icon --prompt "minimalist terminal..." --style minimalism` |
-| `premium play button with glossy green surface and glass-like reflections`         | ![Glassy Play Button](test-icons/glassy.png)   | `snapai icon --prompt "premium play button..." --style glassy`     |
-| `retro arcade joystick with pixelated red ball and classic gaming aesthetic`       | ![Pixel Joystick](test-icons/pixel.png)        | `snapai icon --prompt "retro arcade joystick..." --style pixel`    |
-
-## 🎨 Amazing Example Prompts
-
-Try these proven prompts that create stunning icons:
+Use environment variables so nothing is written to disk:
 
 ```bash
-# Glass-like design (trending!)
-snapai icon --prompt "glass-like color-wheel flower made of eight evenly spaced, semi-transparent petals forming a perfect circle"
+export SNAPAI_API_KEY="sk-..."
+export SNAPAI_GOOGLE_API_KEY="..."
 
-# Minimalist apps
-snapai icon --prompt "minimalist calculator app with clean geometric numbers and soft gradients"
-snapai icon --prompt "fitness tracker app with stylized running figure using vibrant gradient colors"
-
-# Creative concepts
-snapai icon --prompt "weather app with glass-like sun and translucent cloud elements"
-snapai icon --prompt "music player app with abstract sound waves in soft pastel hues"
-snapai icon --prompt "banking app with secure lock symbol and professional gradients"
-
-# Style-specific examples
-snapai icon --prompt "minimalist calculator app with clean geometric numbers and soft blue gradients" --style minimalism
-snapai icon --prompt "premium music player with glass-like sound waves and translucent purple elements" --style glassy
-snapai icon --prompt "cyberpunk gaming app with electric neon borders and glowing green accents" --style neon
-snapai icon --prompt "retro indie game with pixelated rocket ship and 8-bit style stars" --style pixel
-snapai icon --prompt "modern Android app with Material Design floating action button and bold colors" --style material
+# Also supported:
+# export OPENAI_API_KEY="sk-..."
+# export GEMINI_API_KEY="..."
 ```
 
-## 🛠️ Command Reference
+**GitHub Actions example:**
 
-### Generate Icons
-
-#### Basic Usage
-
-```bash
-# Basic usage
-snapai icon --prompt "modern fitness tracker with heart rate monitor and clean geometric design"
-
-# Custom output directory
-snapai icon --prompt "professional banking app with secure lock icon and elegant blue gradients" --output ./assets/icons
-
-# High quality (costs 2x but worth it!)
-snapai icon --prompt "premium social media app with camera icon and vibrant gradient background" --quality hd
-
-# Different sizes
-snapai icon --prompt "wide landscape banner with company logo and modern typography" --size 1536x1024
-snapai icon --prompt "tall portrait icon with vertical app interface and clean layout" --size 1024x1536
-
-# Different styles
-snapai icon --prompt "minimalist calculator with clean white background and subtle blue accents" --style minimalism
-snapai icon --prompt "premium music player with glass-like equalizer bars and translucent elements" --style glassy
-snapai icon --prompt "futuristic weather app with neon cloud icons and electric blue glow effects" --style neon
+```yaml
+- name: Generate app icon
+  run: npx snapai icon --prompt "minimalist weather app with sun and cloud" --output ./assets/icons
+  env:
+    SNAPAI_API_KEY: ${{ secrets.SNAPAI_API_KEY }}
 ```
 
-#### Advanced Options
-
-##### Model Selection
+You can also pass keys per command (does not persist):
 
 ```bash
-# Use GPT-Image-1 (default, best quality)
-snapai icon --prompt "professional task manager with checkmark icon and clean minimalist design" --model gpt-image-1
-
-# Use DALL-E 3 (creative, artistic)
-snapai icon --prompt "artistic photo editing app with paintbrush and vibrant color palette" --model dall-e-3
-
-# Use DALL-E 2 (fast, cost-effective)
-snapai icon --prompt "simple note-taking app with pencil icon and clean white background" --model dall-e-2
+npx snapai icon --openai-api-key "sk-..." --prompt "modern app artwork"
+npx snapai icon --model banana --google-api-key "..." --prompt "modern app artwork"
 ```
 
-##### Multiple Images
+## Usage 🚀
+
+### Common (recommended)
 
 ```bash
-# Generate 3 variations (gpt-image-1 only)
-snapai icon --prompt "modern fitness app with dumbbell icon and energetic design" --num-images 3
+# Default (OpenAI)
+npx snapai icon --prompt "modern fitness tracker with heart rate monitor"
 
-# Generate 5 variations with high quality
-snapai icon --prompt "professional company logo with geometric shapes and modern typography" --num-images 5 --quality high
+# Output directory
+npx snapai icon --prompt "professional banking app with secure lock" --output ./assets/icons
+
+# Style hint (appended after enhancement)
+npx snapai icon --prompt "calculator app" --style minimalism
+
+# Preview the final generated prompt (no image generation)
+npx snapai icon --prompt "calculator app" --raw-prompt --prompt-only
+npx snapai icon --prompt "calculator app" --prompt-only
+npx snapai icon --prompt "calculator app" --style minimalism --prompt-only
 ```
 
-##### Background & Format
+### OpenAI (`gpt-1.5` / `gpt-1`)
 
 ```bash
-# Transparent background (gpt-image-1 only)
-snapai icon --prompt "modern company logo with geometric shapes and clean typography" --background transparent --output-format png
+# Multiple variations
+npx snapai icon --prompt "app icon concept" --model gpt-1.5 -n 3
 
-# Different output formats (gpt-image-1 only)
-snapai icon --prompt "wide web banner with company branding and call-to-action elements" --output-format webp
-snapai icon --prompt "professional headshot with clean background and business attire" --output-format jpeg
+# Higher quality
+npx snapai icon --prompt "premium app icon" --quality high
+
+# Transparent background + output format
+npx snapai icon --prompt "logo mark" --background transparent --output-format png
 ```
 
-##### Style Selection
+### Google Gemini (`gemini-2.5-flash-image / gemini-3-pro-image-preview`)
 
 ```bash
-# Minimalist design (clean, Apple-inspired)
-snapai icon --prompt "minimalist calculator with clean white background and subtle blue number buttons" --style minimalism
+# Normal (1 image)
+npx snapai icon --prompt "modern app artwork" --model banana
 
-# Glass-like aesthetic (semi-transparent, premium)
-snapai icon --prompt "premium music player with glass-like equalizer bars and translucent purple elements" --style glassy
-
-# Neon cyberpunk style (electric colors, glowing)
-snapai icon --prompt "futuristic gaming app with neon laser effects and electric green glow" --style neon
-
-# Material Design (Google's design language)
-snapai icon --prompt "modern Android app with Material Design floating action button and bold orange accent" --style material
-
-# Pixel art (retro 8-bit/16-bit gaming)
-snapai icon --prompt "retro indie game with pixelated spaceship and 8-bit style starfield background" --style pixel
+# Pro (multiple images + quality tiers)
+npx snapai icon --prompt "modern app artwork" --model banana --pro --quality 2k -n 3
 ```
 
-##### Quality & Moderation
+Nano Banana notes:
+
+- **Normal mode** always generates **1 image** (no `-n`, no `--quality` tiers).
+- **Pro mode** supports **multiple images** (`-n`) and **HD tiers** (`--quality 1k|2k|4k`).
+- Output is always **square**.
+
+## Prompt tips (small changes, big impact) 📝
+
+- **Describe the product first**, then the style:
+  - “a finance app, shield + checkmark, modern, clean gradients”
+- If you see too much empty border:
+  - remove the words `"icon"` / `"logo"` (default behavior), or keep them off and be explicit about “fill the frame”
+- Use `--style` for rendering/material hints (examples: `minimalism`, `material`, `pixel`, `kawaii`, `cute`, `glassy`, `neon`)
+
+> **Note** 📝  
+> If you pass `--style`, the style system is treated as a **hard constraint** and will take priority over other wording in your prompt.  
+> Try to avoid prompts that _conflict_ with the chosen style (e.g. `--style minimalism` + “neon glow”), or the model may produce inconsistent results.
+
+## Command reference 📚
+
+### `snapai icon` flags
+
+| Flag               | Short | Default    | Description                                                                       |
+| ------------------ | ----- | ---------- | --------------------------------------------------------------------------------- |
+| `--prompt`         | `-p`  | required   | Description of the icon to generate                                               |
+| `--output`         | `-o`  | `./assets` | Output directory                                                                  |
+| `--model`          | `-m`  | `gpt-1.5`  | `gpt-1.5`/`gpt-1` (OpenAI) or `banana` (Google Nano Banana)                       |
+| `--quality`        | `-q`  | `auto`     | GPT: `auto/high/medium/low` (aliases: `hd`, `standard`). Banana Pro: `1k/2k/4k`   |
+| `--background`     | `-b`  | `auto`     | Background (`transparent`, `opaque`, `auto`) (OpenAI only)                        |
+| `--output-format`  | `-f`  | `png`      | Output format (`png`, `jpeg`, `webp`) (OpenAI only)                               |
+| `--n`              | `-n`  | `1`        | Number of images (max 10). For Banana normal, must be `1`.                        |
+| `--moderation`     |       | `auto`     | Content filtering (`low`, `auto`) (OpenAI only)                                   |
+| `--prompt-only`    |       | `false`    | Preview final prompt + config without generating images                           |
+| `--raw-prompt`     | `-r`  | `false`    | Send prompt as-is (no SnapAI enhancement/constraints). Style still applies if set |
+| `--style`          | `-s`  |            | Rendering style hint appended after enhancement                                   |
+| `--use-icon-words` | `-i`  | `false`    | Include `"icon"` / `"logo"` in enhancement (may increase padding)                 |
+| `--pro`            | `-P`  | `false`    | Enable Nano Banana Pro (banana only)                                              |
+| `--openai-api-key` | `-k`  |            | OpenAI API key override (does not persist)                                        |
+| `--google-api-key` | `-g`  |            | Google API key override (does not persist)                                        |
+
+## Examples (real outputs) 🖼️
+
+| Prompt                                                                  | Result                                                                                                                                                        | Command                                                                                                                 |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `minimalist weather app with sun and cloud`                             | ![Weather Icon](<test-icons/npx snapai icon --prompt "minimalist weather app with sun and cloud" --model gpt-1.5.webp>)                                       | `npx snapai icon --prompt "minimalist weather app with sun and cloud" --model gpt-1.5`                                  |
+| `premium banking app, shield + checkmark, clean gradients`              | ![Banking Icon](<test-icons/npx snapai icon --prompt "premium banking app, shield + checkmark, clean gradients" --model gpt-1.5.webp>)                        | `npx snapai icon --prompt "premium banking app, shield + checkmark, clean gradients" --model gpt-1.5`                   |
+| `calendar app, simple date grid, clean illustration`                    | ![Calendar Icon](<test-icons/npx snapai icon --prompt "calendar app, simple date grid, clean illustration" --model gpt-1.webp>)                               | `npx snapai icon --prompt "calendar app, simple date grid, clean illustration" --model gpt-1`                           |
+| `notes app, pen + paper, minimal, friendly`                             | ![Notes Icon](<test-icons/npx snapai icon --prompt "notes app, pen + paper, minimal, friendly" --model gpt-1.webp>)                                           | `npx snapai icon --prompt "notes app, pen + paper, minimal, friendly" --model gpt-1`                                    |
+| `music player app, abstract sound wave, clean shapes`                   | ![Music Icon](<test-icons/npx snapai icon --prompt "music player app, abstract sound wave, clean shapes" --model banana.webp>)                                | `npx snapai icon --prompt "music player app, abstract sound wave, clean shapes" --model banana`                         |
+| `camera app, lens icon, simple concentric circles`                      | ![Camera Icon](<test-icons/npx snapai icon --prompt "camera app, lens icon, simple concentric circles" --model banana.webp>)                                  | `npx snapai icon --prompt "camera app, lens icon, simple concentric circles" --model banana`                            |
+| `finance app, secure lock, clean illustration, bold silhouette`         | ![Finance Lock Icon](<test-icons/npx snapai icon --prompt "finance app, secure lock, clean illustration, bold silhouette" --model banana --pro.webp>)         | `npx snapai icon --prompt "finance app, secure lock, clean illustration, bold silhouette" --model banana --pro`         |
+| `photo editor app, magic wand + spark, simple shapes, modern gradients` | ![Photo Editor Icon](<test-icons/npx snapai icon --prompt "photo editor app, magic wand + spark, simple shapes, modern gradients" --model banana --pro.webp>) | `npx snapai icon --prompt "photo editor app, magic wand + spark, simple shapes, modern gradients" --model banana --pro` |
+
+## Privacy & security 🔒
+
+- SnapAI does **not** ship telemetry or analytics.
+- SnapAI sends requests **directly** to OpenAI or Google (depending on `--model`).
+- SnapAI does not run a backend and does not collect your prompts/images.
+- API keys are stored locally only if you run `snapai config ...` (or provided at runtime via env vars/flags).
+
+> **Warning** ⚠️  
+> Never commit API keys to git. Use environment variables in CI.
+
+## Development 🛠️
+
+- [Development Setup](DEV_SETUP.md)
+- [Publishing Guide](PUBLISHING_GUIDE.md)
 
 ```bash
-# Ultra-high quality (gpt-image-1)
-snapai icon --prompt "professional banking app with secure lock icon and elegant gold gradients" --quality high
-
-# Lower content filtering (gpt-image-1 only)
-snapai icon --prompt "edgy gaming app with dark theme and bold red accent colors" --moderation low
-```
-
-#### All Available Flags
-
-| Flag              | Short | Options                               | Default       | Description                          |
-| ----------------- | ----- | ------------------------------------- | ------------- | ------------------------------------ |
-| `--prompt`        | `-p`  | text                                  | _required_    | Description of the icon to generate  |
-| `--output`        | `-o`  | path                                  | `./assets`    | Output directory for generated icons |
-| `--model`         | `-m`  | `gpt-image-1`, `dall-e-3`, `dall-e-2` | `gpt-image-1` | AI model to use                      |
-| `--size`          | `-s`  | See sizes table below                 | `1024x1024`   | Icon size (model-dependent)          |
-| `--quality`       | `-q`  | See quality table below               | `auto`        | Image quality (model-dependent)      |
-| `--background`    | `-b`  | `transparent`, `opaque`, `auto`       | `auto`        | Background type (gpt-image-1 only)   |
-| `--output-format` | `-f`  | `png`, `jpeg`, `webp`                 | `png`         | Output format (gpt-image-1 only)     |
-| `--num-images`    | `-n`  | 1-10                                  | `1`           | Number of images (dall-e-3 max: 1)   |
-| `--moderation`    |       | `low`, `auto`                         | `auto`        | Content filtering (gpt-image-1 only) |
-| `--raw-prompt`    |       | boolean                               | `false`       | Skip iOS enhancement                 |
-| `--style`         |       | See style table below                 | _none_        | Icon design style                    |
-
-
-#### Model Comparison
-
-| Feature             | GPT-Image-1                           | DALL-E 3                        | DALL-E 2                    |
-| ------------------- | ------------------------------------- | ------------------------------- | --------------------------- |
-| **Quality**         | ⭐⭐⭐⭐⭐                            | ⭐⭐⭐⭐                        | ⭐⭐⭐                      |
-| **Speed**           | ⭐⭐⭐⭐                              | ⭐⭐⭐                          | ⭐⭐⭐⭐⭐                  |
-| **Cost**            | Medium                                | High                            | Low                         |
-| **Sizes**           | 1024x1024, 1536x1024, 1024x1536, auto | 1024x1024, 1792x1024, 1024x1792 | 256x256, 512x512, 1024x1024 |
-| **Quality Options** | auto, high, medium, low               | standard, hd                    | standard only               |
-| **Multiple Images** | 1-10                                  | 1 only                          | 1-10                        |
-| **Transparent BG**  | ✅                                    | ❌                              | ❌                          |
-| **Format Options**  | png, jpeg, webp                       | png only                        | png only                    |
-
-#### Size Guide
-
-**GPT-Image-1 & DALL-E 2:**
-
-- `1024x1024` - Square (perfect for app icons)
-- `1536x1024` - Landscape
-- `1024x1536` - Portrait
-- `auto` - Let AI decide best size (gpt-image-1 only)
-
-**DALL-E 3:**
-
-- `1024x1024` - Square
-- `1792x1024` - Wide landscape
-- `1024x1792` - Tall portrait
-
-**DALL-E 2:**
-
-- `256x256` - Small square
-- `512x512` - Medium square
-- `1024x1024` - Large square
-
-#### Quality Guide
-
-**GPT-Image-1:**
-
-- `auto` - AI optimizes quality vs speed
-- `high` - Maximum quality, slower
-- `medium` - Balanced quality and speed
-- `low` - Fast generation, lower quality
-
-**DALL-E 3:**
-
-- `standard` - Good quality, faster
-- `hd` - High definition, costs 2x more
-
-**DALL-E 2:**
-
-- `standard` - Only option available
-- API does not support quality option
-
-#### Style Guide
-
-SnapAI offers 14 distinct visual styles to match your app's personality and target audience:
-
-| Style                | Description                                                                                       | Best For                                          | Example Use                |
-| -------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------- | -------------------------- |
-| **minimalism**       | Clean, simple lines with maximum 2-3 colors. Ultra-clean, Apple-inspired minimalism.              | Productivity apps, utilities, professional tools  | `--style minimalism`       |
-| **glassy**           | Glass-like, semi-transparent elements with soft color blending. Modern, premium glass aesthetic.  | Social apps, media players, lifestyle apps        | `--style glassy`           |
-| **woven**            | Textile-inspired patterns with woven textures and organic flowing lines. Warm, tactile materials. | Craft apps, lifestyle, wellness, organic products | `--style woven`            |
-| **geometric**        | Only geometric shapes with bold, angular compositions. Mathematical precision and symmetry.       | Finance apps, productivity, technical tools       | `--style geometric`        |
-| **neon**             | Electric neon colors with glowing effects. Cyberpunk, futuristic aesthetic.                       | Gaming apps, tech tools, nightlife apps           | `--style neon`             |
-| **gradient**         | Smooth, vibrant gradients as primary design element. Modern, Instagram-inspired aesthetic.        | Social media, photo apps, creative tools          | `--style gradient`         |
-| **flat**             | Solid colors, no gradients, no shadows. Clean, modern, Microsoft-inspired flat design.            | Business apps, utilities, professional tools      | `--style flat`             |
-| **material**         | Google Material Design principles with bold colors and geometric shapes.                          | Android apps, Google services, productivity       | `--style material`         |
-| **ios-classic**      | Traditional iOS design with subtle gradients and Apple's signature color palette.                 | iOS apps, Apple ecosystem, premium apps           | `--style ios-classic`      |
-| **android-material** | Android Material Design 3 with dynamic colors and modern Android styling.                         | Android apps, Google services, modern mobile      | `--style android-material` |
-| **pixel**            | Pixel-perfect, retro 8-bit/16-bit game art style with sharp, blocky pixels.                       | Indie games, retro apps, nostalgic tools          | `--style pixel`            |
-| **game**             | Vibrant, energetic gaming aesthetics with bold colors and playful elements.                       | Mobile games, gaming platforms, entertainment     | `--style game`             |
-| **clay**             | Soft, malleable clay-like textures with organic, handcrafted appearance.                          | Kids apps, creative tools, playful utilities      | `--style clay`             |
-| **holographic**      | Iridescent, rainbow-shifting colors with metallic finishes and prismatic effects.                 | Futuristic apps, AR/VR, premium tech              | `--style holographic`      |
-
-##### Style Examples
-
-```bash
-# Clean productivity app
-snapai icon --prompt "minimalist task manager with clean white checkmark icon and subtle blue accent" --style minimalism
-
-# Premium social media app
-snapai icon --prompt "premium photo sharing app with glass-like camera icon and translucent elements" --style glassy
-
-# Retro gaming app
-snapai icon --prompt "retro space shooter with pixelated rocket ship and 8-bit style stars" --style pixel
-
-# Modern Android app
-snapai icon --prompt "modern weather app with sun and cloud icons using Material Design principles" --style android-material
-
-# Futuristic AR app
-snapai icon --prompt "futuristic augmented reality app with holographic glasses and rainbow effects" --style holographic
-```
-
-> [!TIP]
-> Combine styles with different models for unique results! Try `--style neon --model dall-e-3` for creative cyberpunk designs or `--style minimalism --model gpt-image-1 --quality high` for ultra-clean professional icons.
-
-### Configuration
-
-```bash
-snapai config --show              # Check your setup
-snapai config --api-key YOUR_KEY  # Set/update API key
-```
-
-> [!NOTE]  
-> Icons are saved as PNG files with timestamps. Perfect for version control!
-
-## 🔐 Privacy & Security
-
-**Your data stays yours** 🛡️
-
-- ✅ **Zero tracking** - We collect absolutely nothing
-- ✅ **Local storage** - API keys never leave your machine
-- ✅ **No telemetry** - No analytics, no phone-home
-- ✅ **Open source** - Inspect every line of code
-- ✅ **No accounts** - Just install and use
-
-> [!WARNING]  
-> Keep your OpenAI API key secure! Never commit it to version control or share it publicly.
-
-## 💰 Pricing
-
-**SnapAI is 100% free!** You only pay OpenAI for generation:
-
-### Model Pricing
-
-| Model           | Quality     | Size      | Price per Image | Best For                |
-| --------------- | ----------- | --------- | --------------- | ----------------------- |
-| **GPT-Image-1** | auto/medium | 1024x1024 | ~$0.04          | Balanced quality & cost |
-| **GPT-Image-1** | high        | 1024x1024 | ~$0.08          | Professional icons      |
-| **GPT-Image-1** | low         | 1024x1024 | ~$0.02          | Quick iterations        |
-| **DALL-E 3**    | standard    | 1024x1024 | ~$0.04          | Creative designs        |
-| **DALL-E 3**    | hd          | 1024x1024 | ~$0.08          | High-detail artwork     |
-| **DALL-E 2**    | standard    | 1024x1024 | ~$0.02          | Fast & economical       |
-
-### Cost Optimization Tips
-
-```bash
-# 💡 Cost-effective workflow
-# 1. Start with DALL-E 2 for quick iterations
-snapai icon --prompt "modern fitness app icon concept with dumbbell and clean design" --model dall-e-2
-
-# 2. Test different styles with GPT-Image-1 (low cost)
-snapai icon --prompt "minimalist calculator app with clean white background and blue accents" --style minimalism --model gpt-image-1 --quality low
-snapai icon --prompt "premium calculator app with glass-like elements and translucent effects" --style glassy --model gpt-image-1 --quality low
-
-# 2.1 Generate multiple variations with GPT-Image-1
-snapai icon --prompt "refined app icon" --model gpt-image-1 --num-images 3
-
-# 3. Generate multiple variations with GPT-Image-1
-snapai icon --prompt "refined fitness app icon with dumbbell and energetic gradient design" --model gpt-image-1 --num-images 3 --style minimalism
-
-# 4. Final high-quality version with DALL-E 3
-snapai icon --prompt "final fitness app icon with professional dumbbell design and clean minimalist style" --model dall-e-3 --quality hd --style minimalism
-```
-
-> [!TIP]
-> Use `--model dall-e-2` for testing, then `--model gpt-image-1` for style exploration and variations, and `--model dall-e-3 --quality hd` for production! Combine with `--style` for consistent visual identity.
-
-## 🚀 Advanced Usage
-
-### CI/CD Integration
-
-```bash
-# Perfect for automation with different models
-npx snapai icon --prompt "$(cat icon-prompt.txt)" --output ./dist/icons --model gpt-image-1 --style minimalism
-
-# Generate multiple formats for web
-npx snapai icon --prompt "modern web logo with company branding and clean geometric design" --background transparent --output-format webp --output ./web-assets --style glassy
-```
-
-### Batch Generation
-
-```bash
-# Generate multiple variations with single command
-snapai icon --prompt "modern fitness app icon variations with dumbbell and energetic design" --num-images 5 --model gpt-image-1 --output ./icons --style minimalism
-
-# Generate different sizes for different platforms
-snapai icon --prompt "vibrant social media logo with gradient background and modern typography" --size 1024x1024 --output ./social --model dall-e-3 --style gradient
-snapai icon --prompt "premium banner logo with glass-like elements and translucent effects" --size 1792x1024 --output ./banners --model dall-e-3 --style glassy
-```
-
-### Professional Workflow
-
-```bash
-# 1. Concept phase - quick & cheap
-snapai icon --prompt "modern fitness app icon concept with dumbbell and clean geometric design" --model dall-e-2 --num-images 5
-
-# 2. Style exploration - try different visual approaches
-snapai icon --prompt "minimalist fitness app with clean white dumbbell icon and subtle blue accents" --style minimalism --model gpt-image-1
-snapai icon --prompt "premium fitness app with glass-like dumbbell and translucent purple elements" --style glassy --model gpt-image-1
-snapai icon --prompt "energetic fitness app with neon dumbbell and electric green glow effects" --style neon --model gpt-image-1
-
-# 3. Refinement phase - multiple high-quality options
-snapai icon --prompt "professional fitness app icon with dumbbell and clean minimalist design" --model gpt-image-1 --quality high --num-images 3 --style minimalism
-
-# 4. Final production - transparent background for overlays
-snapai icon --prompt "final fitness app icon with professional dumbbell design and clean white background" --model gpt-image-1 --background transparent --quality high --style minimalism
-
-# 5. Platform-specific versions
-snapai icon --prompt "iOS app store fitness icon with classic Apple design and subtle gradients" --model dall-e-3 --quality hd --style ios-classic
-snapai icon --prompt "Android play store fitness icon with Material Design and bold colors" --model dall-e-3 --quality hd --style android-material
-```
-
-## 🛠️ For Developers
-
-Need help setting up for development? Check out our detailed guides:
-
-- 📚 [Development Setup](DEV_SETUP.md) - Local development workflow
-- 📦 [Publishing Guide](PUBLISHING_GUIDE.md) - For maintainers
-
-```bash
-# Quick dev setup
 git clone https://github.com/betomoedano/snapai.git
 cd snapai && pnpm install && pnpm run build
 ./bin/dev.js --help
 ```
 
-## 📚 Learn More
+## Contributing 🤝
 
-**Want to master React Native & Expo development?** 🚀
+- Report bugs: [GitHub Issues](https://github.com/betomoedano/snapai/issues)
+- Suggest features: [GitHub Issues](https://github.com/betomoedano/snapai/issues)
+- Improve docs / code: see `CONTRIBUTING.md`
 
-Visit [**Code with Beto**](https://codewithbeto.dev) for premium courses:
+## License 📄
 
-- 📱 **React Native with Expo** - Build real-world apps
-- ⚡ **React with TypeScript** - Type-safe development
-- 🔧 **GitHub Mastery** - Professional workflows
-- 🔥 **LiveStore Course** _(Coming Soon)_ - Local-first apps
-
-_Build the skills that top developers use in production!_ ✨
-
-## 🤝 Contributing
-
-Love SnapAI? Help make it even better!
-
-- 🐛 [Report bugs](https://github.com/betomoedano/snapai/issues)
-- 💡 [Suggest features](https://github.com/betomoedano/snapai/issues)
-- 📝 [Improve docs](CONTRIBUTING.md)
-- 🔧 [Submit code](CONTRIBUTING.md)
-
-## 📄 License
-
-MIT License - build amazing things! 🎉
+MIT

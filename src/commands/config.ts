@@ -7,13 +7,18 @@ export default class ConfigCommand extends Command {
   static description = 'Manage SnapAI configuration';
 
   static examples = [
-    '<%= config.bin %> <%= command.id %> --api-key sk-your-openai-key',
+    '<%= config.bin %> <%= command.id %> --openai-api-key sk-your-openai-key',
     '<%= config.bin %> <%= command.id %> --show',
   ];
 
   static flags = {
-    'api-key': Flags.string({
+    'openai-api-key': Flags.string({
+      char: 'k',
       description: 'Set OpenAI API key',
+    }),
+    'google-api-key': Flags.string({
+      char: 'g',
+      description: 'Set Google Studio (Gemini) API key',
     }),
     show: Flags.boolean({
       description: 'Show current configuration',
@@ -23,8 +28,12 @@ export default class ConfigCommand extends Command {
   public async run(): Promise<void> {
     const { flags } = await this.parse(ConfigCommand);
 
-    if (flags['api-key']) {
-      await this.setApiKey(flags['api-key']);
+    if (flags['openai-api-key']) {
+      await this.setApiKey(flags['openai-api-key']);
+    }
+
+    if (flags['google-api-key']) {
+      await this.setGoogleApiKey(flags['google-api-key']);
     }
 
     if (flags.show) {
@@ -46,7 +55,19 @@ export default class ConfigCommand extends Command {
     await ConfigService.set('openai_api_key', apiKey);
     this.log(chalk.green('✅ OpenAI API key configured successfully!'));
     this.log('');
-    this.log(chalk.dim('Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence'));
+    this.log(chalk.dim('Powered by codewithbeto.dev — check out our React Native course!'));
+  }
+
+  private async setGoogleApiKey(apiKey: string): Promise<void> {
+    const error = ValidationService.validateGoogleApiKey(apiKey);
+    if (error) {
+      this.error(chalk.red(error));
+    }
+
+    await ConfigService.set('google_api_key', apiKey);
+    this.log(chalk.green('✅ Google API key configured successfully!'));
+    this.log('');
+    this.log(chalk.dim('Powered by codewithbeto.dev — check out our React Native course!'));
   }
 
   private async showConfig(): Promise<void> {
@@ -60,7 +81,15 @@ export default class ConfigCommand extends Command {
       this.log(`🔑 OpenAI API Key: ${chalk.green(maskedKey)}`);
     } else {
       this.log(`🔑 OpenAI API Key: ${chalk.red('Not configured')}`);
-      this.log(chalk.gray('   Set with: snapai config --api-key YOUR_KEY'));
+      this.log(chalk.gray('   Set with: snapai config --openai-api-key YOUR_KEY'));
+    }
+
+    if (config.google_api_key) {
+      const maskedKey = `...${config.google_api_key.slice(-4)}`;
+      this.log(`🟦 Google API Key: ${chalk.green(maskedKey)}`);
+    } else {
+      this.log(`🟦 Google API Key: ${chalk.red('Not configured')}`);
+      this.log(chalk.gray('   Set with: snapai config --google-api-key YOUR_KEY'));
     }
     
     if (config.default_output_path) {
@@ -68,6 +97,6 @@ export default class ConfigCommand extends Command {
     }
     
     this.log('');
-    this.log(chalk.dim('Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence'));
+    this.log(chalk.dim('Powered by codewithbeto.dev — check out our React Native course!'));
   }
 }
