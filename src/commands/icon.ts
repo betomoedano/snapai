@@ -69,6 +69,15 @@ export default class IconCommand extends Command {
       description: "Output directory",
       default: "./assets",
     }),
+    /**
+     * Deprecated: use --openai-api-key.
+     * Kept for backwards compatibility.
+     */
+    "api-key": Flags.string({
+      description:
+        "OpenAI API key override (does not persist to disk). Also supports SNAPAI_API_KEY / OPENAI_API_KEY",
+      hidden: true,
+    }),
     "openai-api-key": Flags.string({
       char: "k",
       description:
@@ -84,9 +93,9 @@ export default class IconCommand extends Command {
     model: Flags.string({
       char: "m",
       description:
-        'Model: OpenAI ("gpt-1.5" or "gpt-1") or Gemini ("banana")',
+        'Model: OpenAI ("gpt-1.5" or "gpt-1") or Gemini ("banana"). (Legacy alias: "gpt")',
       default: "gpt-1.5",
-      options: ["gpt-1.5", "gpt-1", "banana"],
+      options: ["gpt-1.5", "gpt-1", "banana", "gpt"],
     }),
     quality: Flags.string({
       char: "q",
@@ -111,8 +120,7 @@ export default class IconCommand extends Command {
     // === Advanced Options ===
     background: Flags.string({
       char: "b",
-      description:
-        "Background request: transparent, opaque, auto (OpenAI only)",
+      description: "Background: transparent, opaque, auto (GPT-Image-1 only)",
       default: "auto",
       options: ["transparent", "opaque", "auto"],
     }),
@@ -121,6 +129,17 @@ export default class IconCommand extends Command {
       description: "Output format: png, jpeg, webp (GPT-Image-1 only)",
       default: "png",
       options: ["png", "jpeg", "webp"],
+    }),
+    /**
+     * Deprecated: use -n/--n.
+     * Kept for backwards compatibility.
+     */
+    "num-images": Flags.integer({
+      description: "Number of images 1-10 (OpenAI only)",
+      default: 1,
+      min: 1,
+      max: 10,
+      hidden: true,
     }),
     moderation: Flags.string({
       description: "Content filtering: low, auto (GPT-Image-1 only)",
@@ -228,12 +247,17 @@ export default class IconCommand extends Command {
         modelFlag === "banana" ? "banana" : "openai";
       const openaiModel =
         provider === "openai"
-          ? (modelFlag as "gpt-1" | "gpt-1.5")
+          ? (modelFlag as "gpt-1" | "gpt-1.5" | "gpt")
           : undefined;
 
       const qualityInput = this.normalizeFlagString(flags.quality, "auto");
 
-      const openaiApiKey = flags["openai-api-key"];
+      const openaiApiKey = flags["openai-api-key"] || flags["api-key"];
+      if (flags["openai-api-key"] && flags["api-key"]) {
+        this.error(
+          chalk.red('Use only one: --openai-api-key or the deprecated --api-key')
+        );
+      }
       if (openaiApiKey) {
         const keyError = ValidationService.validateApiKey(openaiApiKey);
         if (keyError) this.error(chalk.red(keyError));
@@ -245,7 +269,13 @@ export default class IconCommand extends Command {
         if (keyError) this.error(chalk.red(keyError));
       }
 
-      const requestedN = flags.n;
+      // unify image count flags
+      if (flags.n !== 1 && flags["num-images"] !== 1) {
+        this.error(
+          chalk.red('Use only one: -n/--n or the deprecated --num-images')
+        );
+      }
+      const requestedN = flags.n !== 1 ? flags.n : flags["num-images"];
 
       if (provider === "banana") {
         if (!flags.pro) {
@@ -303,16 +333,12 @@ export default class IconCommand extends Command {
         useIconWords: flags["use-icon-words"],
       });
       const outputFormat = flags["output-format"] as "png" | "jpeg" | "webp";
-      const requestedBackground = flags.background as
-        | "transparent"
-        | "opaque"
-        | "auto";
       const imageBase64Array = await OpenAIService.generateIcon({
         prompt: basePrompt,
         output: flags.output,
         model: openaiModel,
         quality: openaiQuality,
-        background: requestedBackground,
+        background: flags.background as "transparent" | "opaque" | "auto",
         outputFormat,
         numImages: requestedN,
         moderation: flags.moderation as "low" | "auto",

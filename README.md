@@ -149,7 +149,7 @@ npx snapai icon --prompt "premium app icon" --quality high
 npx snapai icon --prompt "logo mark" --background transparent --output-format png
 ```
 
-### Google Nano Banana (`--model banana`)
+### Google Gemini (`gemini-2.5-flash-image / gemini-3-pro-image-preview`)
 
 ```bash
 # Normal (1 image)
@@ -175,7 +175,7 @@ Nano Banana notes:
 
 > **Note** 📝  
 > If you pass `--style`, the style system is treated as a **hard constraint** and will take priority over other wording in your prompt.  
-> Try to avoid prompts that *conflict* with the chosen style (e.g. `--style minimalism` + “neon glow”), or the model may produce inconsistent results.
+> Try to avoid prompts that _conflict_ with the chosen style (e.g. `--style minimalism` + “neon glow”), or the model may produce inconsistent results.
 
 ## Command reference 📚
 
