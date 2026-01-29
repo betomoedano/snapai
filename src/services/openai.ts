@@ -7,15 +7,13 @@ export class OpenAIService {
   /**
    * SnapAI model aliases (CLI-facing) → OpenAI model IDs.
    *
-   * - gpt-1.5: current default (was previously exposed as "gpt")
+   * - gpt-1.5: current default
    * - gpt-1: previous generation
-   * - gpt: kept as backwards-compatible alias for gpt-1.5
    */
   private static readonly OPENAI_IMAGE_MODEL_ID_BY_ALIAS: Record<string, string> =
     {
       "gpt-1": "gpt-image-1",
       "gpt-1.5": "gpt-image-1.5",
-      gpt: "gpt-image-1.5",
     };
   private static readonly FIXED_SIZE = "1024x1024";
 
@@ -28,7 +26,7 @@ export class OpenAIService {
 
     if (!apiKey) {
       throw new Error(
-        "OpenAI API key not configured. Use SNAPAI_API_KEY / OPENAI_API_KEY, or run: snapai config --api-key YOUR_KEY"
+        "OpenAI API key not configured. Use SNAPAI_API_KEY / OPENAI_API_KEY, or run: snapai config --openai-api-key YOUR_KEY"
       );
     }
 
@@ -147,11 +145,10 @@ export class OpenAIService {
     const resolved = this.OPENAI_IMAGE_MODEL_ID_BY_ALIAS[key];
     if (!resolved) {
       const valid = Object.keys(this.OPENAI_IMAGE_MODEL_ID_BY_ALIAS)
-        .filter((k) => k !== "gpt")
         .sort()
         .join(", ");
       throw new Error(
-        `Invalid OpenAI model "${model}". Valid: ${valid} (or legacy alias: gpt)`
+        `Invalid OpenAI model "${model}". Valid: ${valid}`
       );
     }
     return resolved;

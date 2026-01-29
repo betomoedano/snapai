@@ -86,7 +86,7 @@ You can store keys locally (developer machine), or provide them at runtime (CI/C
 ### Local config (writes to `~/.snapai/config.json`)
 
 ```bash
-snapai config --api-key "sk-your-openai-api-key"
+snapai config --openai-api-key "sk-your-openai-api-key"
 snapai config --google-api-key "your-google-ai-studio-key"
 
 snapai config --show
@@ -172,6 +172,10 @@ Nano Banana notes:
 - If you see too much empty border:
   - remove the words `"icon"` / `"logo"` (default behavior), or keep them off and be explicit about “fill the frame”
 - Use `--style` for rendering/material hints (examples: `minimalism`, `material`, `pixel`, `kawaii`, `cute`, `glassy`, `neon`)
+
+> **Note** 📝  
+> If you pass `--style`, the style system is treated as a **hard constraint** and will take priority over other wording in your prompt.  
+> Try to avoid prompts that *conflict* with the chosen style (e.g. `--style minimalism` + “neon glow”), or the model may produce inconsistent results.
 
 ## Command reference 📚
 

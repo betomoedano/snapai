@@ -7,15 +7,17 @@ export default class ConfigCommand extends Command {
   static description = 'Manage SnapAI configuration';
 
   static examples = [
-    '<%= config.bin %> <%= command.id %> --api-key sk-your-openai-key',
+    '<%= config.bin %> <%= command.id %> --openai-api-key sk-your-openai-key',
     '<%= config.bin %> <%= command.id %> --show',
   ];
 
   static flags = {
-    'api-key': Flags.string({
+    'openai-api-key': Flags.string({
+      char: 'k',
       description: 'Set OpenAI API key',
     }),
     'google-api-key': Flags.string({
+      char: 'g',
       description: 'Set Google Studio (Gemini) API key',
     }),
     show: Flags.boolean({
@@ -26,8 +28,8 @@ export default class ConfigCommand extends Command {
   public async run(): Promise<void> {
     const { flags } = await this.parse(ConfigCommand);
 
-    if (flags['api-key']) {
-      await this.setApiKey(flags['api-key']);
+    if (flags['openai-api-key']) {
+      await this.setApiKey(flags['openai-api-key']);
     }
 
     if (flags['google-api-key']) {
@@ -79,7 +81,7 @@ export default class ConfigCommand extends Command {
       this.log(`🔑 OpenAI API Key: ${chalk.green(maskedKey)}`);
     } else {
       this.log(`🔑 OpenAI API Key: ${chalk.red('Not configured')}`);
-      this.log(chalk.gray('   Set with: snapai config --api-key YOUR_KEY'));
+      this.log(chalk.gray('   Set with: snapai config --openai-api-key YOUR_KEY'));
     }
 
     if (config.google_api_key) {
