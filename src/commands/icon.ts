@@ -9,6 +9,28 @@ import { buildFinalIconPrompt } from "../utils/icon-prompt.js";
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 
+function isStyleDangerous(style?: string): boolean {
+  if (!style) return false;
+  const s = style.toLowerCase();
+  const banned = [
+    "photo",
+    "photograph",
+    "photoreal",
+    "photorealistic",
+    "portrait",
+    "headshot",
+    "selfie",
+    "concert",
+    "wedding",
+    "dslr",
+    "35mm",
+    "cinematic still",
+    "real person",
+    "celebrity",
+  ];
+  return banned.some((k) => s.includes(k));
+}
+
 export default class IconCommand extends Command {
   static description =
     "Generate AI-powered app icons using OpenAI (gpt-image-1.5) or Gemini (banana)";
@@ -161,16 +183,24 @@ export default class IconCommand extends Command {
       this.log("");
       this.log(
         chalk.dim(
-          "Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence"
+          "Powered by codewithbeto.dev — check out our React Native course!"
         )
       );
       this.log("");
       this.log(chalk.gray(`Prompt: ${flags.prompt}`));
       if (flags.style) {
-        this.log(chalk.blue(`🎨 Style: ${flags.style} - ${StyleTemplates.getStyleDescription(flags.style as any)}`));
+        this.log(chalk.blue(`🎨 Style: ${flags.style}`));
       }
       if (flags["raw-prompt"]) {
         this.log(chalk.yellow("⚠️  Using raw prompt (no style enhancement)"));
+      }
+
+      if (isStyleDangerous(flags.style)) {
+        this.error(
+          chalk.red(
+            'Blocked: --style contains photo/portrait keywords. Use a rendering style (materials/lighting) instead of camera/portrait terms.'
+          )
+        );
       }
 
       const modelFlag = flags.model as "banana" | "gpt-image-1.5";
@@ -206,7 +236,7 @@ export default class IconCommand extends Command {
           }
         }
 
-        const finalPrompt = buildFinalIconPrompt({
+        const basePrompt = buildFinalIconPrompt({
           prompt: flags.prompt,
           rawPrompt: flags["raw-prompt"],
           style: flags.style,
@@ -214,9 +244,8 @@ export default class IconCommand extends Command {
           sizeHint: flags.pro ? `${flags.q.toUpperCase()}` : "1K",
           useIconWords: flags["use-icon-words"],
         });
-
         const images = await GeminiService.generateBananaImages({
-          prompt: finalPrompt,
+          prompt: basePrompt,
           pro: flags.pro,
           n: flags.pro ? flags.n : 1,
           quality: flags.q as "1k" | "2k" | "4k",
@@ -237,7 +266,7 @@ export default class IconCommand extends Command {
       }
 
       // OpenAI (gpt)
-      const finalPrompt = buildFinalIconPrompt({
+      const basePrompt = buildFinalIconPrompt({
         prompt: flags.prompt,
         rawPrompt: flags["raw-prompt"],
         style: flags.style,
@@ -245,9 +274,9 @@ export default class IconCommand extends Command {
         sizeHint: flags.size,
         useIconWords: flags["use-icon-words"],
       });
-
+      const outputFormat = flags["output-format"] as "png" | "jpeg" | "webp";
       const imageBase64Array = await OpenAIService.generateIcon({
-        prompt: finalPrompt,
+        prompt: basePrompt,
         output: flags.output,
         model: openaiModel,
         size: flags.size,
@@ -259,7 +288,7 @@ export default class IconCommand extends Command {
           | "medium"
           | "low",
         background: flags.background as "transparent" | "opaque" | "auto",
-        outputFormat: flags["output-format"] as "png" | "jpeg" | "webp",
+        outputFormat,
         numImages: flags["num-images"],
         moderation: flags.moderation as "low" | "auto",
         rawPrompt: true,
@@ -269,7 +298,7 @@ export default class IconCommand extends Command {
       const outputPaths = await this.saveBase64Images(
         imageBase64Array,
         flags.output,
-        flags["output-format"]
+        outputFormat
       );
 
       this.log(chalk.green("✅ Icon(s) generated successfully!"));

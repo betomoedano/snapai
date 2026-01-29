@@ -1,14 +1,7 @@
 import OpenAI from "openai";
 import { ConfigService } from "./config.js";
-import { IconGenerationOptions, OpenAIResponse } from "../types.js";
+import { IconGenerationOptions } from "../types.js";
 import { ImageGenerateParams } from "openai/resources/images.js";
-import {
-  IconComposerPlan,
-  ICON_COMPOSER_COLORS,
-  ICON_COMPOSER_SIZE,
-  ICON_COMPOSER_SHAPES,
-  parseAndValidateIconComposerPlan,
-} from "../utils/icon-composer.js";
 
 export class OpenAIService {
   private static async getClient(apiKeyOverride?: string): Promise<OpenAI> {
@@ -35,41 +28,26 @@ export class OpenAIService {
       prompt,
       model = "gpt-image-1.5",
       size = "1024x1024",
-      quality,
+      quality = "auto",
       background = "auto",
       outputFormat = "png",
       numImages = 1,
       moderation = "auto",
       rawPrompt = false,
-      style,
     } = options;
-
-    // Set default quality based on model
-    const defaultQuality = model === "dall-e-2" ? undefined : quality || "auto";
 
     // Validate model-specific parameters
     this.validateModelParameters(
       model,
       size,
-      defaultQuality,
+      quality,
       numImages,
       background,
       outputFormat,
       moderation
     );
 
-    
-    // Use either raw prompt, style-enhanced prompt, or default iOS prompt
-    let finalPrompt: string;
-    
-    if (rawPrompt) {
-      finalPrompt = prompt;
-    } else if (style) {
-      finalPrompt = StyleTemplates.getStylePrompt(prompt, style, size);
-    } else {
-      // Default iOS prompt (backward compatibility)
-      finalPrompt = `Create a full-bleed ${size} px iOS app icon: ${prompt}.Use crisp, minimal design with vibrant colors. Add a subtle inner bevel for gentle depth; no hard shadows or outlines. Center the design with comfortable breathing room from the edges. Solid, light-neutral background. IMPORTANT: Fill the entire canvas edge-to-edge with the design, no padding, no margins. Design elements should be centered with appropriate spacing from edges but the background must cover 100% of the canvas. Add subtle depth with inner highlights, avoid hard shadows. Clean, minimal, Apple-style design. No borders, frames, or rounded corners.`;
-    }
+    const finalPrompt = rawPrompt ? prompt : prompt;
 
     // Build request parameters based on model
     const requestParams: ImageGenerateParams = {
@@ -102,83 +80,10 @@ export class OpenAIService {
     });
   }
 
-  static async planIconComposerLayers(params: {
-    prompt: string;
-    model?: string;
-    apiKey?: string;
-  }): Promise<IconComposerPlan> {
-    const client = await this.getClient(params.apiKey);
-    const { prompt, model = "gpt-4o-mini" } = params;
-
-    const systemPrompt = [
-      `You are an icon layer architect for Apple Icon Composer.`,
-      `Return ONLY valid JSON. No explanations. No comments. No Markdown.`,
-      ``,
-      `Hard rules:`,
-      `- Output must be a single JSON object.`,
-      `- You MUST NOT output SVG.`,
-      `- You MUST NOT output any path data (no "d", no "path", no coordinates lists).`,
-      `- One layer = one SVG file. Layers must be independent.`,
-      `- icon.size must be exactly ${ICON_COMPOSER_SIZE}.`,
-      `- Use ONLY these colors: ${ICON_COMPOSER_COLORS.join(", ")}.`,
-      `- Allowed shapes only: ${ICON_COMPOSER_SHAPES.join(", ")}.`,
-      `- All numbers MUST be integers and multiples of 8 (8px grid).`,
-      ``,
-      `Layer planning goal: be creative and dynamic, but deterministic and icon-like.`,
-      `- Produce between 3 and 10 layers.`,
-      `- Layers must be ordered back-to-front in the array (first drawn = furthest back).`,
-      `- The first layer MUST be a background layer (id or type must be exactly "background").`,
-      `- Background must be a full-canvas rounded-rect: x=0 y=0 w=512 h=512 radius 96..128.`,
-      ``,
-      `For all other layers: DO NOT assume any fixed layer names or roles.`,
-      `- Choose your own layer count and structure based on the prompt.`,
-      `- Use id/type strings that describe the layer's meaning for THIS icon (e.g. "paper", "shadow-1", "sparkle", "bubble", "sun-core", "ray-set-1").`,
-      `- Every non-background layer should add a specific, meaningful silhouette/detail.`,
-      `- Favor bold simple forms, clear negative space, and clean stacking.`,
-      ``,
-      `Composition guidelines (not prescriptive):`,
-      `- Keep the main subject roughly centered and readable at small sizes.`,
-      `- Prefer 1–2 dominant shapes, then 1–3 smaller accents/details.`,
-      `- Avoid thin details: keep minimum thickness ~16px unless it's intentional lines texture.`,
-      `- Use high contrast between adjacent layers when possible (within the 3-color palette).`,
-      `- If you use "lines": treat it as a texture block inside a bounded area; choose count 3–9 and gap 8–16.`,
-      ``,
-      `Output schema:`,
-      `{ "icon": { "size": 512, "layers": [ ...layer objects... ] } }`,
-      ``,
-      `Each layer object MUST include: id, type, shape, fill, x, y, w, h. If shape is rounded-rect or badge also include radius.`,
-      `If shape is lines include: count, gap, direction.`,
-    ].join("\n");
-
-    const response = await client.chat.completions.create({
-      model,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: prompt },
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0,
-    });
-
-    const content = response.choices?.[0]?.message?.content;
-    if (!content) {
-      throw new Error("Planner returned empty response");
-    }
-
-    let json: unknown;
-    try {
-      json = JSON.parse(content);
-    } catch {
-      throw new Error("Planner returned invalid JSON");
-    }
-
-    return parseAndValidateIconComposerPlan(json);
-  }
-
   private static validateModelParameters(
     model: string,
     size: string,
-    quality: string | undefined,
+    quality: string,
     numImages: number,
     background: string,
     outputFormat: string,

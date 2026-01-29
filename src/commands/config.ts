@@ -53,7 +53,7 @@ export default class ConfigCommand extends Command {
     await ConfigService.set('openai_api_key', apiKey);
     this.log(chalk.green('✅ OpenAI API key configured successfully!'));
     this.log('');
-    this.log(chalk.dim('Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence'));
+    this.log(chalk.dim('Powered by codewithbeto.dev — check out our React Native course!'));
   }
 
   private async setGoogleApiKey(apiKey: string): Promise<void> {
@@ -65,7 +65,7 @@ export default class ConfigCommand extends Command {
     await ConfigService.set('google_api_key', apiKey);
     this.log(chalk.green('✅ Google API key configured successfully!'));
     this.log('');
-    this.log(chalk.dim('Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence'));
+    this.log(chalk.dim('Powered by codewithbeto.dev — check out our React Native course!'));
   }
 
   private async showConfig(): Promise<void> {
@@ -95,6 +95,6 @@ export default class ConfigCommand extends Command {
     }
     
     this.log('');
-    this.log(chalk.dim('Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence'));
+    this.log(chalk.dim('Powered by codewithbeto.dev — check out our React Native course!'));
   }
 }

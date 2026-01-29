@@ -189,25 +189,25 @@ snapai icon --prompt "edgy design" --moderation low
 
 #### All Available Flags
 
-| Flag               | Short | Options                         | Default         | Description                                                    |
-| ------------------ | ----- | ------------------------------- | --------------- | -------------------------------------------------------------- |
-| `--prompt`         | `-p`  | text                            | _required_      | Description of the icon to generate                            |
-| `--output`         | `-o`  | path                            | `./assets`      | Output directory for generated icons                           |
-| `--model`          | `-m`  | `gpt-image-1.5`, `banana`       | `gpt-image-1.5` | Model to use                                                   |
-| `--size`           | `-s`  | See sizes table below           | `1024x1024`     | Icon size (model-dependent)                                    |
-| `--quality`        | `-q`  | See quality table below         | `auto`          | Image quality (model-dependent)                                |
-| `--background`     | `-b`  | `transparent`, `opaque`, `auto` | `auto`          | Background type (OpenAI only)                                  |
-| `--output-format`  | `-f`  | `png`, `jpeg`, `webp`           | `png`           | Output format (OpenAI only)                                    |
-| `--num-images`     |       | 1-10                            | `1`             | Number of images (OpenAI only)                                 |
-| `--moderation`     |       | `low`, `auto`                   | `auto`          | Content filtering (OpenAI only)                                |
-| `--raw-prompt`     |       | boolean                         | `false`         | Skip iOS enhancement                                           |
-| `--style`          |       | text                            |                 | Style hint appended after enhancement                          |
-| `--use-icon-words` |       | boolean                         | `false`         | Include the words "icon/logo" in enhancement (may add borders) |
-| `--pro`            |       | boolean                         | `false`         | Gemini Pro (banana only)                                       |
-| `--n`              | `-n`  | 1-10                            | `1`             | Number of images (banana pro only)                             |
-| `--q`              |       | `1k`, `2k`, `4k`                | `1k`            | Quality (banana pro only)                                      |
-| `--api-key`        |       | text                            |                 | OpenAI API key override (does not persist)                     |
-| `--google-api-key` |       | text                            |                 | Google API key override (does not persist)                     |
+| Flag               | Short | Options                         | Default         | Description                                                                                                                                   |
+| ------------------ | ----- | ------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--prompt`         | `-p`  | text                            | _required_      | Description of the icon to generate                                                                                                           |
+| `--output`         | `-o`  | path                            | `./assets`      | Output directory for generated icons                                                                                                          |
+| `--model`          | `-m`  | `gpt-image-1.5`, `banana`       | `gpt-image-1.5` | Model to use                                                                                                                                  |
+| `--size`           | `-s`  | See sizes table below           | `1024x1024`     | Icon size (model-dependent)                                                                                                                   |
+| `--quality`        | `-q`  | See quality table below         | `auto`          | Image quality (model-dependent)                                                                                                               |
+| `--background`     | `-b`  | `transparent`, `opaque`, `auto` | `auto`          | Background type (OpenAI only)                                                                                                                 |
+| `--output-format`  | `-f`  | `png`, `jpeg`, `webp`           | `png`           | Output format (OpenAI only)                                                                                                                   |
+| `--num-images`     |       | 1-10                            | `1`             | Number of images (OpenAI only)                                                                                                                |
+| `--moderation`     |       | `low`, `auto`                   | `auto`          | Content filtering (OpenAI only)                                                                                                               |
+| `--raw-prompt`     |       | boolean                         | `false`         | Skip iOS enhancement                                                                                                                          |
+| `--style`          |       | text                            |                 | Rendering style hint applied after the concept is defined (supports presets like `glassy`, `minimalism`, `clay`, `holographic`, `game`, etc.) |
+| `--use-icon-words` |       | boolean                         | `false`         | Include the words "icon/logo" in enhancement (may add borders)                                                                                |
+| `--pro`            |       | boolean                         | `false`         | Gemini Pro (banana only)                                                                                                                      |
+| `--n`              | `-n`  | 1-10                            | `1`             | Number of images (banana pro only)                                                                                                            |
+| `--q`              |       | `1k`, `2k`, `4k`                | `1k`            | Quality (banana pro only)                                                                                                                     |
+| `--api-key`        |       | text                            |                 | OpenAI API key override (does not persist)                                                                                                    |
+| `--google-api-key` |       | text                            |                 | Google API key override (does not persist)                                                                                                    |
 
 #### Model Notes
 
