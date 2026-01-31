@@ -29,9 +29,11 @@ export class OpenAIService {
         "OpenAI API key not configured. Use SNAPAI_API_KEY / OPENAI_API_KEY, or run: snapai config --openai-api-key YOUR_KEY"
       );
     }
+    const baseURL = await ConfigService.get("openai_base_url");
 
     return new OpenAI({
       apiKey: apiKey,
+      baseURL: baseURL || undefined,
     });
   }
 
