@@ -217,6 +217,12 @@ Nano Banana notes:
 | `finance app, secure lock, clean illustration, bold silhouette`         | ![Finance Lock Icon](<test-icons/npx snapai icon --prompt "finance app, secure lock, clean illustration, bold silhouette" --model banana --pro.webp>)         | `npx snapai icon --prompt "finance app, secure lock, clean illustration, bold silhouette" --model banana --pro`         |
 | `photo editor app, magic wand + spark, simple shapes, modern gradients` | ![Photo Editor Icon](<test-icons/npx snapai icon --prompt "photo editor app, magic wand + spark, simple shapes, modern gradients" --model banana --pro.webp>) | `npx snapai icon --prompt "photo editor app, magic wand + spark, simple shapes, modern gradients" --model banana --pro` |
 
+## Built by Code with Beto 👋
+
+SnapAI is made by [Beto](https://x.com/betomoedano) — I build open-source tools and teach React Native. If you're learning React Native, I have a [comprehensive course](https://cwb.sh/rn?r=snapai-readme) with real-world projects, lifetime access, and a private Discord community. Hundreds of developers are already in.
+
+[YouTube](https://cwb.sh/youtube) · [Discord](https://cwb.sh/discord) · [Newsletter](https://cwb.sh/newsletter)
+
 ## Privacy & security 🔒
 
 - SnapAI does **not** ship telemetry or analytics.
