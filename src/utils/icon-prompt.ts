@@ -1,11 +1,14 @@
 import { StyleTemplates, type IconStyle } from "./styleTemplates.js";
 
-// Shared "always-on" rules to prevent common icon-generation failure modes.
+// Shared "always-on" rules to prevent common generation failure modes.
 const ICON_BASE_CONTEXT_LINES = [
-  `Context: Mobile app launcher icon. The output image IS the icon (full-bleed).`,
-  `Do not draw an icon inside a larger canvas. No outer margins/padding.`,
-  `Do not draw a rounded-square tile/container (platform corners are applied later).`,
-  `No UI mockups. No borders/frames/stickers/app plates.`,
+  `Context: standalone symbol/illustration for general use, not an app launcher icon or UI mockup.`,
+  `Do not design or imply an app icon, logo plate, badge, or rounded-square container, even if the user prompt mentions "app icon", "logo", "badge", or similar terms.`,
+  `Do not draw an icon inside a larger canvas. No outer margins, padding, or separate card background.`,
+  `Do not draw any rounded-square tile, card, or container behind the subject.`,
+  `The canvas itself is a perfect square with sharp 90° corners; do not simulate rounded-corner app icon masks or device-rounded corners.`,
+  `No global drop shadows, long cast shadows, outer glows, or halos around the subject or canvas.`,
+  `No UI mockups. No borders, frames, stickers, app plates, or device chrome.`,
   `No text/typography (letters, numbers, monograms). No watermark.`,
   `Not a full photo/portrait/real-world scene. No realistic human faces as the main subject.`,
   `Do not copy or imitate real brand logos, trademarked shapes, or recognizable brand marks.`,
@@ -17,7 +20,7 @@ const ICON_BASE_RULES_LINES = [
   `Main subject fills 92–98% of the canvas (zoom in; avoid excessive empty space).`,
   `Center/balance the silhouette. Keep critical details within ~5–8% safe area.`,
   `Android-safe: keep critical details within central ~70% (silhouette may extend).`,
-  `Background is full-bleed to all four edges; keep it clean (low-detail, low-noise).`,
+  `Background extends to all four edges of the square canvas with straight (non-rounded) corners; keep it clean (low-detail, low-noise).`,
 ] as const;
 
 // Resolves `--style` into either a known preset or a free-form style string.
@@ -75,8 +78,8 @@ export function buildFinalIconPrompt(params: {
 
   const sizeText = "1024x1024";
   const artworkNoun = useIconWords
-    ? "square app icon artwork"
-    : "square app artwork";
+    ? "square symbol illustration (icon-style, but not an app launcher tile)"
+    : "square symbol illustration";
 
   // If the user explicitly asks for glossy-ish vibes, we don't apply the default matte guardrails.
   const glossyKeywords =
@@ -88,7 +91,7 @@ export function buildFinalIconPrompt(params: {
 
   // Layer 1: concept + art-direction guidance (human readable).
   const layer1 = [
-    `Create a full-bleed ${sizeText} ${artworkNoun}.`,
+    `Create a ${sizeText} ${artworkNoun}.`,
     ``,
     `Subject: ${prompt}`,
     ``,
@@ -126,7 +129,7 @@ export function buildFinalIconPrompt(params: {
       : `Use lighting to define mood and hierarchy. Do not add facial expressions unless using the character_icon archetype.`,
     ``,
     `Overall feel:`,
-    `Modern, premium, app-icon-first. Creative without being childish. Readable at small sizes.`,
+    `Modern, bold, subject-first illustration (not an app icon layout). Creative without being childish. Readable at small sizes.`,
     isDefaultLook
       ? `Rendering default: clean illustration / 2D or 2.5D, matte finish, subtle shading only.`
       : null,
@@ -142,8 +145,8 @@ export function buildFinalIconPrompt(params: {
     `If generating multiple images: keep the same archetype + dominant material; vary only small details.`,
     ``,
     `Quality filters (internal):`,
-    `Reject if: it reads like a photo/portrait/full scene; it becomes a mascot by default; too many elements hurt clarity; a face appears without choosing character_icon.`,
-    `Accept if: instant read at small size; strong silhouette; intentional material; clean contrast on light and dark wallpapers.`,
+    `Reject if: it reads like a photo/portrait/full scene; it becomes a mascot by default; too many elements hurt clarity; a face appears without choosing character_icon; any rounded-square/card/tile background or app-icon-style container appears behind the subject.`,
+    `Accept if: instant read at small size; strong silhouette; intentional material; clean contrast on both light and dark backgrounds.`,
     ``,
     `Icon QA (internal): blur test (~64px), small-size readability, wallpaper contrast, one focal point.`,
   ]
