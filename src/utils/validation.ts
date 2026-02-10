@@ -19,9 +19,12 @@ export class ValidationService {
     return null;
   }
 
-  static validateGoogleApiKey(apiKey: string): string | null {
-    if (!apiKey || apiKey.trim().length === 0) {
-      return 'Invalid Google API key format';
+  static validateReplicateApiToken(token: string): string | null {
+    if (!token || typeof token !== 'string' || token.trim().length === 0) {
+      return 'Replicate API token cannot be empty';
+    }
+    if (!token.startsWith('r8_')) {
+      return 'Invalid Replicate API token format (expected r8_...)';
     }
     return null;
   }

@@ -7,18 +7,17 @@ export default class ConfigCommand extends Command {
   static description = 'Manage SnapAI configuration';
 
   static examples = [
-    '<%= config.bin %> <%= command.id %> --openai-api-key sk-your-openai-key',
+    '<%= config.bin %> <%= command.id %> --api-key sk-your-openai-key',
+    '<%= config.bin %> <%= command.id %> --replicate-api-token r8_your-token',
     '<%= config.bin %> <%= command.id %> --show',
   ];
 
   static flags = {
-    'openai-api-key': Flags.string({
-      char: 'k',
+    'api-key': Flags.string({
       description: 'Set OpenAI API key',
     }),
-    'google-api-key': Flags.string({
-      char: 'g',
-      description: 'Set Google Studio (Gemini) API key',
+    'replicate-api-token': Flags.string({
+      description: 'Set Replicate API token (for recraft-v3-svg model)',
     }),
     show: Flags.boolean({
       description: 'Show current configuration',
@@ -28,12 +27,12 @@ export default class ConfigCommand extends Command {
   public async run(): Promise<void> {
     const { flags } = await this.parse(ConfigCommand);
 
-    if (flags['openai-api-key']) {
-      await this.setApiKey(flags['openai-api-key']);
+    if (flags['api-key']) {
+      await this.setApiKey(flags['api-key']);
     }
 
-    if (flags['google-api-key']) {
-      await this.setGoogleApiKey(flags['google-api-key']);
+    if (flags['replicate-api-token']) {
+      await this.setReplicateApiToken(flags['replicate-api-token']);
     }
 
     if (flags.show) {
@@ -55,19 +54,19 @@ export default class ConfigCommand extends Command {
     await ConfigService.set('openai_api_key', apiKey);
     this.log(chalk.green('✅ OpenAI API key configured successfully!'));
     this.log('');
-    this.log(chalk.dim('Powered by codewithbeto.dev — check out our React Native course!'));
+    this.log(chalk.dim('Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence'));
   }
 
-  private async setGoogleApiKey(apiKey: string): Promise<void> {
-    const error = ValidationService.validateGoogleApiKey(apiKey);
+  private async setReplicateApiToken(token: string): Promise<void> {
+    const error = ValidationService.validateReplicateApiToken(token);
     if (error) {
       this.error(chalk.red(error));
     }
 
-    await ConfigService.set('google_api_key', apiKey);
-    this.log(chalk.green('✅ Google API key configured successfully!'));
+    await ConfigService.set('replicate_api_token', token);
+    this.log(chalk.green('✅ Replicate API token configured successfully!'));
     this.log('');
-    this.log(chalk.dim('Powered by codewithbeto.dev — check out our React Native course!'));
+    this.log(chalk.dim('Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence'));
   }
 
   private async showConfig(): Promise<void> {
@@ -81,22 +80,22 @@ export default class ConfigCommand extends Command {
       this.log(`🔑 OpenAI API Key: ${chalk.green(maskedKey)}`);
     } else {
       this.log(`🔑 OpenAI API Key: ${chalk.red('Not configured')}`);
-      this.log(chalk.gray('   Set with: snapai config --openai-api-key YOUR_KEY'));
+      this.log(chalk.gray('   Set with: snapai config --api-key YOUR_KEY'));
     }
 
-    if (config.google_api_key) {
-      const maskedKey = `...${config.google_api_key.slice(-4)}`;
-      this.log(`🟦 Google API Key: ${chalk.green(maskedKey)}`);
+    if (config.replicate_api_token) {
+      const maskedToken = `r8_...${config.replicate_api_token.slice(-4)}`;
+      this.log(`🔑 Replicate API Token: ${chalk.green(maskedToken)}`);
     } else {
-      this.log(`🟦 Google API Key: ${chalk.red('Not configured')}`);
-      this.log(chalk.gray('   Set with: snapai config --google-api-key YOUR_KEY'));
+      this.log(`🔑 Replicate API Token: ${chalk.red('Not configured')}`);
+      this.log(chalk.gray('   Set with: snapai config --replicate-api-token YOUR_TOKEN'));
     }
-    
+
     if (config.default_output_path) {
       this.log(`📁 Default Output: ${chalk.blue(config.default_output_path)}`);
     }
     
     this.log('');
-    this.log(chalk.dim('Powered by codewithbeto.dev — check out our React Native course!'));
+    this.log(chalk.dim('Built with ❤️  by \u001b]8;;https://codewithbeto.dev\u001b\\codewithbeto.dev\u001b]8;;\u001b\\ - Ship faster, contribute more, lead with confidence'));
   }
 }

@@ -1,5 +1,6 @@
 export interface ConfigData {
   openai_api_key?: string;
+  replicate_api_token?: string;
   google_api_key?: string;
   default_output_path?: string;
 }
@@ -7,18 +8,16 @@ export interface ConfigData {
 export interface IconGenerationOptions {
   prompt: string;
   output?: string;
+  size?: string;
   quality?: 'auto' | 'standard' | 'hd' | 'high' | 'medium' | 'low';
   background?: 'transparent' | 'opaque' | 'auto';
-  outputFormat?: 'png' | 'jpeg' | 'webp';
-  /**
-   * CLI model alias.
-   * Internally, SnapAI maps this to the provider's underlying model ID.
-   */
-  model?: 'gpt-1' | 'gpt-1.5' | 'gpt';
+  outputFormat?: 'png' | 'jpeg' | 'webp' | 'svg';
+  model?: 'dall-e-2' | 'dall-e-3' | 'gpt-image-1' | 'recraft-v3-svg';
   numImages?: number;
   moderation?: 'low' | 'auto';
   rawPrompt?: boolean;
-  apiKey?: string;
+  style?: 'minimalism' | 'glassy' | 'woven' | 'geometric' | 'neon' | 'gradient' | 'flat' | 'material' | 'ios-classic' | 'android-material' | 'pixel' | 'game' | 'clay' | 'holographic';
+  
 }
 
 export interface OpenAIResponse {
