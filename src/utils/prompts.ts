@@ -1,23 +1,21 @@
 export class PromptTemplates {
   static enhanceForIOSIcon(userPrompt: string): string {
-    return `Create a 1024 × 1024 px square iOS app-icon illustration: ${userPrompt}. Use crisp, minimal design with vibrant colors. Use subtle shading for gentle depth (matte finish); no glossy glass look, no harsh specular highlights, no lens flare. The output image IS the icon: full-bleed edge-to-edge background (no white outer margin), do not draw a smaller icon centered on a blank canvas. Center the design with comfortable breathing room from the edges (but avoid excessive empty space). Solid, light-neutral background. No text, borders, or extraneous details. Final look: clean, modern, and illustration-first. Use the full image size for the icon, don't draw it inside the image, don't add borders, the rounded corners would be applied by the platform, so don't add them.`;
+    return `Create a 1024 × 1024 px square illustration of ${userPrompt}. Do NOT design or imply an app launcher icon, rounded-square tile, badge, or card. Do not add any outer drop shadow, halo, or border around the canvas. Focus only on the main subject and its complements on a simple, clean background. No text, typography, or UI elements. Final look: crisp, minimal, and illustration-first. Use subtle internal shading only; avoid glossy glass looks, harsh specular highlights, or lens flare.`;
   }
 
   static enhanceForAndroidIcon(userPrompt: string): string {
-    return `Create a 1024 × 1024 px square Android app-icon illustration: ${userPrompt}. Use material design principles with bold, vibrant colors and clean geometry. Subtle depth with soft, controlled shadowing (matte finish); avoid glossy glass icons, exaggerated shine, neon glow, sparkles, or lens flare. The output image IS the icon: full-bleed edge-to-edge background (no white outer margin), do not draw a smaller icon centered on a blank canvas. Center the design with comfortable margins (but avoid excessive empty space). Solid background or subtle gradient. No text, borders, or extraneous details. Final look should be modern, bold, and illustration-first. Use the full image size for the icon.`;
+    return `Create a 1024 × 1024 px square illustration of ${userPrompt}. Do NOT design or imply an Android app icon, adaptive icon, rounded-square tile, badge, or card. Do not add any outer drop shadow, halo, or glow around the canvas. Focus only on the main subject and its complements on a simple, clean background. No text, typography, or UI mockups. Final look should be modern, bold, and illustration-first with clean geometry and controlled, matte shading (no neon glow, sparkles, or lens flare).`;
   }
 
   static getSuccessfulPromptElements(): string[] {
     return [
-      "crisp, minimal design",
-      "vibrant colors with subtle inner bevel",
-      "comfortable breathing room from edges", 
-      "solid, light-neutral background",
-      "clean, vibrant, and Apple-polished",
-      "no text, borders, or extraneous details",
-      "use full image size for the icon",
-      "don't draw it inside the image",
-      "rounded corners applied by platform"
+      "crisp, minimal design focused on the main subject only",
+      "vibrant colors with subtle internal shading (no outer drop shadows)",
+      "comfortable breathing room around the subject",
+      "simple, clean background without a separate card or tile",
+      "no text, borders, badges, or UI chrome",
+      "do not design an app launcher icon or rounded-square plate",
+      "avoid implying platform-specific icon shapes or corners"
     ];
   }
 

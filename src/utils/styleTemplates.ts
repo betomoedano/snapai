@@ -417,7 +417,7 @@ function buildStylePrompt(
   userPrompt: string
 ): string {
   const lines: Array<string | null> = [
-    `Create a ${sizeNum}x${sizeNum} square app icon artwork.`,
+    `Create a ${sizeNum}x${sizeNum} square symbol/subject illustration (not an app launcher icon or rounded-square tile).`,
     `Subject: ${userPrompt}.`,
     def.includeBaseRules === false ? null : baseRules,
     ``,
@@ -440,11 +440,12 @@ export class StyleTemplates {
 
   private static readonly baseRulesV2 = [
     `Single dominant subject only.`,
-    `No rounded-square tile or app plate.`,
+    `No rounded-square tile, card, badge, or app plate behind the subject (no app icon layouts).`,
     `No heavy realism or photo look.`,
-    `No UI mockups or interface elements.`,
+    `No UI mockups, interface elements, or device frames.`,
     `High contrast and clear focal point.`,
     `Soft edges unless the selected style requires sharp geometry.`,
+    `No large outer drop shadows, halos, or glow that make the design look like a floating app icon card.`,
   ].join(" ");
 
   static getStylePrompt(userPrompt: string, style: IconStyle): string {
