@@ -2,6 +2,68 @@
 
 All notable changes to SnapAI will be documented in this file.
 
+## [0.6.0] - 2026-02-11
+
+### 🤖 Multi-Provider Support & Prompt Preview
+
+#### New Features
+
+- **Google Gemini Integration**: Generate icons with Gemini alongside OpenAI
+  - `--model banana` for Gemini 2.5 Flash Image generation
+  - `--pro` flag to use Gemini 3 Pro Image Preview for higher quality
+  - `--google-api-key` flag and `GEMINI_API_KEY` / `SNAPAI_GOOGLE_API_KEY` env vars
+  - Quality tiers for Gemini Pro: `--quality 1k|2k|4k`
+
+- **Prompt-Only Mode**: Preview prompts before spending API credits
+  - `--prompt-only` flag shows the final enhanced prompt/config without generating images
+  - Works with all flags (`--style`, `--raw-prompt`, etc.) for easy prompt iteration
+
+- **Google API Key Management**: `snapai config --google-api-key` to store and manage Gemini keys alongside OpenAI keys
+
+- **GitHub Actions CI/CD**: Automated npm publishing workflow
+  - Publishes on GitHub release events
+  - Automatic `beta` dist-tag for pre-releases
+  - Manual `workflow_dispatch` trigger with custom dist-tag
+
+#### Improvements
+
+- **Updated Model Naming**: Clearer model aliases
+  - `gpt-1.5` (default, best quality), `gpt-1` (fast), `banana` (Gemini)
+  - Legacy alias `gpt` still supported for backward compatibility
+
+- **Refactored Prompt Engine**: Shared context and technical rules for more consistent icon output
+  - Design constraints prevent common failures (no rounded corners, no UI elements)
+  - Better platform-specific prompt enhancement
+  - Style applied as dominant constraint when combined with `--raw-prompt`
+
+- **Expanded Style System**: Style flag now accepts any string hint, beyond the built-in presets
+  - Massively expanded style templates with richer descriptions
+  - Dangerous style detection blocks photorealistic/portrait requests
+
+- **Improved CLI Flags**:
+  - `-r` shorthand for `--raw-prompt`
+  - `-s` shorthand for `--style`
+  - `-i` / `--use-icon-words` to optionally include "icon"/"logo" in the enhancer
+  - `-n` shorthand for image count (replaces `--num-images`)
+  - `-k` / `--openai-api-key` replaces `--api-key` (old flag kept as hidden alias)
+
+- **ESLint Configuration**: Added `.eslintrc.cjs` for consistent code quality
+
+#### Breaking Changes
+
+- Deprecated size options removed — output is always 1024x1024
+- `--api-key` flag renamed to `--openai-api-key` (old flag still works but is hidden)
+- `--num-images` flag replaced by `-n` / `--n` (old flag still works but is hidden)
+- Icon composer command and related utilities removed
+
+#### Technical
+
+- New `GeminiService` with streaming support and binary image extraction
+- `buildFinalIconPrompt` utility for unified prompt generation across providers
+- Google API key validation in `ValidationService`
+- TypeScript interfaces for Gemini options and binary image types
+- Removed `pngjs` dependency
+
 ## [0.5.0] - 2025-09-15 🇲🇽
 
 ### 🎨 Style System & Enhanced Prompts
