@@ -2,6 +2,7 @@ import { Command, Flags } from '@oclif/core';
 import chalk from 'chalk';
 import { ConfigService } from '../services/config.js';
 import { ValidationService } from '../utils/validation.js';
+import { CTA } from '../utils/branding.js';
 
 export default class ConfigCommand extends Command {
   static description = 'Manage SnapAI configuration';
@@ -55,7 +56,7 @@ export default class ConfigCommand extends Command {
     await ConfigService.set('openai_api_key', apiKey);
     this.log(chalk.green('✅ OpenAI API key configured successfully!'));
     this.log('');
-    this.log(chalk.dim('Powered by codewithbeto.dev — check out our React Native course!'));
+    this.log(CTA);
   }
 
   private async setGoogleApiKey(apiKey: string): Promise<void> {
@@ -67,7 +68,7 @@ export default class ConfigCommand extends Command {
     await ConfigService.set('google_api_key', apiKey);
     this.log(chalk.green('✅ Google API key configured successfully!'));
     this.log('');
-    this.log(chalk.dim('Powered by codewithbeto.dev — check out our React Native course!'));
+    this.log(CTA);
   }
 
   private async showConfig(): Promise<void> {
@@ -97,6 +98,6 @@ export default class ConfigCommand extends Command {
     }
     
     this.log('');
-    this.log(chalk.dim('Powered by codewithbeto.dev — check out our React Native course!'));
+    this.log(CTA);
   }
 }

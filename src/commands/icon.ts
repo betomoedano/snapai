@@ -7,6 +7,7 @@ import { GeminiService } from "../services/gemini.js";
 import { ValidationService } from "../utils/validation.js";
 import { buildFinalIconPrompt } from "../utils/icon-prompt.js";
 import { StyleTemplates } from "../utils/styleTemplates.js";
+import { CTA } from "../utils/branding.js";
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 
@@ -396,11 +397,7 @@ export default class IconCommand extends Command {
 
       this.log(chalk.blue("🎨 Generating your app icon..."));
       this.log("");
-      this.log(
-        chalk.dim(
-          "Powered by codewithbeto.dev — check out our React Native course!"
-        )
-      );
+      this.log(CTA);
       this.log("");
       this.log(chalk.gray(`Prompt: ${flags.prompt}`));
       if (flags.style) {
