@@ -19,6 +19,7 @@ export interface IconGenerationOptions {
   moderation?: 'low' | 'auto';
   rawPrompt?: boolean;
   apiKey?: string;
+  size?: string;
 }
 
 export interface OpenAIResponse {
