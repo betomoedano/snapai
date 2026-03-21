@@ -78,38 +78,32 @@ export class GeminiService {
     const { prompt, pro, n, quality, modelVariant } = options;
 
     if (modelVariant === "banana-2") {
-      return await this.generateStream(
-        ai,
-        BANANA_2_MODEL,
-        prompt,
-        1,
-        undefined,
-        "banana-2",
-        options.thinkingLevel,
-        options.aspectRatio
-      );
+      return await this.generateStream(ai, BANANA_2_MODEL, prompt, 1, {
+        variant: "banana-2",
+        thinkingLevel: options.thinkingLevel,
+        aspectRatio: options.aspectRatio,
+      });
     }
 
     if (!pro) {
-      return await this.generateStream(ai, BANANA_NORMAL_MODEL, prompt, 1, undefined, undefined, undefined, options.aspectRatio);
+      return await this.generateStream(ai, BANANA_NORMAL_MODEL, prompt, 1, {
+        aspectRatio: options.aspectRatio,
+      });
     }
 
     if (n <= 1) {
-      return await this.generateStream(ai, BANANA_PRO_MODEL, prompt, 1, quality, undefined, undefined, options.aspectRatio);
+      return await this.generateStream(ai, BANANA_PRO_MODEL, prompt, 1, {
+        quality,
+        aspectRatio: options.aspectRatio,
+      });
     }
 
     const results = await Promise.all(
       Array.from({ length: n }, async () => {
-        const imgs = await this.generateStream(
-          ai,
-          BANANA_PRO_MODEL,
-          prompt,
-          1,
+        const imgs = await this.generateStream(ai, BANANA_PRO_MODEL, prompt, 1, {
           quality,
-          undefined,
-          undefined,
-          options.aspectRatio
-        );
+          aspectRatio: options.aspectRatio,
+        });
         return imgs[0];
       })
     );
@@ -129,11 +123,14 @@ export class GeminiService {
     model: string,
     prompt: string,
     desired: number,
-    quality?: BananaQuality,
-    variant?: "banana-2",
-    thinkingLevel?: Banana2ThinkingLevel,
-    aspectRatio?: string
+    opts?: {
+      quality?: BananaQuality;
+      variant?: "banana-2";
+      thinkingLevel?: Banana2ThinkingLevel;
+      aspectRatio?: string;
+    }
   ): Promise<GeneratedBinaryImage[]> {
+    const { quality, variant, thinkingLevel, aspectRatio } = opts ?? {};
     const config: any = {
       responseModalities: ["IMAGE", "TEXT"],
     };

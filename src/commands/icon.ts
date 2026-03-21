@@ -2,35 +2,13 @@ import { Command, Flags } from "@oclif/core";
 import chalk from "chalk";
 import { OpenAIService } from "../services/openai.js";
 import { GeminiService } from "../services/gemini.js";
-import { ValidationService } from "../utils/validation.js";
+import { ValidationService, isStyleDangerous } from "../utils/validation.js";
 import { buildFinalIconPrompt } from "../utils/icon-prompt.js";
 import { StyleTemplates } from "../utils/styleTemplates.js";
 import { CTA } from "../utils/branding.js";
 import { saveBase64Images, saveBinaryImages } from "../utils/save-images.js";
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
-
-function isStyleDangerous(style?: string): boolean {
-  if (!style) return false;
-  const s = style.toLowerCase();
-  const banned = [
-    "photo",
-    "photograph",
-    "photoreal",
-    "photorealistic",
-    "portrait",
-    "headshot",
-    "selfie",
-    "concert",
-    "wedding",
-    "dslr",
-    "35mm",
-    "cinematic still",
-    "real person",
-    "celebrity",
-  ];
-  return banned.some((k) => s.includes(k));
-}
 
 export default class IconCommand extends Command {
   static description =

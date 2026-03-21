@@ -1,14 +1,4 @@
-import { StyleTemplates, type IconStyle } from "./styleTemplates.js";
-
-function resolveStylePreset(style?: string): { preset?: IconStyle; text?: string } {
-  if (!style) return {};
-  const normalized = style.trim().toLowerCase();
-  const available = StyleTemplates.getAvailableStyles() as readonly string[];
-  if (available.includes(normalized)) {
-    return { preset: normalized as IconStyle };
-  }
-  return { text: style.trim() };
-}
+import { StyleTemplates } from "./styleTemplates.js";
 
 export function buildFeatureGraphicPrompt(params: {
   prompt: string;
@@ -18,7 +8,7 @@ export function buildFeatureGraphicPrompt(params: {
 }): string {
   const { prompt, rawPrompt = false, style, appName } = params;
 
-  const styleResolved = resolveStylePreset(style);
+  const styleResolved = StyleTemplates.resolveStylePreset(style);
   const presetDirective = styleResolved.preset
     ? StyleTemplates.getStyleDirective(styleResolved.preset)
     : null;

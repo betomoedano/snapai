@@ -3,26 +3,15 @@ import fs from "fs-extra";
 import chalk from "chalk";
 import { OpenAIService } from "../services/openai.js";
 import { GeminiService } from "../services/gemini.js";
-import { ValidationService } from "../utils/validation.js";
+import { ValidationService, isStyleDangerous } from "../utils/validation.js";
 import { buildFeatureGraphicPrompt } from "../utils/fg-prompt.js";
 import { StyleTemplates } from "../utils/styleTemplates.js";
 import { CTA } from "../utils/branding.js";
-import { saveBase64Images, saveBinaryImages } from "../utils/save-images.js";
+import { saveBase64Images } from "../utils/save-images.js";
 import {
   resizeToFeatureGraphic,
   compositeLogoOnBanner,
 } from "../utils/image-processing.js";
-
-function isStyleDangerous(style?: string): boolean {
-  if (!style) return false;
-  const s = style.toLowerCase();
-  const banned = [
-    "photo", "photograph", "photoreal", "photorealistic", "portrait",
-    "headshot", "selfie", "concert", "wedding", "dslr", "35mm",
-    "cinematic still", "real person", "celebrity",
-  ];
-  return banned.some((k) => s.includes(k));
-}
 
 export default class FeatureGraphicCommand extends Command {
   static description =
