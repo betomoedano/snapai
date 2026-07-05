@@ -34,6 +34,14 @@ export class OpenAIService {
 
     return new OpenAI({
       apiKey: apiKey,
+      // Route through Node's built-in fetch (undici) instead of the SDK's
+      // bundled node-fetch + agentkeepalive. On large image responses the
+      // node-fetch/keep-alive path throws "Invalid response body while trying
+      // to fetch ...: Premature close" deterministically, while undici reads
+      // the same responses reliably. Requires Node 18+ (see package engines).
+      ...(typeof globalThis.fetch === "function"
+        ? { fetch: (...args: Parameters<typeof globalThis.fetch>) => globalThis.fetch(...args) }
+        : {}),
     });
   }
 
