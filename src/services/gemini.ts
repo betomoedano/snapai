@@ -18,6 +18,8 @@ export interface BananaGenerateOptions {
   modelVariant?: BananaModel;
   /** Only used when modelVariant is "banana-2". Sent as thinkingConfig.thinkingLevel (MINIMAL | HIGH). */
   thinkingLevel?: Banana2ThinkingLevel;
+  /** Optional aspect ratio override (e.g. "16:9"). Passed to imageConfig.aspectRatio. */
+  aspectRatio?: string;
 }
 
 export interface GeneratedBinaryImage {
@@ -76,34 +78,32 @@ export class GeminiService {
     const { prompt, pro, n, quality, modelVariant } = options;
 
     if (modelVariant === "banana-2") {
-      return await this.generateStream(
-        ai,
-        BANANA_2_MODEL,
-        prompt,
-        1,
-        undefined,
-        "banana-2",
-        options.thinkingLevel
-      );
+      return await this.generateStream(ai, BANANA_2_MODEL, prompt, 1, {
+        variant: "banana-2",
+        thinkingLevel: options.thinkingLevel,
+        aspectRatio: options.aspectRatio,
+      });
     }
 
     if (!pro) {
-      return await this.generateStream(ai, BANANA_NORMAL_MODEL, prompt, 1);
+      return await this.generateStream(ai, BANANA_NORMAL_MODEL, prompt, 1, {
+        aspectRatio: options.aspectRatio,
+      });
     }
 
     if (n <= 1) {
-      return await this.generateStream(ai, BANANA_PRO_MODEL, prompt, 1, quality);
+      return await this.generateStream(ai, BANANA_PRO_MODEL, prompt, 1, {
+        quality,
+        aspectRatio: options.aspectRatio,
+      });
     }
 
     const results = await Promise.all(
       Array.from({ length: n }, async () => {
-        const imgs = await this.generateStream(
-          ai,
-          BANANA_PRO_MODEL,
-          prompt,
-          1,
-          quality
-        );
+        const imgs = await this.generateStream(ai, BANANA_PRO_MODEL, prompt, 1, {
+          quality,
+          aspectRatio: options.aspectRatio,
+        });
         return imgs[0];
       })
     );
@@ -123,10 +123,14 @@ export class GeminiService {
     model: string,
     prompt: string,
     desired: number,
-    quality?: BananaQuality,
-    variant?: "banana-2",
-    thinkingLevel?: Banana2ThinkingLevel
+    opts?: {
+      quality?: BananaQuality;
+      variant?: "banana-2";
+      thinkingLevel?: Banana2ThinkingLevel;
+      aspectRatio?: string;
+    }
   ): Promise<GeneratedBinaryImage[]> {
+    const { quality, variant, thinkingLevel, aspectRatio } = opts ?? {};
     const config: any = {
       responseModalities: ["IMAGE", "TEXT"],
     };
@@ -143,6 +147,10 @@ export class GeminiService {
       config.imageConfig = {
         imageSize: mapQualityToImageSize(quality),
       };
+    }
+
+    if (aspectRatio) {
+      config.imageConfig = { ...config.imageConfig, aspectRatio };
     }
 
     const contents = [
