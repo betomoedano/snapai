@@ -31,6 +31,18 @@ export class ValidationService {
     return null;
   }
 
+  static validateBaseUrl(baseUrl: string): string | null {
+    try {
+      const url = new URL(baseUrl);
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+        return 'Base URL must use http:// or https://';
+      }
+    } catch {
+      return 'Invalid base URL format (expected e.g. https://my-proxy.example.com/v1)';
+    }
+    return null;
+  }
+
   static validateGoogleApiKey(apiKey: string): string | null {
     if (!apiKey || apiKey.trim().length === 0) {
       return 'Invalid Google API key format';
