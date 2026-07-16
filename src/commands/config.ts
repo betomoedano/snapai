@@ -41,7 +41,7 @@ export default class ConfigCommand extends Command {
       await this.showConfig();
     }
 
-    // If no flags provided, show help
+    // If no flags provided, show the current configuration
     if (Object.keys(flags).length === 0) {
       await this.showConfig();
     }

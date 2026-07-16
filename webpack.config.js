@@ -22,7 +22,9 @@ export default {
     // Keep these as external dependencies
     '@oclif/core': '@oclif/core',
     '@oclif/plugin-help': '@oclif/plugin-help',
+    '@google/genai': '@google/genai',
     'openai': 'openai',
+    'mime': 'mime',
     'fs-extra': 'fs-extra',
     'chalk': 'chalk',
     'sharp': 'sharp',

@@ -47,7 +47,6 @@ export class OpenAIService {
       outputFormat = "png",
       numImages = 1,
       moderation = "auto",
-      rawPrompt = false,
     } = options;
 
     // Validate model-specific parameters
@@ -60,14 +59,12 @@ export class OpenAIService {
       moderation
     );
 
-    const finalPrompt = rawPrompt ? prompt : prompt;
-
     const resolvedModelId = this.resolveOpenAIImageModelId(model);
 
     // Build request parameters based on model
     const requestParams: ImageGenerateParams = {
       model: resolvedModelId,
-      prompt: finalPrompt,
+      prompt,
       n: numImages,
       size: (options.size ?? this.FIXED_SIZE) as any,
     };
