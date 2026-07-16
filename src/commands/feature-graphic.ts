@@ -1,4 +1,4 @@
-import { Command, Flags } from "@oclif/core";
+import { Command, Errors, Flags } from "@oclif/core";
 import fs from "fs-extra";
 import chalk from "chalk";
 import { OpenAIService } from "../services/openai.js";
@@ -223,6 +223,19 @@ export default class FeatureGraphicCommand extends Command {
 
       // Prompt-only mode
       if (flags["prompt-only"]) {
+        // Provider-specific validation (so the preview matches generation mode).
+        if (provider === "banana") {
+          if (bananaVariant === "banana-2" && requestedN !== 1) {
+            this.error(chalk.red("banana-2 only supports -n 1"));
+          }
+          if (bananaVariant === "banana" && !flags.pro && requestedN !== 1) {
+            this.error(chalk.red("Banana normal only supports -n 1"));
+          }
+          this.resolveBananaQuality(qualityInput);
+        } else {
+          this.resolveOpenAIQuality(qualityInput);
+        }
+
         const styleInput = flags.style?.trim();
         const styleNormalized = styleInput?.toLowerCase();
         const availableStyles = StyleTemplates.getAvailableStyles().map((s) =>
@@ -380,6 +393,11 @@ export default class FeatureGraphicCommand extends Command {
         });
       }
     } catch (error) {
+      // Errors raised via this.error() above are already user-facing CLI
+      // errors; re-throw them as-is instead of double-wrapping the message.
+      if (error instanceof Errors.CLIError) {
+        throw error;
+      }
       this.error(
         chalk.red(
           `Failed to generate feature graphic: ${(error as Error).message}`
