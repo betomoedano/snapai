@@ -466,4 +466,14 @@ export class StyleTemplates {
     const def = STYLE_DEFINITIONS[style] || STYLE_DEFINITIONS.minimalism;
     return buildStyleDirective(def);
   }
+
+  static resolveStylePreset(style?: string): { preset?: IconStyle; text?: string } {
+    if (!style) return {};
+    const normalized = style.trim().toLowerCase();
+    const available = this.getAvailableStyles() as readonly string[];
+    if (available.includes(normalized)) {
+      return { preset: normalized as IconStyle };
+    }
+    return { text: style.trim() };
+  }
 }

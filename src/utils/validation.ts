@@ -1,3 +1,15 @@
+const DANGEROUS_STYLE_KEYWORDS = [
+  "photo", "photograph", "photoreal", "photorealistic", "portrait",
+  "headshot", "selfie", "concert", "wedding", "dslr", "35mm",
+  "cinematic still", "real person", "celebrity",
+];
+
+export function isStyleDangerous(style?: string): boolean {
+  if (!style) return false;
+  const s = style.toLowerCase();
+  return DANGEROUS_STYLE_KEYWORDS.some((k) => s.includes(k));
+}
+
 export class ValidationService {
   static validatePrompt(prompt: string): string | null {
     if (!prompt || prompt.trim().length === 0) {

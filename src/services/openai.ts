@@ -66,7 +66,7 @@ export class OpenAIService {
       model: resolvedModelId,
       prompt,
       n: numImages,
-      size: this.FIXED_SIZE as any,
+      size: (options.size ?? this.FIXED_SIZE) as any,
     };
 
     // OpenAI image parameters

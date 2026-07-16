@@ -27,6 +27,7 @@ export default {
     'mime': 'mime',
     'fs-extra': 'fs-extra',
     'chalk': 'chalk',
+    'sharp': 'sharp',
     'fs': 'fs',
     'path': 'path',
     'os': 'os'

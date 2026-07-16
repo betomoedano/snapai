@@ -1,37 +1,14 @@
 import { Command, Errors, Flags } from "@oclif/core";
-import fs from "fs-extra";
-import path from "path";
 import chalk from "chalk";
 import { OpenAIService } from "../services/openai.js";
 import { GeminiService } from "../services/gemini.js";
-import { ValidationService } from "../utils/validation.js";
+import { ValidationService, isStyleDangerous } from "../utils/validation.js";
 import { buildFinalIconPrompt } from "../utils/icon-prompt.js";
 import { StyleTemplates } from "../utils/styleTemplates.js";
 import { CTA } from "../utils/branding.js";
+import { saveBase64Images, saveBinaryImages } from "../utils/save-images.js";
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
-
-function isStyleDangerous(style?: string): boolean {
-  if (!style) return false;
-  const s = style.toLowerCase();
-  const banned = [
-    "photo",
-    "photograph",
-    "photoreal",
-    "photorealistic",
-    "portrait",
-    "headshot",
-    "selfie",
-    "concert",
-    "wedding",
-    "dslr",
-    "35mm",
-    "cinematic still",
-    "real person",
-    "celebrity",
-  ];
-  return banned.some((k) => s.includes(k));
-}
 
 export default class IconCommand extends Command {
   static description =
@@ -487,7 +464,8 @@ export default class IconCommand extends Command {
           thinkingLevel,
         });
 
-        const outputPaths = await this.saveBinaryImages(images, flags.output);
+        this.log(chalk.gray(`💾 Saving ${images.length} image(s)...`));
+        const outputPaths = await saveBinaryImages(images, flags.output);
         this.log(chalk.green("✅ Icon(s) generated successfully!"));
         if (outputPaths.length === 1) {
           this.log(chalk.gray(`Saved to: ${outputPaths[0]}`));
@@ -516,7 +494,8 @@ export default class IconCommand extends Command {
         apiKey: openaiApiKey,
       });
 
-      const outputPaths = await this.saveBase64Images(
+      this.log(chalk.gray(`💾 Saving ${imageBase64Array.length} image(s)...`));
+      const outputPaths = await saveBase64Images(
         imageBase64Array,
         flags.output,
         outputFormat
@@ -555,67 +534,4 @@ export default class IconCommand extends Command {
     }
   }
 
-  private async saveBase64Images(
-    base64DataArray: string[],
-    outputDir: string,
-    outputFormat: string
-  ): Promise<string[]> {
-    await fs.ensureDir(outputDir);
-
-    const outputPaths: string[] = [];
-    const timestamp = Date.now();
-
-    try {
-      this.log(chalk.gray(`💾 Saving ${base64DataArray.length} image(s)...`));
-
-      for (let i = 0; i < base64DataArray.length; i++) {
-        const base64Data = base64DataArray[i];
-        const extension = outputFormat || "png";
-        const filename =
-          base64DataArray.length === 1
-            ? `icon-${timestamp}.${extension}`
-            : `icon-${timestamp}-${i + 1}.${extension}`;
-        const outputPath = path.join(outputDir, filename);
-
-        // Convert base64 to buffer
-        const buffer = Buffer.from(base64Data, "base64");
-        await fs.writeFile(outputPath, buffer);
-
-        outputPaths.push(outputPath);
-      }
-
-      return outputPaths;
-    } catch (error: any) {
-      throw new Error(`Failed to save image(s): ${error.message}`);
-    }
-  }
-
-  private async saveBinaryImages(
-    images: Array<{ base64: string; extension: string }>,
-    outputDir: string
-  ): Promise<string[]> {
-    await fs.ensureDir(outputDir);
-    const outputPaths: string[] = [];
-    const timestamp = Date.now();
-
-    try {
-      this.log(chalk.gray(`💾 Saving ${images.length} image(s)...`));
-
-      for (let i = 0; i < images.length; i++) {
-        const { base64, extension } = images[i];
-        const filename =
-          images.length === 1
-            ? `icon-${timestamp}.${extension}`
-            : `icon-${timestamp}-${i + 1}.${extension}`;
-        const outputPath = path.join(outputDir, filename);
-        const buffer = Buffer.from(base64, "base64");
-        await fs.writeFile(outputPath, buffer);
-        outputPaths.push(outputPath);
-      }
-
-      return outputPaths;
-    } catch (error: any) {
-      throw new Error(`Failed to save image(s): ${error.message}`);
-    }
-  }
 }

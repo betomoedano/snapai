@@ -1,4 +1,4 @@
-import { StyleTemplates, type IconStyle } from "./styleTemplates.js";
+import { StyleTemplates } from "./styleTemplates.js";
 
 // Shared "always-on" rules to prevent common generation failure modes.
 const ICON_BASE_CONTEXT_LINES = [
@@ -23,17 +23,6 @@ const ICON_BASE_RULES_LINES = [
   `Background extends to all four edges of the square canvas with straight (non-rounded) corners; keep it clean (low-detail, low-noise).`,
 ] as const;
 
-// Resolves `--style` into either a known preset or a free-form style string.
-function resolveStylePreset(style?: string): { preset?: IconStyle; text?: string } {
-  if (!style) return {};
-  const normalized = style.trim().toLowerCase();
-  const available = StyleTemplates.getAvailableStyles() as readonly string[];
-  if (available.includes(normalized)) {
-    return { preset: normalized as IconStyle };
-  }
-  return { text: style.trim() };
-}
-
 export function buildFinalIconPrompt(params: {
   prompt: string;
   rawPrompt?: boolean;
@@ -47,7 +36,7 @@ export function buildFinalIconPrompt(params: {
     useIconWords = false,
   } = params;
 
-  const styleResolved = resolveStylePreset(style);
+  const styleResolved = StyleTemplates.resolveStylePreset(style);
   const presetDirective = styleResolved.preset
     ? StyleTemplates.getStyleDirective(styleResolved.preset)
     : null;
