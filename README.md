@@ -95,6 +95,19 @@ snapai config --google-api-key "your-google-ai-studio-key"
 snapai config --show
 ```
 
+### Custom OpenAI-compatible endpoint (optional)
+
+Point SnapAI at an OpenAI-compatible service (Azure OpenAI, OpenRouter, a local server, etc.) instead of `api.openai.com`:
+
+```bash
+snapai config --openai-base-url "https://my-proxy.example.com/v1"
+
+# Or via environment variable (takes precedence over the local config):
+export OPENAI_BASE_URL="https://my-proxy.example.com/v1"
+```
+
+To go back to the default endpoint, remove `openai_base_url` from `~/.snapai/config.json`.
+
 ### CI/CD secrets (recommended)
 
 Use environment variables so nothing is written to disk:

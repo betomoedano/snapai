@@ -9,6 +9,7 @@ export default class ConfigCommand extends Command {
 
   static examples = [
     '<%= config.bin %> <%= command.id %> --openai-api-key sk-your-openai-key',
+    '<%= config.bin %> <%= command.id %> --openai-base-url https://my-proxy.example.com/v1',
     '<%= config.bin %> <%= command.id %> --show',
   ];
 
@@ -16,6 +17,9 @@ export default class ConfigCommand extends Command {
     'openai-api-key': Flags.string({
       char: 'k',
       description: 'Set OpenAI API key',
+    }),
+    'openai-base-url': Flags.string({
+      description: 'Set a custom OpenAI-compatible API base URL (e.g. Azure OpenAI, OpenRouter, local server)',
     }),
     'google-api-key': Flags.string({
       char: 'g',
@@ -31,6 +35,10 @@ export default class ConfigCommand extends Command {
 
     if (flags['openai-api-key']) {
       await this.setApiKey(flags['openai-api-key']);
+    }
+
+    if (flags['openai-base-url']) {
+      await this.setBaseUrl(flags['openai-base-url']);
     }
 
     if (flags['google-api-key']) {
@@ -59,6 +67,18 @@ export default class ConfigCommand extends Command {
     this.log(CTA);
   }
 
+  private async setBaseUrl(baseUrl: string): Promise<void> {
+    const error = ValidationService.validateBaseUrl(baseUrl);
+    if (error) {
+      this.error(chalk.red(error));
+    }
+
+    await ConfigService.set('openai_base_url', baseUrl);
+    this.log(chalk.green('✅ OpenAI base URL configured successfully!'));
+    this.log('');
+    this.log(CTA);
+  }
+
   private async setGoogleApiKey(apiKey: string): Promise<void> {
     const error = ValidationService.validateGoogleApiKey(apiKey);
     if (error) {
@@ -83,6 +103,10 @@ export default class ConfigCommand extends Command {
     } else {
       this.log(`🔑 OpenAI API Key: ${chalk.red('Not configured')}`);
       this.log(chalk.gray('   Set with: snapai config --openai-api-key YOUR_KEY'));
+    }
+
+    if (config.openai_base_url) {
+      this.log(`🌐 OpenAI Base URL: ${chalk.blue(config.openai_base_url)}`);
     }
 
     if (config.google_api_key) {
