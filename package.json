@@ -15,7 +15,6 @@
     "dev": "tsc --watch",
     "dev:cmd": "./dev-cli.js",
     "test": "jest",
-    "test:icon-batch": "bash scripts/test-icon-batch.sh",
     "lint": "eslint src/**/*.ts",
     "clean": "rm -rf dist bundle"
   },

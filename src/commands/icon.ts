@@ -1,4 +1,4 @@
-import { Command, Flags } from "@oclif/core";
+import { Command, Errors, Flags } from "@oclif/core";
 import fs from "fs-extra";
 import path from "path";
 import chalk from "chalk";
@@ -134,13 +134,14 @@ export default class IconCommand extends Command {
     // === Advanced Options ===
     background: Flags.string({
       char: "b",
-      description: "Background: transparent, opaque, auto (GPT-Image-1 only)",
+      description:
+        "Background: transparent, opaque, auto (OpenAI only; transparent not supported by gpt-image-2)",
       default: "auto",
       options: ["transparent", "opaque", "auto"],
     }),
     "output-format": Flags.string({
       char: "f",
-      description: "Output format: png, jpeg, webp (GPT-Image-1 only)",
+      description: "Output format: png, jpeg, webp (OpenAI only)",
       default: "png",
       options: ["png", "jpeg", "webp"],
     }),
@@ -156,7 +157,7 @@ export default class IconCommand extends Command {
       hidden: true,
     }),
     moderation: Flags.string({
-      description: "Content filtering: low, auto (GPT-Image-1 only)",
+      description: "Content filtering: low, auto (OpenAI only)",
       default: "auto",
       options: ["low", "auto"],
     }),
@@ -330,6 +331,9 @@ export default class IconCommand extends Command {
             if (requestedN !== 1) {
               this.error(chalk.red("banana-2 only supports -n 1"));
             }
+            // Generation mode resolves banana quality for banana-2 too; run the
+            // same validation here so the preview matches real behavior.
+            this.resolveBananaQuality(qualityInput);
           } else if (!flags.pro) {
             if (requestedN !== 1) {
               this.error(chalk.red("Banana normal only supports -n 1"));
@@ -528,6 +532,11 @@ export default class IconCommand extends Command {
         });
       }
     } catch (error) {
+      // Errors raised via this.error() above are already user-facing CLI
+      // errors; re-throw them as-is instead of double-wrapping the message.
+      if (error instanceof Errors.CLIError) {
+        throw error;
+      }
       this.error(
         chalk.red(`Failed to generate icon: ${(error as Error).message}`)
       );

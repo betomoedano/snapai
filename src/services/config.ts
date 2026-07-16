@@ -8,7 +8,10 @@ export class ConfigService {
 
   static async getConfig(): Promise<ConfigData> {
     try {
-      await fs.ensureFile(this.configPath);
+      // Read-only: don't create the config file as a side effect.
+      if (!(await fs.pathExists(this.configPath))) {
+        return {};
+      }
       const config = await fs.readJSON(this.configPath);
       return config;
     } catch {
