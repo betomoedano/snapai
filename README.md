@@ -39,7 +39,7 @@ SnapAI requires Node.js 18 or newer and an API key from OpenAI or Google AI Stud
 Install the [Code with Beto App Icon skill](https://github.com/Code-with-Beto/skills/tree/main/plugins/cwb-app-icon) with one command:
 
 ```bash
-npx skills add code-with-beto/skills/plugins/cwb-app-icon
+npx skills add https://github.com/code-with-beto/skills --skill app-icon
 ```
 
 Run the command yourself, or paste it into Codex, Claude Code, or another skills-compatible agent. Then describe what you want in natural language:

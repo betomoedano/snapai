@@ -25,7 +25,7 @@ The easiest way to use SnapAI in an Expo project is through the [Code with Beto 
 ### Any skills-compatible agent
 
 ```bash
-npx skills add code-with-beto/skills/plugins/cwb-app-icon
+npx skills add https://github.com/code-with-beto/skills --skill app-icon
 ```
 
 You can run that command directly or give it to your agent. After installation, ask for the result in natural language:
