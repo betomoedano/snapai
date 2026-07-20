@@ -2,18 +2,22 @@
 
 ![SnapAI](./test-icons/OG-SnapAI.webp)
 
-Generate high-quality **square app icon artwork** from the terminal — built for **React Native** and **Expo**.
+Generate high-quality **app icon artwork** and **Google Play feature graphics** from the terminal — built for **React Native** and **Expo**.
 
 SnapAI is a developer-friendly CLI that talks directly to:
 
 - **OpenAI Images** (`gpt-1.5` → `gpt-image-1.5`, `gpt-1` → `gpt-image-1`, `gpt-image-2` → `gpt-image-2`)
 - **Google Nano Banana** _(Gemini image models)_ — selected via `--model banana` or `--model banana-2`
 
-The workflow is intentionally **square-only**: **always `1024x1024` (1:1)** to match iOS/Android icon needs and avoid resizing headaches.
+Two commands, two fixed sizes:
+
+- `snapai icon` — **square-only**, **always `1024x1024` (1:1)**, to match iOS/Android icon needs and avoid resizing headaches.
+- `snapai feature-graphic` (alias `fg`) — **always `1024x500`**, sized for the Google Play Store feature graphic slot.
 
 ## Features ✨
 
 - **Fast**: generate icons in seconds. No UI. No accounts.
+- **Google Play feature graphics**: `snapai feature-graphic` (alias `fg`) generates 1024x500 banners, with optional app-name text and logo compositing.
 - **Latest image models**:
   - OpenAI:
     - `gpt-1.5` _(uses `gpt-image-1.5` under the hood)_
@@ -189,6 +193,30 @@ Nano Banana notes:
 - **Pro mode** supports **multiple images** (`-n`) and **HD tiers** (`--quality 1k|2k|4k`).
 - Output is always **square**.
 
+### Feature graphics (`snapai feature-graphic` / `snapai fg`)
+
+Generates a **1024x500** Google Play Store feature graphic using the same OpenAI/Gemini models as `icon`.
+
+```bash
+# Basic
+npx snapai feature-graphic --prompt "fitness tracker app"
+
+# Render an app name as text on the banner
+npx snapai fg --prompt "fitness tracker" --app-name "FitTrack"
+
+# Style hint + explicit model
+npx snapai fg --prompt "music player" --style neon --model gpt-1.5
+
+# Nano Banana 2, jpeg output (no webp — not accepted by Google Play)
+npx snapai fg --prompt "weather app" --model banana-2 --output-format jpeg
+
+# Composite a logo onto the banner
+npx snapai fg --prompt "tracker" --logo ./assets/icon.png --logo-position left
+
+# Preview the enhanced prompt without generating images
+npx snapai fg --prompt "calculator app" --prompt-only
+```
+
 ## Prompt tips (small changes, big impact) 📝
 
 - **Describe the product first**, then the style:
@@ -220,6 +248,28 @@ Nano Banana notes:
 | `--style`          | `-s`  |            | Rendering style hint appended after enhancement                                   |
 | `--use-icon-words` | `-i`  | `false`    | Include `"icon"` / `"logo"` in enhancement (may increase padding)                 |
 | `--pro`            | `-P`  | `false`    | Enable Nano Banana Pro (banana only)                                              |
+| `--openai-api-key` | `-k`  |            | OpenAI API key override (does not persist)                                        |
+| `--google-api-key` | `-g`  |            | Google API key override (does not persist)                                        |
+
+### `snapai feature-graphic` flags (alias `fg`)
+
+| Flag               | Short | Default    | Description                                                                       |
+| ------------------ | ----- | ---------- | --------------------------------------------------------------------------------- |
+| `--prompt`         | `-p`  | required   | Description of the feature graphic to generate                                   |
+| `--output`         | `-o`  | `./assets` | Output directory                                                                  |
+| `--model`          | `-m`  | `gpt-1.5`  | `gpt-1.5`/`gpt-1` (OpenAI) or `banana` / `banana-2` (Google Nano Banana)          |
+| `--quality`        | `-q`  | `auto`     | Quality level (depends on model)                                                  |
+| `--output-format`  | `-f`  | `png`      | Output format: `png` or `jpeg` (no `webp` — not accepted by Google Play)          |
+| `--n`              | `-n`  | `1`        | Number of images (max 10)                                                         |
+| `--moderation`     |       | `auto`     | Content filtering (`low`, `auto`) (OpenAI only)                                   |
+| `--prompt-only`    |       | `false`    | Preview final prompt without generating images                                    |
+| `--raw-prompt`     | `-r`  | `false`    | Send prompt as-is (no enhancement)                                                |
+| `--style`          | `-s`  |            | Optional style hint                                                               |
+| `--app-name`       |       |            | App name to render as text on the banner                                          |
+| `--logo`           |       |            | Path to a logo file to composite onto the banner                                  |
+| `--logo-position`  |       | `left`     | Logo position (`left`, `center`, `right`)                                         |
+| `--thinking`       |       |            | Thinking level for `banana-2` (`minimal`, `max`)                                  |
+| `--pro`            | `-P`  | `false`    | Use Gemini Pro model (`banana` only)                                              |
 | `--openai-api-key` | `-k`  |            | OpenAI API key override (does not persist)                                        |
 | `--google-api-key` | `-g`  |            | Google API key override (does not persist)                                        |
 
