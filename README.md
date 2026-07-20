@@ -1,7 +1,9 @@
 # SnapAI
 
 <p align="center">
-  <img src="./test-icons/OG-SnapAI.webp" alt="SnapAI" width="680" />
+  <a href="#quick-start">
+    <img src="./test-icons/OG-SnapAI.webp" alt="SnapAI — jump to Quick Start" width="680" />
+  </a>
 </p>
 
 Generate app icon artwork and Google Play feature graphics from the terminal with OpenAI or Google Gemini. SnapAI is built for React Native and Expo developers, but the generated assets work with any mobile stack.
