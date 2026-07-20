@@ -5,17 +5,26 @@ export interface ConfigData {
   default_output_path?: string;
 }
 
+export type OpenAIImageModel =
+  | 'gpt'
+  | 'gpt-1'
+  | 'gpt-1.5'
+  | 'gpt-2'
+  | 'gpt-image-2'
+  | 'gpt-image-2-2026-04-21';
+
 export interface IconGenerationOptions {
   prompt: string;
   output?: string;
   quality?: 'auto' | 'standard' | 'hd' | 'high' | 'medium' | 'low';
   background?: 'transparent' | 'opaque' | 'auto';
   outputFormat?: 'png' | 'jpeg' | 'webp';
+  outputCompression?: number;
   /**
    * CLI model alias.
    * Internally, SnapAI maps this to the provider's underlying model ID.
    */
-  model?: 'gpt-1' | 'gpt-1.5' | 'gpt-image-2' | 'gpt';
+  model?: OpenAIImageModel;
   numImages?: number;
   moderation?: 'low' | 'auto';
   rawPrompt?: boolean;

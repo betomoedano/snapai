@@ -152,6 +152,6 @@ npm pack --dry-run
 
 ## Security Notes
 
-- The `NPM_TOKEN` secret is stored in GitHub repository settings
+- npm publishing uses GitHub Actions trusted publishing with OIDC; no long-lived `NPM_TOKEN` is required
 - Users provide their own OpenAI API keys
 - No sensitive data is collected or stored

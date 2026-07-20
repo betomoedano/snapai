@@ -3,6 +3,7 @@ import fs from "fs-extra";
 import chalk from "chalk";
 import { OpenAIService } from "../services/openai.js";
 import { GeminiService } from "../services/gemini.js";
+import type { OpenAIImageModel } from "../types.js";
 import { ValidationService, isStyleDangerous } from "../utils/validation.js";
 import { buildFeatureGraphicPrompt } from "../utils/fg-prompt.js";
 import { StyleTemplates } from "../utils/styleTemplates.js";
@@ -56,9 +57,18 @@ export default class FeatureGraphicCommand extends Command {
     model: Flags.string({
       char: "m",
       description:
-        'Model: OpenAI ("gpt-1.5" or "gpt-1") or Gemini ("banana" or "banana-2")',
-      default: "gpt-1.5",
-      options: ["gpt-1.5", "gpt-1", "banana", "banana-2", "gpt"],
+        'Model: OpenAI ("gpt-2", "gpt-1.5", or "gpt-1") or Gemini ("banana" or "banana-2")',
+      default: "gpt-2",
+      options: [
+        "gpt-2",
+        "gpt-1.5",
+        "gpt-1",
+        "gpt-image-2",
+        "gpt-image-2-2026-04-21",
+        "banana",
+        "banana-2",
+        "gpt",
+      ],
     }),
     quality: Flags.string({
       char: "q",
@@ -74,6 +84,12 @@ export default class FeatureGraphicCommand extends Command {
       description: "Output format: png or jpeg (no webp per Google Play spec)",
       default: "png",
       options: ["png", "jpeg"],
+    }),
+    "output-compression": Flags.integer({
+      description:
+        "Output compression from 0-100 (OpenAI jpeg only; API default: 100)",
+      min: 0,
+      max: 100,
     }),
     n: Flags.integer({
       char: "n",
@@ -167,7 +183,7 @@ export default class FeatureGraphicCommand extends Command {
       const modelFlag = flags.model as string;
       const normalizedModelFlag =
         String(modelFlag || "").trim().toLowerCase() === "gpt"
-          ? "gpt-1.5"
+          ? "gpt-2"
           : modelFlag;
       const provider: "banana" | "openai" =
         normalizedModelFlag === "banana" || normalizedModelFlag === "banana-2"
@@ -181,7 +197,7 @@ export default class FeatureGraphicCommand extends Command {
             : undefined;
       const openaiModel =
         provider === "openai"
-          ? (normalizedModelFlag as "gpt-1" | "gpt-1.5" | "gpt")
+          ? (normalizedModelFlag as OpenAIImageModel)
           : undefined;
 
       const qualityInput = (
@@ -213,6 +229,10 @@ export default class FeatureGraphicCommand extends Command {
 
       const requestedN = flags.n;
       const outputFormat = flags["output-format"] as "png" | "jpeg";
+      const openaiGenerationSize =
+        openaiModel && OpenAIService.isGptImage2Model(openaiModel)
+          ? "1280x640"
+          : "1536x1024";
 
       const finalPrompt = buildFeatureGraphicPrompt({
         prompt: flags.prompt,
@@ -233,7 +253,18 @@ export default class FeatureGraphicCommand extends Command {
           }
           this.resolveBananaQuality(qualityInput);
         } else {
-          this.resolveOpenAIQuality(qualityInput);
+          const openaiQuality = this.resolveOpenAIQuality(qualityInput);
+          OpenAIService.validateGenerationOptions({
+            prompt: finalPrompt,
+            model: openaiModel,
+            quality: openaiQuality,
+            background: "opaque",
+            outputFormat,
+            outputCompression: flags["output-compression"],
+            numImages: requestedN,
+            moderation: flags.moderation as "low" | "auto",
+            size: openaiGenerationSize,
+          });
         }
 
         const styleInput = flags.style?.trim();
@@ -274,7 +305,19 @@ export default class FeatureGraphicCommand extends Command {
         this.log(chalk.gray("Configuration:"));
         this.log(chalk.gray(`  provider: ${provider}`));
         this.log(chalk.gray(`  model: ${normalizedModelFlag}`));
-        this.log(chalk.gray(`  output size: 1024x500 (feature graphic)`));
+        if (provider === "openai") {
+          this.log(
+            chalk.gray(`  generation size: ${openaiGenerationSize}`)
+          );
+          this.log(
+            chalk.gray(
+              `  output compression: ${
+                flags["output-compression"] ?? "100 (API default)"
+              }`
+            )
+          );
+        }
+        this.log(chalk.gray(`  final size: 1024x500 (feature graphic)`));
         this.log(chalk.gray(`  output format: ${outputFormat}`));
         this.log(chalk.gray(`  n: ${requestedN}`));
         if (flags.logo) {
@@ -346,11 +389,12 @@ export default class FeatureGraphicCommand extends Command {
           quality: openaiQuality,
           background: "opaque",
           outputFormat: outputFormat,
+          outputCompression: flags["output-compression"],
           numImages: requestedN,
           moderation: flags.moderation as "low" | "auto",
           rawPrompt: true,
           apiKey: flags["openai-api-key"],
-          size: "1536x1024",
+          size: openaiGenerationSize,
         });
 
         imageBuffers = base64Array.map((b64) => Buffer.from(b64, "base64"));

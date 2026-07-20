@@ -2,6 +2,7 @@ import { Command, Errors, Flags } from "@oclif/core";
 import chalk from "chalk";
 import { OpenAIService } from "../services/openai.js";
 import { GeminiService } from "../services/gemini.js";
+import type { OpenAIImageModel } from "../types.js";
 import { ValidationService, isStyleDangerous } from "../utils/validation.js";
 import { buildFinalIconPrompt } from "../utils/icon-prompt.js";
 import { StyleTemplates } from "../utils/styleTemplates.js";
@@ -12,7 +13,7 @@ import { stdin as input, stdout as output } from "node:process";
 
 export default class IconCommand extends Command {
   static description =
-    "Generate AI-powered app icons using OpenAI (gpt-1.5/gpt-1/gpt-image-2) or Gemini (banana / banana-2)";
+    "Generate AI-powered app icons using OpenAI (gpt-2/gpt-1.5/gpt-1) or Gemini (banana / banana-2)";
 
   static examples = [
     // Basic usage
@@ -21,6 +22,7 @@ export default class IconCommand extends Command {
     "",
     // OpenAI
     '<%= config.bin %> <%= command.id %> --prompt "best quality" --model gpt-1.5 -n 3 -q high',
+    '<%= config.bin %> <%= command.id %> --prompt "minimal 3D star" --model gpt-2',
     "",
     // Gemini
     '<%= config.bin %> <%= command.id %> --prompt "modern app icon" --model banana',
@@ -84,9 +86,18 @@ export default class IconCommand extends Command {
     model: Flags.string({
       char: "m",
       description:
-        'Model: OpenAI ("gpt-1.5", "gpt-1", or "gpt-image-2") or Gemini ("banana" or "banana-2"). (Legacy alias: "gpt")',
-      default: "gpt-1.5",
-      options: ["gpt-1.5", "gpt-1", "gpt-image-2", "banana", "banana-2", "gpt"],
+        'Model: OpenAI ("gpt-2", "gpt-1.5", or "gpt-1") or Gemini ("banana" or "banana-2"). Official GPT Image 2 IDs are also accepted.',
+      default: "gpt-2",
+      options: [
+        "gpt-2",
+        "gpt-1.5",
+        "gpt-1",
+        "gpt-image-2",
+        "gpt-image-2-2026-04-21",
+        "banana",
+        "banana-2",
+        "gpt",
+      ],
     }),
     quality: Flags.string({
       char: "q",
@@ -121,6 +132,12 @@ export default class IconCommand extends Command {
       description: "Output format: png, jpeg, webp (OpenAI only)",
       default: "png",
       options: ["png", "jpeg", "webp"],
+    }),
+    "output-compression": Flags.integer({
+      description:
+        "Output compression from 0-100 (OpenAI jpeg/webp only; API default: 100)",
+      min: 0,
+      max: 100,
     }),
     /**
      * Deprecated: use -n/--n.
@@ -229,7 +246,7 @@ export default class IconCommand extends Command {
         String(modelFlag || "")
           .trim()
           .toLowerCase() === "gpt"
-          ? "gpt-1.5"
+          ? "gpt-2"
           : modelFlag;
       const provider: "banana" | "openai" =
         normalizedModelFlag === "banana" || normalizedModelFlag === "banana-2"
@@ -243,11 +260,7 @@ export default class IconCommand extends Command {
             : undefined;
       const openaiModel =
         provider === "openai"
-          ? (normalizedModelFlag as
-              | "gpt-1"
-              | "gpt-1.5"
-              | "gpt-image-2"
-              | "gpt")
+          ? (normalizedModelFlag as OpenAIImageModel)
           : undefined;
 
       const qualityInput = this.normalizeFlagString(flags.quality, "auto");
@@ -323,6 +336,24 @@ export default class IconCommand extends Command {
             // In generation mode we prompt for confirmation when n is large; in preview we just warn.
             // (We still allow preview so users can inspect the prompt/config without paying.)
           }
+        } else {
+          const openaiQuality = this.resolveOpenAIQuality(qualityInput);
+          OpenAIService.validateGenerationOptions({
+            prompt: finalPrompt,
+            model: openaiModel,
+            quality: openaiQuality,
+            background: flags.background as
+              | "transparent"
+              | "opaque"
+              | "auto",
+            outputFormat: flags["output-format"] as
+              | "png"
+              | "jpeg"
+              | "webp",
+            outputCompression: flags["output-compression"],
+            numImages: requestedN,
+            moderation: flags.moderation as "low" | "auto",
+          });
         }
 
         this.log(chalk.blue("🔎 Prompt preview (no generation)"));
@@ -395,6 +426,13 @@ export default class IconCommand extends Command {
           );
           this.log(chalk.gray(`  background: ${flags.background}`));
           this.log(chalk.gray(`  outputFormat: ${flags["output-format"]}`));
+          this.log(
+            chalk.gray(
+              `  outputCompression: ${
+                flags["output-compression"] ?? "100 (API default)"
+              }`
+            )
+          );
           this.log(chalk.gray(`  moderation: ${flags.moderation}`));
           if (requestedN >= 5) {
             this.log(
@@ -478,7 +516,7 @@ export default class IconCommand extends Command {
         return;
       }
 
-      // OpenAI (gpt-1.5 / gpt-1)
+      // OpenAI (gpt-2 / gpt-1.5 / gpt-1)
       const openaiQuality = this.resolveOpenAIQuality(qualityInput);
       const outputFormat = flags["output-format"] as "png" | "jpeg" | "webp";
       const imageBase64Array = await OpenAIService.generateIcon({
@@ -488,6 +526,7 @@ export default class IconCommand extends Command {
         quality: openaiQuality,
         background: flags.background as "transparent" | "opaque" | "auto",
         outputFormat,
+        outputCompression: flags["output-compression"],
         numImages: requestedN,
         moderation: flags.moderation as "low" | "auto",
         rawPrompt: true,

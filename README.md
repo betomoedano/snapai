@@ -2,328 +2,171 @@
 
 ![SnapAI](./test-icons/OG-SnapAI.webp)
 
-Generate high-quality **app icon artwork** and **Google Play feature graphics** from the terminal — built for **React Native** and **Expo**.
+Generate app icon artwork and Google Play feature graphics from the terminal with OpenAI or Google Gemini. SnapAI is built for React Native and Expo developers, but the generated assets work with any mobile stack.
 
-SnapAI is a developer-friendly CLI that talks directly to:
+[Quick start](#quick-start) · [Feature guide](#feature-guide) · [Examples](docs/EXAMPLES.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Changelog](CHANGELOG.md) · [Learn React Native](https://cwb.sh/rn?r=snapai-readme)
 
-- **OpenAI Images** (`gpt-1.5` → `gpt-image-1.5`, `gpt-1` → `gpt-image-1`, `gpt-image-2` → `gpt-image-2`)
-- **Google Nano Banana** _(Gemini image models)_ — selected via `--model banana` or `--model banana-2`
+## What SnapAI generates
 
-Two commands, two fixed sizes:
+| Asset | Output | Command |
+| --- | --- | --- |
+| App icon artwork | `1024x1024` | `snapai icon` |
+| Google Play feature graphic | `1024x500` | `snapai feature-graphic` or `snapai fg` |
 
-- `snapai icon` — **square-only**, **always `1024x1024` (1:1)**, to match iOS/Android icon needs and avoid resizing headaches.
-- `snapai feature-graphic` (alias `fg`) — **always `1024x500`**, sized for the Google Play Store feature graphic slot.
+- OpenAI and Gemini image models behind one consistent CLI
+- Prompt enhancement tuned for mobile app artwork
+- Built-in styles, custom style hints, and raw prompt control
+- Prompt previews before spending API credits
+- Multiple variations with supported models
+- No SnapAI account, backend, telemetry, or tracking
 
-## Features ✨
+## Quick start
 
-- **Fast**: generate icons in seconds. No UI. No accounts.
-- **Google Play feature graphics**: `snapai feature-graphic` (alias `fg`) generates 1024x500 banners, with optional app-name text and logo compositing.
-- **Latest image models**:
-  - OpenAI:
-    - `gpt-1.5` _(uses `gpt-image-1.5` under the hood)_
-    - `gpt-1` _(uses `gpt-image-1` under the hood)_
-    - `gpt-image-2` _(OpenAI GPT Image 2; same Image API path as above)_
-  - Google Nano Banana (Gemini):
-    - normal: `gemini-2.5-flash-image`
-    - pro: `gemini-3-pro-image-preview`
-- **iOS + Android oriented**: prompt enhancement tuned for app-icon style outputs.
-- **Quality controls**:
-  - OpenAI: `--quality auto|high|medium|low` (aliases: `hd` → `high`, `standard` → `medium`)
-  - Nano Banana Pro: `--quality 1k|2k|4k`
-- **DX-friendly**: just a CLI (great for CI/CD too).
-- **Privacy-first**: no telemetry, no tracking. Uses your API keys and sends requests directly to the provider you choose.
-
-## Video tutorial 🎥
-
-[Watch on YouTube](https://youtu.be/R4hvt8iz_rE)
-
-[Read: Introducing Code With Beto Skills](https://codewithbeto.dev/blog/introducing-code-with-beto-skills)
-
-## Install 📦
+SnapAI requires Node.js 18 or newer and an API key from OpenAI or Google AI Studio.
 
 ```bash
-# Recommended (no install)
+# See every command without installing
 npx snapai --help
 
-# Or install globally
-npm install -g snapai
-```
+# Save an OpenAI key locally
+npx snapai config --openai-api-key "sk-your-openai-api-key"
 
-> **Important** 🔑  
-> You need **at least one** API key:
->
-> - **OpenAI** (for `gpt-1.5` → `gpt-image-1.5`, `gpt-1` → `gpt-image-1`, `gpt-image-2` → `gpt-image-2`)
-> - **Google AI Studio** (for Google Nano Banana / Gemini via `--model banana`)
->
-> SnapAI is **CLI-only** and sends requests **directly** to the provider you select.
-
-## Quickstart (first icon) ⚡
-
-```bash
+# Generate your first icon
 npx snapai icon --prompt "minimalist weather app with sun and cloud"
 ```
 
-Output defaults to `./assets` (timestamped filenames).
+Images are saved to `./assets` by default.
 
-> **Note** 📝  
-> Models can still draw the subject with **visual padding** (an empty border). This is normal.  
-> SnapAI avoids forcing the words `"icon"` / `"logo"` by default to reduce padding.  
-> If you want more “icon-y” framing, opt in with `--use-icon-words`.
-
-## Providers & models (what “banana” means) 🧠
-
-SnapAI exposes providers via `--model`:
-
-| Provider                    | SnapAI flag              | Underlying model                   | Notes                                                     |
-| --------------------------- | ------------------------ | ---------------------------------- | --------------------------------------------------------- |
-| OpenAI (latest)             | `--model gpt-1.5`        | `gpt-image-1.5`                    | Always 1:1 square `1024x1024`, background/output controls |
-| OpenAI (previous)           | `--model gpt-1`          | `gpt-image-1`                      | Same controls as above                                    |
-| OpenAI (GPT Image 2)        | `--model gpt-image-2`    | `gpt-image-2`                      | Same size/quality/format/moderation flags; **`--background transparent` is not supported** (use `opaque` or `auto`) |
-| Google Nano Banana (normal) | `--model banana`         | `gemini-2.5-flash-image`           | Always 1 image, square output                             |
-| Google Nano Banana 2        | `--model banana-2`       | `gemini-3.1-flash-image-preview`   | 1 image, thinking config, 1K output                      |
-| Google Nano Banana (pro)    | `--model banana --pro`   | `gemini-3-pro-image-preview`       | Quality tiers via `--quality 1k/2k/4k`, multiple via `-n` |
-
-> **Tip** 💡  
-> If you want **multiple variations** quickly, use **OpenAI** (`-n`) or **Banana Pro** (`--pro -n ...`).
-
-## Setup 🔐
-
-You can store keys locally (developer machine), or provide them at runtime (CI/CD).
-
-### Local config (writes to `~/.snapai/config.json`)
+Prefer Gemini? Configure a Google key and select a Banana model:
 
 ```bash
-snapai config --openai-api-key "sk-your-openai-api-key"
-snapai config --google-api-key "your-google-ai-studio-key"
-
-snapai config --show
+npx snapai config --google-api-key "your-google-ai-studio-key"
+npx snapai icon \
+  --prompt "music player with an abstract sound wave" \
+  --model banana
 ```
 
-### Custom OpenAI-compatible endpoint (optional)
-
-Point SnapAI at an OpenAI-compatible service (Azure OpenAI, OpenRouter, a local server, etc.) instead of `api.openai.com`:
+You can also install SnapAI globally:
 
 ```bash
-snapai config --openai-base-url "https://my-proxy.example.com/v1"
-
-# Or via environment variable (takes precedence over the local config):
-export OPENAI_BASE_URL="https://my-proxy.example.com/v1"
+npm install -g snapai
 ```
 
-To go back to the default endpoint, remove `openai_base_url` from `~/.snapai/config.json`.
+## Feature guide
 
-### CI/CD secrets (recommended)
+Jump directly to the feature you need:
 
-Use environment variables so nothing is written to disk:
+| Feature | Guide |
+| --- | --- |
+| Generate app icons | [App icon generation](docs/ICON_GENERATION.md) |
+| Generate Google Play banners | [Feature graphics](docs/FEATURE_GRAPHICS.md) |
+| Choose an OpenAI or Gemini model | [Models](docs/ICON_GENERATION.md#models) |
+| Generate multiple variations | [Variations](docs/ICON_GENERATION.md#generate-variations) |
+| Control quality, background, and format | [Output controls](docs/ICON_GENERATION.md#quality-background-and-format) |
+| Preview or bypass prompt enhancement | [Prompt controls](docs/ICON_GENERATION.md#prompt-enhancement) |
+| Use built-in or custom styles | [Styles](docs/ICON_GENERATION.md#styles) |
+| Add a name or logo to a Play banner | [Banner branding](docs/FEATURE_GRAPHICS.md#add-an-app-name) |
+| Configure keys and custom endpoints | [Configuration](docs/CONFIGURATION.md) |
+| Run SnapAI in CI | [GitHub Actions](docs/CONFIGURATION.md#github-actions) |
+| Look up every option | [CLI reference](docs/CLI_REFERENCE.md) |
+| Browse real outputs | [Generated examples](docs/EXAMPLES.md) |
+
+## Common recipes
+
+### App icons
 
 ```bash
-export SNAPAI_API_KEY="sk-..."
-export SNAPAI_GOOGLE_API_KEY="..."
+# Default OpenAI model
+npx snapai icon --prompt "fitness tracker with a heart-rate symbol"
 
-# Also supported:
-# export OPENAI_API_KEY="sk-..."
-# export GEMINI_API_KEY="..."
+# Three high-quality variations
+npx snapai icon \
+  --prompt "premium banking app with a secure lock" \
+  --model gpt-2 \
+  --quality high \
+  -n 3
+
+# Gemini with a style
+npx snapai icon \
+  --prompt "music player with an abstract sound wave" \
+  --model banana \
+  --style glassy
+
+# Preview the enhanced prompt without generating
+npx snapai icon \
+  --prompt "calculator app" \
+  --style minimalism \
+  --prompt-only
 ```
 
-**GitHub Actions example:**
-
-```yaml
-- name: Generate app icon
-  run: npx snapai icon --prompt "minimalist weather app with sun and cloud" --output ./assets/icons
-  env:
-    SNAPAI_API_KEY: ${{ secrets.SNAPAI_API_KEY }}
-```
-
-You can also pass keys per command (does not persist):
+### Google Play feature graphics
 
 ```bash
-npx snapai icon --openai-api-key "sk-..." --prompt "modern app artwork"
-npx snapai icon --model banana --google-api-key "..." --prompt "modern app artwork"
+# Basic 1024x500 banner
+npx snapai fg --prompt "fitness tracker with energetic green gradients"
+
+# Add an app name
+npx snapai fg \
+  --prompt "fitness tracker with energetic green gradients" \
+  --app-name "FitTrack"
+
+# Composite an existing logo
+npx snapai fg \
+  --prompt "clean productivity banner with space on the left" \
+  --logo ./assets/icon.png \
+  --logo-position left
 ```
 
-## Usage 🚀
+## Models at a glance
 
-### Common (recommended)
+| SnapAI option | Provider model | Commands | Notes |
+| --- | --- | --- | --- |
+| `gpt-2` | OpenAI `gpt-image-2` | Icon, feature graphic | Default; no transparent background |
+| `gpt-1.5` | OpenAI `gpt-image-1.5` | Icon, feature graphic | Previous OpenAI generation |
+| `gpt-1` | OpenAI `gpt-image-1` | Icon, feature graphic | Previous OpenAI generation |
+| `banana` | Gemini `gemini-2.5-flash-image` | Icon, feature graphic | One image |
+| `banana-2` | Gemini `gemini-3.1-flash-image-preview` | Icon, feature graphic | One image, optional thinking level |
+| `banana --pro` | Gemini `gemini-3-pro-image-preview` | Icon, feature graphic | Multiple images and 1K/2K/4K quality |
 
-```bash
-# Default (OpenAI)
-npx snapai icon --prompt "modern fitness tracker with heart rate monitor"
+The official `gpt-image-2` model ID and its `gpt-image-2-2026-04-21` snapshot are also accepted.
 
-# Output directory
-npx snapai icon --prompt "professional banking app with secure lock" --output ./assets/icons
+For provider-specific behavior and examples, see the [icon guide](docs/ICON_GENERATION.md#models) and [feature graphic guide](docs/FEATURE_GRAPHICS.md#choose-a-model).
 
-# Style hint (appended after enhancement)
-npx snapai icon --prompt "calculator app" --style minimalism
+## Build the app behind the icon
 
-# Preview the final generated prompt (no image generation)
-npx snapai icon --prompt "calculator app" --raw-prompt --prompt-only
-npx snapai icon --prompt "calculator app" --prompt-only
-npx snapai icon --prompt "calculator app" --style minimalism --prompt-only
-```
+SnapAI is built by [Code with Beto](https://codewithbeto.dev), where I teach developers how to build and ship production-ready React Native apps.
 
-### OpenAI (`gpt-1.5` / `gpt-1` / `gpt-image-2`)
+- [Learn React Native](https://cwb.sh/rn?r=snapai-readme) — the complete course with lifetime access and real-world projects
+- [Get Pro Access](https://cwb.sh/pro?r=snapai-readme) — production codebases, future courses, Figma files, and priority support
+- [Watch on YouTube](https://cwb.sh/youtube?r=snapai-readme) for practical React Native, Expo, and AI tutorials
+- Join the [Discord community](https://cwb.sh/discord?r=snapai-readme) or [newsletter](https://cwb.sh/newsletter?r=snapai-readme)
 
-```bash
-# Multiple variations
-npx snapai icon --prompt "app icon concept" --model gpt-1.5 -n 3
+## See real outputs
 
-# Higher quality
-npx snapai icon --prompt "premium app icon" --quality high
+| OpenAI | Gemini |
+| --- | --- |
+| ![Weather icon generated with GPT Image 1.5](<test-icons/npx snapai icon --prompt "minimalist weather app with sun and cloud" --model gpt-1.5.webp>) | ![Music icon generated with Gemini](<test-icons/npx snapai icon --prompt "music player app, abstract sound wave, clean shapes" --model banana.webp>) |
 
-# GPT Image 2 (same CLI; transparent background is rejected — use opaque or auto)
-npx snapai icon --prompt "minimal 3D star icon, soft glossy plastic" --model gpt-image-2
+[Browse the full gallery and copy the commands →](docs/EXAMPLES.md)
 
-# Transparent background + output format (gpt-1.5 / gpt-1 only — not gpt-image-2)
-npx snapai icon --prompt "logo mark" --model gpt-1.5 --background transparent --output-format png
-```
+## Privacy and security
 
-### Google Gemini (`gemini-2.5-flash-image / gemini-3-pro-image-preview`)
+- Requests go directly from your machine to the provider you select.
+- SnapAI does not run a backend or collect prompts and images.
+- Local configuration is only created when you save a key.
+- Use environment variables or repository secrets in CI, and never commit API keys.
 
-```bash
-# Normal (1 image)
-npx snapai icon --prompt "modern app artwork" --model banana
+Read the full [configuration and security guide](docs/CONFIGURATION.md).
 
-# Pro (multiple images + quality tiers)
-npx snapai icon --prompt "modern app artwork" --model banana --pro --quality 2k -n 3
-```
+## Project links
 
-Nano Banana notes:
+- [Video tutorial](https://youtu.be/R4hvt8iz_rE)
+- [Report a bug or request a feature](https://github.com/betomoedano/snapai/issues)
+- [Contributing guide](CONTRIBUTING.md)
+- [Development setup](DEV_SETUP.md)
+- [Publishing guide](PUBLISHING_GUIDE.md)
+- [Changelog](CHANGELOG.md)
 
-- **Normal mode** always generates **1 image** (no `-n`, no `--quality` tiers).
-- **Pro mode** supports **multiple images** (`-n`) and **HD tiers** (`--quality 1k|2k|4k`).
-- Output is always **square**.
-
-### Feature graphics (`snapai feature-graphic` / `snapai fg`)
-
-Generates a **1024x500** Google Play Store feature graphic using the same OpenAI/Gemini models as `icon`.
-
-```bash
-# Basic
-npx snapai feature-graphic --prompt "fitness tracker app"
-
-# Render an app name as text on the banner
-npx snapai fg --prompt "fitness tracker" --app-name "FitTrack"
-
-# Style hint + explicit model
-npx snapai fg --prompt "music player" --style neon --model gpt-1.5
-
-# Nano Banana 2, jpeg output (no webp — not accepted by Google Play)
-npx snapai fg --prompt "weather app" --model banana-2 --output-format jpeg
-
-# Composite a logo onto the banner
-npx snapai fg --prompt "tracker" --logo ./assets/icon.png --logo-position left
-
-# Preview the enhanced prompt without generating images
-npx snapai fg --prompt "calculator app" --prompt-only
-```
-
-## Prompt tips (small changes, big impact) 📝
-
-- **Describe the product first**, then the style:
-  - “a finance app, shield + checkmark, modern, clean gradients”
-- If you see too much empty border:
-  - remove the words `"icon"` / `"logo"` (default behavior), or keep them off and be explicit about “fill the frame”
-- Use `--style` for rendering/material hints (examples: `minimalism`, `material`, `pixel`, `kawaii`, `cute`, `glassy`, `neon`)
-
-> **Note** 📝  
-> If you pass `--style`, the style system is treated as a **hard constraint** and will take priority over other wording in your prompt.  
-> Try to avoid prompts that _conflict_ with the chosen style (e.g. `--style minimalism` + “neon glow”), or the model may produce inconsistent results.
-
-## Command reference 📚
-
-### `snapai icon` flags
-
-| Flag               | Short | Default    | Description                                                                       |
-| ------------------ | ----- | ---------- | --------------------------------------------------------------------------------- |
-| `--prompt`         | `-p`  | required   | Description of the icon to generate                                               |
-| `--output`         | `-o`  | `./assets` | Output directory                                                                  |
-| `--model`          | `-m`  | `gpt-1.5`  | `gpt-1.5`/`gpt-1`/`gpt-image-2` (OpenAI) or `banana` / `banana-2` (Google Nano Banana) |
-| `--quality`        | `-q`  | `auto`     | GPT: `auto/high/medium/low` (aliases: `hd`, `standard`). Banana Pro: `1k/2k/4k`   |
-| `--background`     | `-b`  | `auto`     | Background (`transparent`, `opaque`, `auto`) (OpenAI only; **`transparent` invalid for `gpt-image-2`**) |
-| `--output-format`  | `-f`  | `png`      | Output format (`png`, `jpeg`, `webp`) (OpenAI only)                               |
-| `--n`              | `-n`  | `1`        | Number of images (max 10). For Banana normal, must be `1`.                        |
-| `--moderation`     |       | `auto`     | Content filtering (`low`, `auto`) (OpenAI only)                                   |
-| `--prompt-only`    |       | `false`    | Preview final prompt + config without generating images                           |
-| `--raw-prompt`     | `-r`  | `false`    | Send prompt as-is (no SnapAI enhancement/constraints). Style still applies if set |
-| `--style`          | `-s`  |            | Rendering style hint appended after enhancement                                   |
-| `--use-icon-words` | `-i`  | `false`    | Include `"icon"` / `"logo"` in enhancement (may increase padding)                 |
-| `--pro`            | `-P`  | `false`    | Enable Nano Banana Pro (banana only)                                              |
-| `--openai-api-key` | `-k`  |            | OpenAI API key override (does not persist)                                        |
-| `--google-api-key` | `-g`  |            | Google API key override (does not persist)                                        |
-
-### `snapai feature-graphic` flags (alias `fg`)
-
-| Flag               | Short | Default    | Description                                                                       |
-| ------------------ | ----- | ---------- | --------------------------------------------------------------------------------- |
-| `--prompt`         | `-p`  | required   | Description of the feature graphic to generate                                   |
-| `--output`         | `-o`  | `./assets` | Output directory                                                                  |
-| `--model`          | `-m`  | `gpt-1.5`  | `gpt-1.5`/`gpt-1` (OpenAI) or `banana` / `banana-2` (Google Nano Banana)          |
-| `--quality`        | `-q`  | `auto`     | Quality level (depends on model)                                                  |
-| `--output-format`  | `-f`  | `png`      | Output format: `png` or `jpeg` (no `webp` — not accepted by Google Play)          |
-| `--n`              | `-n`  | `1`        | Number of images (max 10)                                                         |
-| `--moderation`     |       | `auto`     | Content filtering (`low`, `auto`) (OpenAI only)                                   |
-| `--prompt-only`    |       | `false`    | Preview final prompt without generating images                                    |
-| `--raw-prompt`     | `-r`  | `false`    | Send prompt as-is (no enhancement)                                                |
-| `--style`          | `-s`  |            | Optional style hint                                                               |
-| `--app-name`       |       |            | App name to render as text on the banner                                          |
-| `--logo`           |       |            | Path to a logo file to composite onto the banner                                  |
-| `--logo-position`  |       | `left`     | Logo position (`left`, `center`, `right`)                                         |
-| `--thinking`       |       |            | Thinking level for `banana-2` (`minimal`, `max`)                                  |
-| `--pro`            | `-P`  | `false`    | Use Gemini Pro model (`banana` only)                                              |
-| `--openai-api-key` | `-k`  |            | OpenAI API key override (does not persist)                                        |
-| `--google-api-key` | `-g`  |            | Google API key override (does not persist)                                        |
-
-## Examples (real outputs) 🖼️
-
-| Prompt                                                                  | Result                                                                                                                                                        | Command                                                                                                                 |
-| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `minimalist weather app with sun and cloud`                             | ![Weather Icon](<test-icons/npx snapai icon --prompt "minimalist weather app with sun and cloud" --model gpt-1.5.webp>)                                       | `npx snapai icon --prompt "minimalist weather app with sun and cloud" --model gpt-1.5`                                  |
-| `premium banking app, shield + checkmark, clean gradients`              | ![Banking Icon](<test-icons/npx snapai icon --prompt "premium banking app, shield + checkmark, clean gradients" --model gpt-1.5.webp>)                        | `npx snapai icon --prompt "premium banking app, shield + checkmark, clean gradients" --model gpt-1.5`                   |
-| `calendar app, simple date grid, clean illustration`                    | ![Calendar Icon](<test-icons/npx snapai icon --prompt "calendar app, simple date grid, clean illustration" --model gpt-1.webp>)                               | `npx snapai icon --prompt "calendar app, simple date grid, clean illustration" --model gpt-1`                           |
-| `notes app, pen + paper, minimal, friendly`                             | ![Notes Icon](<test-icons/npx snapai icon --prompt "notes app, pen + paper, minimal, friendly" --model gpt-1.webp>)                                           | `npx snapai icon --prompt "notes app, pen + paper, minimal, friendly" --model gpt-1`                                    |
-| `music player app, abstract sound wave, clean shapes`                   | ![Music Icon](<test-icons/npx snapai icon --prompt "music player app, abstract sound wave, clean shapes" --model banana.webp>)                                | `npx snapai icon --prompt "music player app, abstract sound wave, clean shapes" --model banana`                         |
-| `camera app, lens icon, simple concentric circles`                      | ![Camera Icon](<test-icons/npx snapai icon --prompt "camera app, lens icon, simple concentric circles" --model banana.webp>)                                  | `npx snapai icon --prompt "camera app, lens icon, simple concentric circles" --model banana`                            |
-| `finance app, secure lock, clean illustration, bold silhouette`         | ![Finance Lock Icon](<test-icons/npx snapai icon --prompt "finance app, secure lock, clean illustration, bold silhouette" --model banana --pro.webp>)         | `npx snapai icon --prompt "finance app, secure lock, clean illustration, bold silhouette" --model banana --pro`         |
-| `photo editor app, magic wand + spark, simple shapes, modern gradients` | ![Photo Editor Icon](<test-icons/npx snapai icon --prompt "photo editor app, magic wand + spark, simple shapes, modern gradients" --model banana --pro.webp>) | `npx snapai icon --prompt "photo editor app, magic wand + spark, simple shapes, modern gradients" --model banana --pro` |
-| `Minimal 3D star icon, soft glossy plastic, clean lighting, centered, square, no text` | ![GPT Image 2 star](<test-icons/gpt-image-2/Minimal 3D star icon, soft glossy plastic, clean lighting, centered, square, no text.webp>) | `npx snapai icon --prompt "Minimal 3D star icon, soft glossy plastic, clean lighting, centered, square, no text" --model gpt-image-2` |
-| `Single smooth 3D pebble shape, subtle shine, pastel gradient, lots of empty space, app icon` | ![GPT Image 2 pebble](<test-icons/gpt-image-2/Single smooth 3D pebble shape, subtle shine, pastel gradient, lots of empty space, app icon.webp>) | `npx snapai icon --prompt "Single smooth 3D pebble shape, subtle shine, pastel gradient, lots of empty space, app icon" --model gpt-image-2` |
-| `Tiny 3D crystal gem, faceted, glassy highlights, minimal, centered on plain background` | ![GPT Image 2 gem](<test-icons/gpt-image-2/Tiny 3D crystal gem, faceted, glassy highlights, minimal, centered on plain background.webp>) | `npx snapai icon --prompt "Tiny 3D crystal gem, faceted, glassy highlights, minimal, centered on plain background" --model gpt-image-2` |
-| `One rounded 3D cube, isometric, soft shadows, matte-gloss mix, very simple composition` | ![GPT Image 2 cube](<test-icons/gpt-image-2/One rounded 3D cube, isometric, soft shadows, matte-gloss mix, very simple composition.webp>) | `npx snapai icon --prompt "One rounded 3D cube, isometric, soft shadows, matte-gloss mix, very simple composition" --model gpt-image-2` |
-| `Minimal 3D ring or orbit shape, metallic sheen, floating in space, clean and calm` | ![GPT Image 2 orbit](<test-icons/gpt-image-2/Minimal 3D ring or orbit shape, metallic sheen, floating in space, clean and calm.webp>) | `npx snapai icon --prompt "Minimal 3D ring or orbit shape, metallic sheen, floating in space, clean and calm" --model gpt-image-2` |
-
-## Built by Code with Beto 👋
-
-SnapAI is made by [Beto](https://x.com/betomoedano) — I build open-source tools and teach React Native. If you're learning React Native, I have a [comprehensive course](https://cwb.sh/rn?r=snapai-readme) with real-world projects, lifetime access, and a private Discord community. Hundreds of developers are already in.
-
-[YouTube](https://cwb.sh/youtube) · [Discord](https://cwb.sh/discord) · [Newsletter](https://cwb.sh/newsletter)
-
-## Privacy & security 🔒
-
-- SnapAI does **not** ship telemetry or analytics.
-- SnapAI sends requests **directly** to OpenAI or Google (depending on `--model`).
-- SnapAI does not run a backend and does not collect your prompts/images.
-- API keys are stored locally only if you run `snapai config ...` (or provided at runtime via env vars/flags).
-
-> **Warning** ⚠️  
-> Never commit API keys to git. Use environment variables in CI.
-
-## Development 🛠️
-
-- [Development Setup](DEV_SETUP.md)
-- [Publishing Guide](PUBLISHING_GUIDE.md)
-
-```bash
-git clone https://github.com/betomoedano/snapai.git
-cd snapai && pnpm install && pnpm run build
-./bin/dev.js --help
-```
-
-## Contributing 🤝
-
-- Report bugs: [GitHub Issues](https://github.com/betomoedano/snapai/issues)
-- Suggest features: [GitHub Issues](https://github.com/betomoedano/snapai/issues)
-- Improve docs / code: see `CONTRIBUTING.md`
-
-## License 📄
+## License
 
 MIT

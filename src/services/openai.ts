@@ -1,23 +1,33 @@
 import OpenAI from "openai";
 import { ConfigService } from "./config.js";
-import { IconGenerationOptions } from "../types.js";
-import { ImageGenerateParams } from "openai/resources/images.js";
+import type { IconGenerationOptions, OpenAIImageModel } from "../types.js";
+import type { ImageGenerateParams } from "openai/resources/images.js";
 
 export class OpenAIService {
   /**
    * SnapAI model aliases (CLI-facing) → OpenAI model IDs.
    *
-   * - gpt-1.5: current default
+   * - gpt-2: current default and friendly alias for OpenAI GPT Image 2
+   * - gpt-1.5: previous default
    * - gpt-1: previous generation
-   * - gpt-image-2: OpenAI GPT Image 2
+   * - gpt-image-2: official GPT Image 2 model ID
    */
-  private static readonly OPENAI_IMAGE_MODEL_ID_BY_ALIAS: Record<string, string> =
-    {
-      "gpt-1": "gpt-image-1",
-      "gpt-1.5": "gpt-image-1.5",
-      "gpt-image-2": "gpt-image-2",
-    };
+  private static readonly OPENAI_IMAGE_MODEL_ID_BY_ALIAS: Record<
+    OpenAIImageModel,
+    string
+  > = {
+    gpt: "gpt-image-2",
+    "gpt-1": "gpt-image-1",
+    "gpt-1.5": "gpt-image-1.5",
+    "gpt-2": "gpt-image-2",
+    "gpt-image-2": "gpt-image-2",
+    "gpt-image-2-2026-04-21": "gpt-image-2-2026-04-21",
+  };
   private static readonly FIXED_SIZE = "1024x1024";
+  private static readonly GPT_IMAGE_2_MODEL_IDS = new Set([
+    "gpt-image-2",
+    "gpt-image-2-2026-04-21",
+  ]);
 
   private static async getClient(apiKeyOverride?: string): Promise<OpenAI> {
     const apiKey =
@@ -43,16 +53,17 @@ export class OpenAIService {
   }
 
   static async generateIcon(options: IconGenerationOptions): Promise<string[]> {
-    const client = await this.getClient(options.apiKey);
     const {
       prompt,
-      model = "gpt-1.5",
+      model = "gpt-2",
       quality = "auto",
       background = "auto",
       outputFormat = "png",
+      outputCompression,
       numImages = 1,
       moderation = "auto",
     } = options;
+    const size = options.size ?? this.FIXED_SIZE;
 
     // Validate model-specific parameters
     this.validateModelParameters(
@@ -61,9 +72,12 @@ export class OpenAIService {
       numImages,
       background,
       outputFormat,
-      moderation
+      moderation,
+      size,
+      outputCompression
     );
 
+    const client = await this.getClient(options.apiKey);
     const resolvedModelId = this.resolveOpenAIImageModelId(model);
 
     // Build request parameters based on model
@@ -71,16 +85,21 @@ export class OpenAIService {
       model: resolvedModelId,
       prompt,
       n: numImages,
-      size: (options.size ?? this.FIXED_SIZE) as any,
+      // The installed SDK predates GPT Image 2's arbitrary-size type, while
+      // the API accepts any validated WIDTHxHEIGHT string for this model.
+      size: size as ImageGenerateParams["size"],
     };
 
     // OpenAI image parameters
-    requestParams.quality = this.mapQualityForGptImage1(
+    requestParams.quality = this.mapOpenAIImageQuality(
       quality
     ) as ImageGenerateParams["quality"];
     requestParams.background = background;
     requestParams.output_format = outputFormat;
     requestParams.moderation = moderation;
+    if (outputCompression !== undefined) {
+      requestParams.output_compression = outputCompression;
+    }
 
     const response = await client.images.generate(requestParams);
 
@@ -97,13 +116,38 @@ export class OpenAIService {
     });
   }
 
+  /**
+   * Validate an image request without creating an API client or spending credits.
+   * Used by prompt-only mode so its behavior matches a real generation.
+   */
+  static validateGenerationOptions(options: IconGenerationOptions): void {
+    this.validateModelParameters(
+      options.model ?? "gpt-2",
+      options.quality ?? "auto",
+      options.numImages ?? 1,
+      options.background ?? "auto",
+      options.outputFormat ?? "png",
+      options.moderation ?? "auto",
+      options.size ?? this.FIXED_SIZE,
+      options.outputCompression
+    );
+  }
+
+  static isGptImage2Model(model: OpenAIImageModel): boolean {
+    return this.GPT_IMAGE_2_MODEL_IDS.has(
+      this.resolveOpenAIImageModelId(model)
+    );
+  }
+
   private static validateModelParameters(
-    model: string,
+    model: OpenAIImageModel,
     quality: string,
     numImages: number,
     background: string,
     outputFormat: string,
-    moderation: string
+    moderation: string,
+    size: string,
+    outputCompression?: number
   ): void {
     const resolvedId = this.resolveOpenAIImageModelId(model);
 
@@ -124,7 +168,10 @@ export class OpenAIService {
       throw new Error(`Invalid background "${background}"`);
     }
 
-    if (resolvedId === "gpt-image-2" && background === "transparent") {
+    if (
+      this.GPT_IMAGE_2_MODEL_IDS.has(resolvedId) &&
+      background === "transparent"
+    ) {
       throw new Error(
         'Model "gpt-image-2" does not support transparent backgrounds. Use "opaque" or "auto".'
       );
@@ -132,12 +179,87 @@ export class OpenAIService {
     if (!["png", "jpeg", "webp"].includes(outputFormat)) {
       throw new Error(`Invalid output format "${outputFormat}"`);
     }
+    if (background === "transparent" && outputFormat === "jpeg") {
+      throw new Error(
+        'Transparent backgrounds require output format "png" or "webp".'
+      );
+    }
     if (!["low", "auto"].includes(moderation)) {
       throw new Error(`Invalid moderation "${moderation}"`);
     }
+    if (
+      outputCompression !== undefined &&
+      (!Number.isInteger(outputCompression) ||
+        outputCompression < 0 ||
+        outputCompression > 100)
+    ) {
+      throw new Error("Output compression must be an integer between 0 and 100");
+    }
+    if (
+      outputCompression !== undefined &&
+      outputFormat !== "jpeg" &&
+      outputFormat !== "webp"
+    ) {
+      throw new Error(
+        'Output compression is only supported with "jpeg" or "webp".'
+      );
+    }
+
+    this.validateSize(resolvedId, size);
   }
 
-  private static mapQualityForGptImage1(quality: string): string {
+  private static validateSize(resolvedModelId: string, size: string): void {
+    const normalizedSize = String(size || "").trim().toLowerCase();
+    const standardSizes = [
+      "auto",
+      "1024x1024",
+      "1536x1024",
+      "1024x1536",
+    ];
+
+    if (!this.GPT_IMAGE_2_MODEL_IDS.has(resolvedModelId)) {
+      if (!standardSizes.includes(normalizedSize)) {
+        throw new Error(
+          `Invalid size "${size}" for model "${resolvedModelId}". Valid sizes: ${standardSizes.join(
+            ", "
+          )}`
+        );
+      }
+      return;
+    }
+
+    if (normalizedSize === "auto") return;
+
+    const match = /^(\d+)x(\d+)$/.exec(normalizedSize);
+    if (!match) {
+      throw new Error(
+        `Invalid size "${size}" for GPT Image 2. Use "auto" or WIDTHxHEIGHT.`
+      );
+    }
+
+    const width = Number(match[1]);
+    const height = Number(match[2]);
+    if (width % 16 !== 0 || height % 16 !== 0) {
+      throw new Error(
+        "GPT Image 2 width and height must both be multiples of 16"
+      );
+    }
+    if (Math.max(width, height) > 3840) {
+      throw new Error("GPT Image 2 maximum edge length is 3840 pixels");
+    }
+    if (Math.max(width, height) / Math.min(width, height) > 3) {
+      throw new Error("GPT Image 2 aspect ratio must be between 1:3 and 3:1");
+    }
+
+    const totalPixels = width * height;
+    if (totalPixels < 655_360 || totalPixels > 8_294_400) {
+      throw new Error(
+        "GPT Image 2 size must contain between 655,360 and 8,294,400 pixels"
+      );
+    }
+  }
+
+  private static mapOpenAIImageQuality(quality: string): string {
     // Map our CLI-friendly quality options to OpenAI image API.
     const qualityMap: { [key: string]: string } = {
       auto: "auto",
@@ -150,9 +272,10 @@ export class OpenAIService {
     return qualityMap[quality] || "auto";
   }
 
-  private static resolveOpenAIImageModelId(model: string): string {
+  private static resolveOpenAIImageModelId(model: OpenAIImageModel): string {
     const key = String(model || "").trim().toLowerCase();
-    const resolved = this.OPENAI_IMAGE_MODEL_ID_BY_ALIAS[key];
+    const resolved =
+      this.OPENAI_IMAGE_MODEL_ID_BY_ALIAS[key as OpenAIImageModel];
     if (!resolved) {
       const valid = Object.keys(this.OPENAI_IMAGE_MODEL_ID_BY_ALIAS)
         .sort()
