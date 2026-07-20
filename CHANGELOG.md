@@ -18,6 +18,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - Made GPT Image 2 the default model for icon and feature graphic generation.
 - Made the legacy `gpt` alias follow the new GPT Image 2 default.
+- Added a compact video tutorial preview and an AI-agent-first Quick Start with Codex and Claude installation instructions.
 - Reorganized the README into a shorter project overview with direct links to focused guides for icon generation, feature graphics, configuration, the CLI, and examples.
 
 ### Fixed

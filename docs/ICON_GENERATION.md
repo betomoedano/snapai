@@ -18,6 +18,45 @@ npx snapai icon \
   --output ./assets/icons
 ```
 
+## Use SnapAI with an AI agent
+
+The easiest way to use SnapAI in an Expo project is through the [Code with Beto App Icon skill](https://github.com/Code-with-Beto/skills/tree/main/plugins/cwb-app-icon). The skill generates the artwork with SnapAI, prepares the iOS 26 `.icon` folder and Android adaptive icon assets, and updates your Expo configuration.
+
+### Any skills-compatible agent
+
+```bash
+npx skills add code-with-beto/skills/plugins/cwb-app-icon
+```
+
+You can run that command directly or give it to your agent. After installation, ask for the result in natural language:
+
+```text
+Create an app icon for my Expo app. It is a personal finance app that should
+feel trustworthy and modern. Show me a few concepts, then configure the
+selected icon for iOS and Android.
+```
+
+### Codex
+
+Add the Code with Beto marketplace:
+
+```bash
+codex plugin marketplace add Code-with-Beto/skills
+```
+
+Run `/plugins`, install the App Icon plugin from the **Code with Beto** marketplace, and start a new session.
+
+### Claude Code
+
+Run these commands inside Claude Code:
+
+```text
+/plugin marketplace add Code-with-Beto/skills
+/plugin install cwb-app-icon@cwb-plugins
+```
+
+For the complete platform workflow and advanced Expo icon setup, read the [App Icon plugin documentation](https://github.com/Code-with-Beto/skills/blob/main/plugins/cwb-app-icon/README.md).
+
 ## Models
 
 | SnapAI option | Provider model | Variations | Notes |

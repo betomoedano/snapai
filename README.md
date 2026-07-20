@@ -1,10 +1,20 @@
 # SnapAI
 
-![SnapAI](./test-icons/OG-SnapAI.webp)
+<p align="center">
+  <img src="./test-icons/OG-SnapAI.webp" alt="SnapAI" width="680" />
+</p>
 
 Generate app icon artwork and Google Play feature graphics from the terminal with OpenAI or Google Gemini. SnapAI is built for React Native and Expo developers, but the generated assets work with any mobile stack.
 
-[Quick start](#quick-start) · [Feature guide](#feature-guide) · [Examples](docs/EXAMPLES.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Changelog](CHANGELOG.md) · [Learn React Native](https://cwb.sh/rn?r=snapai-readme)
+[Quick start](#quick-start) · [Agent skill](#use-an-ai-agent-easiest) · [Feature guide](#feature-guide) · [Examples](docs/EXAMPLES.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Changelog](CHANGELOG.md) · [Learn React Native](https://cwb.sh/rn?r=snapai-readme)
+
+<p align="center">
+  <a href="https://youtu.be/R4hvt8iz_rE">
+    <img src="https://img.youtube.com/vi/R4hvt8iz_rE/maxresdefault.jpg" alt="Watch the SnapAI video tutorial" width="360" />
+  </a>
+  <br />
+  <sub><a href="https://youtu.be/R4hvt8iz_rE">▶ Watch the SnapAI video tutorial</a></sub>
+</p>
 
 ## What SnapAI generates
 
@@ -23,6 +33,26 @@ Generate app icon artwork and Google Play feature graphics from the terminal wit
 ## Quick start
 
 SnapAI requires Node.js 18 or newer and an API key from OpenAI or Google AI Studio.
+
+### Use an AI agent (easiest)
+
+Install the [Code with Beto App Icon skill](https://github.com/Code-with-Beto/skills/tree/main/plugins/cwb-app-icon) with one command:
+
+```bash
+npx skills add code-with-beto/skills/plugins/cwb-app-icon
+```
+
+Run the command yourself, or paste it into Codex, Claude Code, or another skills-compatible agent. Then describe what you want in natural language:
+
+```text
+Create an app icon for my Expo app. It is a habit tracker that feels calm,
+friendly, and modern. Generate the icon assets and configure app.json for
+iOS and Android.
+```
+
+The skill uses SnapAI to generate the artwork, prepares the Expo icon assets, and updates the iOS and Android configuration. See the [agent setup options and workflow](docs/ICON_GENERATION.md#use-snapai-with-an-ai-agent).
+
+### Use the CLI directly
 
 ```bash
 # See every command without installing
@@ -160,7 +190,7 @@ Read the full [configuration and security guide](docs/CONFIGURATION.md).
 
 ## Project links
 
-- [Video tutorial](https://youtu.be/R4hvt8iz_rE)
+- [Code with Beto App Icon agent skill](https://github.com/Code-with-Beto/skills/tree/main/plugins/cwb-app-icon)
 - [Report a bug or request a feature](https://github.com/betomoedano/snapai/issues)
 - [Contributing guide](CONTRIBUTING.md)
 - [Development setup](DEV_SETUP.md)
