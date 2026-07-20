@@ -13,6 +13,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -21,6 +24,7 @@ jobs:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
           cache: "pnpm"
+      - run: npm install -g npm@latest
       - run: pnpm install --frozen-lockfile
       - run: pnpm run prepare-publish
       - name: Determine dist-tag
@@ -34,5 +38,3 @@ jobs:
             echo "tag=latest" >> "$GITHUB_OUTPUT"
           fi
       - run: npm publish --tag ${{ steps.dist-tag.outputs.tag }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
